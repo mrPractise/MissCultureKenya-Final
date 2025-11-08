@@ -19,6 +19,7 @@ const Navigation = () => {
 
   const navItems = [
     { name: 'Home', href: '/' },
+    { name: 'About', href: '/about' },
     { name: 'Our Kenya', href: '/our-kenya' },
     { name: 'Our Culture', href: '/our-culture' },
     { name: 'Global Stage', href: '/global-stage' },
@@ -28,6 +29,8 @@ const Navigation = () => {
     { name: 'Blog', href: '/blog' },
     { name: 'Voting', href: '/voting' },
     { name: 'Partnership', href: '/partnership' },
+    { name: 'Contribute', href: '/contribute' },
+    { name: 'FAQ', href: '/faq' },
     { name: 'Contact', href: '/contact' },
   ]
 

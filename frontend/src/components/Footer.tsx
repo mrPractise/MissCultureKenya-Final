@@ -11,7 +11,8 @@ const Footer = () => {
       { name: 'Our Kenya', href: '/our-kenya' },
       { name: 'Our Culture', href: '/our-culture' },
       { name: 'Global Stage', href: '/global-stage' },
-      { name: 'The Ambassador', href: '/ambassador' }
+      { name: 'The Ambassador', href: '/ambassador' },
+      { name: 'About Us', href: '/about' }
     ],
     explore: [
       { name: 'Gallery', href: '/gallery' },
@@ -23,6 +24,8 @@ const Footer = () => {
     connect: [
       { name: 'Contact Us', href: '/contact' },
       { name: 'Partnership', href: '/partnership' },
+      { name: 'Contribute', href: '/contribute' },
+      { name: 'FAQ', href: '/faq' },
       { name: 'Media Inquiries', href: '/media' },
       { name: 'Privacy Policy', href: '/privacy' }
     ]
