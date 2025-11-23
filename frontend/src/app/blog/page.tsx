@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Calendar, User, ArrowRight } from 'lucide-react'
+import { Calendar, User, ArrowRight, X, Clock } from 'lucide-react'
 import { useState } from 'react'
 
 interface BlogPost {
@@ -140,24 +140,41 @@ Kenya's global impact isn't measured just in economics or politics - it's measur
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gray-50">
       {/* Page Header */}
-      <section className="relative h-96 flex items-center justify-center overflow-hidden">
+      <section className="relative h-[50vh] min-h-[400px] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <div className="w-full h-full bg-gradient-to-br from-green-900/80 via-green-800/70 to-yellow-600/80">
-            <div className="w-full h-full bg-cover bg-center bg-no-repeat" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=1920&h=600&fit=crop)' }} />
-          </div>
+          <motion.div
+            initial={{ scale: 1.1 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 10, repeat: Infinity, repeatType: "reverse" }}
+            className="w-full h-full"
+          >
+            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/60 z-10" />
+            <div
+              className="w-full h-full bg-cover bg-center"
+              style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=1920&h=600&fit=crop)' }}
+            />
+          </motion.div>
         </div>
-        <div className="relative z-10 text-center text-white px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
+
+        {/* Decorative Elements */}
+        <div className="absolute inset-0 z-[1] pointer-events-none overflow-hidden">
+          <div className="absolute top-[-10%] right-[-5%] w-96 h-96 bg-yellow-500/20 rounded-full blur-3xl animate-pulse-glow" />
+          <div className="absolute bottom-[-10%] left-[-5%] w-96 h-96 bg-green-600/20 rounded-full blur-3xl animate-pulse-glow" style={{ animationDelay: '1s' }} />
+        </div>
+
+        <div className="relative z-10 text-center text-white px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-              Engagement Journal
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight drop-shadow-2xl tracking-tight">
+              Engagement <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400">Journal</span>
             </h1>
-            <p className="text-xl sm:text-2xl text-gray-100 max-w-3xl mx-auto">
+            <div className="w-24 h-1 bg-gradient-to-r from-yellow-500 to-orange-500 mx-auto mb-8 rounded-full" />
+            <p className="text-lg sm:text-xl md:text-2xl text-gray-100 max-w-3xl mx-auto px-4 drop-shadow-lg font-light leading-relaxed">
               Follow Susan's experiences, reflections, and insights as she travels the world representing Kenya.
             </p>
           </motion.div>
@@ -165,24 +182,28 @@ Kenya's global impact isn't measured just in economics or politics - it's measur
       </section>
 
       {/* Blog Content */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-24 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
+        {/* Decorative Background */}
+        <div className="absolute inset-0 decorative-pattern opacity-[0.03]" />
+        <div className="absolute top-20 right-10 w-96 h-96 bg-green-500/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-20 left-10 w-96 h-96 bg-yellow-500/5 rounded-full blur-3xl" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           {/* Categories Filter */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
-            className="flex flex-wrap justify-center gap-4 mb-12"
+            className="flex flex-wrap justify-center gap-3 sm:gap-4 mb-16"
           >
             {categories.map((category) => (
               <button
                 key={category}
-                className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
-                  category === 'All'
-                    ? 'bg-green-600 text-white'
-                    : 'bg-white text-gray-700 hover:bg-green-50 hover:text-green-600'
-                }`}
+                className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 text-sm sm:text-base transform hover:-translate-y-1 ${category === 'All'
+                  ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg'
+                  : 'bg-white text-gray-700 hover:bg-green-50 hover:text-green-600 shadow-md hover:shadow-lg border border-gray-100'
+                  }`}
               >
                 {category}
               </button>
@@ -198,46 +219,47 @@ Kenya's global impact isn't measured just in economics or politics - it's measur
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group cursor-pointer"
+                className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden group cursor-pointer transform hover:-translate-y-2 border border-gray-100 flex flex-col h-full"
                 onClick={() => handlePostClick(post)}
               >
-                <div className="relative overflow-hidden">
+                <div className="relative h-56 overflow-hidden">
                   <img
                     src={post.image}
                     alt={post.title}
-                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                   />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60" />
                   <div className="absolute top-4 left-4">
-                    <span className="bg-green-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                    <span className="bg-white/90 backdrop-blur-md text-green-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide shadow-sm">
                       {post.category}
                     </span>
                   </div>
                 </div>
-                
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2 group-hover:text-green-600 transition-colors duration-200">
+
+                <div className="p-8 flex-grow flex flex-col">
+                  <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2 group-hover:text-green-600 transition-colors duration-300">
                     {post.title}
                   </h3>
-                  <p className="text-gray-600 mb-4 line-clamp-3">
+                  <p className="text-gray-600 mb-6 line-clamp-3 text-sm leading-relaxed flex-grow">
                     {post.excerpt}
                   </p>
-                  
-                  <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+
+                  <div className="flex items-center justify-between text-sm text-gray-500 mb-6 pt-4 border-t border-gray-100">
                     <div className="flex items-center space-x-4">
-                      <div className="flex items-center space-x-1">
-                        <User className="w-4 h-4" />
-                        <span>{post.author}</span>
+                      <div className="flex items-center space-x-2">
+                        <User className="w-4 h-4 text-green-500" />
+                        <span className="font-medium">{post.author}</span>
                       </div>
-                      <div className="flex items-center space-x-1">
-                        <Calendar className="w-4 h-4" />
-                        <span>{new Date(post.date).toLocaleDateString()}</span>
+                      <div className="flex items-center space-x-2">
+                        <Calendar className="w-4 h-4 text-green-500" />
+                        <span className="font-medium">{new Date(post.date).toLocaleDateString()}</span>
                       </div>
                     </div>
-                    <span className="text-green-600 font-medium">{post.readTime}</span>
+                    <span className="text-green-600 font-bold text-xs uppercase tracking-wide">{post.readTime}</span>
                   </div>
-                  
-                  <div className="flex items-center text-green-600 font-semibold group-hover:text-green-700 transition-colors duration-200">
-                    <span>Read More</span>
+
+                  <div className="flex items-center text-green-600 font-bold uppercase tracking-wide text-sm group-hover:text-green-700 transition-colors duration-200 mt-auto">
+                    <span>Read Article</span>
                     <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-200" />
                   </div>
                 </div>
@@ -251,9 +273,9 @@ Kenya's global impact isn't measured just in economics or politics - it's measur
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
             viewport={{ once: true }}
-            className="text-center mt-12"
+            className="text-center mt-16"
           >
-            <button className="bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-full font-semibold text-lg transition-colors duration-300">
+            <button className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-10 py-4 rounded-full font-bold text-sm uppercase tracking-widest transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
               Load More Posts
             </button>
           </motion.div>
@@ -262,75 +284,83 @@ Kenya's global impact isn't measured just in economics or politics - it's measur
 
       {/* Blog Post Detail Modal */}
       {isModalOpen && selectedPost && (
-        <div 
-          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+        <div
+          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 sm:p-6"
           onClick={() => setIsModalOpen(false)}
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.9, y: 50 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 50 }}
-            transition={{ duration: 0.3 }}
-            className="bg-white rounded-3xl shadow-elegant-lg w-full max-w-4xl overflow-hidden flex flex-col"
-            style={{ maxHeight: '90vh' }}
+            transition={{ duration: 0.4, type: "spring", damping: 25, stiffness: 300 }}
+            className="bg-white rounded-[2rem] shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col max-h-[90vh]"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="relative h-64 flex-shrink-0 overflow-hidden">
+            <div className="relative h-72 sm:h-96 flex-shrink-0 overflow-hidden group">
               <img
                 src={selectedPost.image}
                 alt={selectedPost.title}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="absolute top-4 right-4 w-10 h-10 bg-white/20 backdrop-blur-sm hover:bg-white/30 rounded-full flex items-center justify-center transition-colors duration-200 text-white"
+                className="absolute top-6 right-6 w-12 h-12 bg-black/20 backdrop-blur-md hover:bg-black/40 rounded-full flex items-center justify-center transition-all duration-300 text-white border border-white/20 group/close"
               >
-                ✕
+                <X className="w-6 h-6 group-hover/close:rotate-90 transition-transform duration-300" />
               </button>
-              <div className="absolute bottom-6 left-6 right-6">
-                <span className="inline-block bg-green-600 text-white px-4 py-1 rounded-full text-sm font-semibold mb-3">
+              <div className="absolute bottom-0 left-0 right-0 p-8 sm:p-10">
+                <span className="inline-block bg-green-600 text-white px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide mb-4 shadow-lg">
                   {selectedPost.category}
                 </span>
-                <h2 className="text-3xl font-bold text-white mb-2">
+                <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-6 leading-tight drop-shadow-lg">
                   {selectedPost.title}
                 </h2>
-                <div className="flex items-center space-x-4 text-sm text-gray-200">
-                  <div className="flex items-center space-x-1">
-                    <User className="w-4 h-4" />
+                <div className="flex flex-wrap items-center gap-6 text-sm text-gray-200 font-medium">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                      <User className="w-4 h-4 text-white" />
+                    </div>
                     <span>{selectedPost.author}</span>
                   </div>
-                  <div className="flex items-center space-x-1">
-                    <Calendar className="w-4 h-4" />
-                    <span>{new Date(selectedPost.date).toLocaleDateString()}</span>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                      <Calendar className="w-4 h-4 text-white" />
+                    </div>
+                    <span>{new Date(selectedPost.date).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</span>
                   </div>
-                  <span>{selectedPost.readTime}</span>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                      <Clock className="w-4 h-4 text-white" />
+                    </div>
+                    <span>{selectedPost.readTime}</span>
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* Modal Content */}
-            <div className="flex-1 overflow-y-auto p-8" style={{ minHeight: 0 }}>
-              <div className="prose prose-lg max-w-none">
+            <div className="flex-1 overflow-y-auto p-8 sm:p-12 custom-scrollbar bg-white">
+              <div className="prose prose-lg max-w-none prose-headings:font-bold prose-headings:text-gray-900 prose-p:text-gray-600 prose-p:leading-relaxed prose-a:text-green-600 hover:prose-a:text-green-700 prose-img:rounded-2xl">
                 {selectedPost.fullContent.split('\\n\\n').map((paragraph, index) => (
-                  <p key={index} className="text-gray-700 mb-4 leading-relaxed">
+                  <p key={index} className="mb-6 first-letter:text-5xl first-letter:font-bold first-letter:text-green-600 first-letter:mr-3 first-letter:float-left">
                     {paragraph}
                   </p>
                 ))}
               </div>
 
               {/* Share Section */}
-              <div className="mt-8 pt-6 border-t border-gray-200">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Share this article</h3>
-                <div className="flex space-x-4">
-                  <button className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200">
+              <div className="mt-12 pt-8 border-t border-gray-100">
+                <h3 className="text-lg font-bold text-gray-900 mb-6 uppercase tracking-wide text-center">Share this article</h3>
+                <div className="flex justify-center space-x-4">
+                  <button className="px-8 py-3 bg-[#1877F2] hover:bg-[#166fe5] text-white rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1 flex items-center">
                     Facebook
                   </button>
-                  <button className="px-6 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-lg transition-colors duration-200">
+                  <button className="px-8 py-3 bg-[#1DA1F2] hover:bg-[#1a91da] text-white rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1 flex items-center">
                     Twitter
                   </button>
-                  <button className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors duration-200">
+                  <button className="px-8 py-3 bg-[#25D366] hover:bg-[#20bd5a] text-white rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1 flex items-center">
                     WhatsApp
                   </button>
                 </div>

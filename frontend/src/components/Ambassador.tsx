@@ -54,25 +54,27 @@ const Ambassador = () => {
   ]
 
   return (
-    <section className="py-20 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
+    <section className="py-24 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
       {/* Decorative Background */}
-      <div className="absolute inset-0 decorative-pattern opacity-30" />
-      <div className="absolute top-20 right-10 w-64 h-64 bg-green-100 rounded-full blur-3xl opacity-50" />
-      <div className="absolute bottom-20 left-10 w-64 h-64 bg-yellow-100 rounded-full blur-3xl opacity-50" />
-      
+      <div className="absolute inset-0 decorative-pattern opacity-[0.03]" />
+      <div className="absolute top-20 right-10 w-96 h-96 bg-green-500/5 rounded-full blur-3xl" />
+      <div className="absolute bottom-20 left-10 w-96 h-96 bg-yellow-500/5 rounded-full blur-3xl" />
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="text-center mb-20"
         >
+          <span className="text-green-600 font-semibold tracking-wider uppercase text-sm mb-2 block">The Ambassador</span>
           <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-6">
-            The Ambassador — <span className="text-gradient-green">Susan's Journey</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600">Susan's Journey</span>
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Meet the inspiring individual who represents Kenya's cultural heritage 
+          <div className="w-24 h-1 bg-gradient-to-r from-green-500 to-emerald-500 mx-auto mb-8 rounded-full" />
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed font-light">
+            Meet the inspiring individual who represents Kenya's cultural heritage
             and values on the global stage.
           </p>
         </motion.div>
@@ -83,35 +85,42 @@ const Ambassador = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
           viewport={{ once: true }}
-          className="grid lg:grid-cols-2 gap-12 items-center mb-20"
+          className="grid lg:grid-cols-2 gap-16 items-center mb-24"
         >
-          <div className="relative">
-            <div className="relative overflow-hidden rounded-3xl shadow-elegant-lg transform hover:scale-[1.02] transition-transform duration-300">
+          <div className="relative group">
+            <div className="absolute inset-0 bg-gradient-to-br from-green-600 to-yellow-500 rounded-[2.5rem] rotate-3 opacity-20 group-hover:rotate-6 transition-transform duration-500" />
+            <div className="relative overflow-hidden rounded-[2.5rem] shadow-2xl transform transition-transform duration-500">
               <img
                 src={ambassadorInfo.image}
                 alt={ambassadorInfo.name}
-                className="w-full h-96 object-cover"
+                className="w-full h-[600px] object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
             </div>
-            <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-gradient-to-br from-yellow-400 to-yellow-500 rounded-full flex items-center justify-center shadow-colored-red animate-pulse-glow">
-              <Award className="w-12 h-12 text-white" />
+            <div className="absolute -bottom-8 -right-8 w-32 h-32 bg-white rounded-full flex items-center justify-center shadow-2xl animate-pulse-glow z-20">
+              <div className="w-24 h-24 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
+                <Award className="w-12 h-12 text-white" />
+              </div>
             </div>
           </div>
-          
+
           <div>
-            <h3 className="text-3xl font-bold text-gray-900 mb-4">
+            <h3 className="text-4xl font-bold text-gray-900 mb-4">
               {ambassadorInfo.name}
             </h3>
-            <p className="text-xl text-green-600 font-semibold mb-6">
+            <p className="text-2xl text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-emerald-600 font-bold mb-8">
               {ambassadorInfo.title}
             </p>
-            <p className="text-lg text-gray-600 mb-6">
+            <p className="text-lg text-gray-600 mb-8 leading-relaxed">
               {ambassadorInfo.bio}
             </p>
-            <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-2xl shadow-elegant border-2 border-green-100">
-              <h4 className="text-lg font-semibold text-gray-900 mb-3">Mission Statement</h4>
-              <p className="text-gray-700 italic">
+            <div className="bg-white p-8 rounded-3xl shadow-lg border border-gray-100 relative overflow-hidden group hover:shadow-xl transition-shadow duration-300">
+              <div className="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-green-500 to-emerald-500" />
+              <h4 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                <Heart className="w-6 h-6 text-red-500 mr-3 fill-current" />
+                Mission Statement
+              </h4>
+              <p className="text-gray-700 italic text-lg leading-relaxed">
                 "{ambassadorInfo.mission}"
               </p>
             </div>
@@ -124,13 +133,13 @@ const Ambassador = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
           viewport={{ once: true }}
-          className="mb-20"
+          className="mb-24"
         >
-          <h3 className="text-3xl font-semibold text-gray-900 mb-8 text-center">
+          <h3 className="text-3xl font-bold text-gray-900 mb-12 text-center">
             Her Journey
           </h3>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+
+          <div className="grid md:grid-cols-2 gap-8">
             {journeyHighlights.map((highlight, index) => (
               <motion.div
                 key={highlight.title}
@@ -138,17 +147,21 @@ const Ambassador = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="bg-white p-6 rounded-2xl shadow-elegant hover:shadow-elegant-lg transition-all duration-300 text-center group cursor-pointer transform hover:-translate-y-2"
+                className="bg-white p-8 rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 group cursor-pointer border border-gray-100"
               >
-                <div className="w-16 h-16 bg-gradient-to-br from-green-100 to-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:from-green-200 group-hover:to-emerald-200 transition-all duration-300 shadow-md">
-                  <highlight.icon className="w-8 h-8 text-green-600" />
+                <div className="flex items-start space-x-6">
+                  <div className="w-16 h-16 bg-green-50 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:bg-green-600 transition-colors duration-300">
+                    <highlight.icon className="w-8 h-8 text-green-600 group-hover:text-white transition-colors duration-300" />
+                  </div>
+                  <div>
+                    <h4 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-green-600 transition-colors duration-300">
+                      {highlight.title}
+                    </h4>
+                    <p className="text-gray-600 leading-relaxed">
+                      {highlight.description}
+                    </p>
+                  </div>
                 </div>
-                <h4 className="text-xl font-semibold text-gray-900 mb-3">
-                  {highlight.title}
-                </h4>
-                <p className="text-gray-600">
-                  {highlight.description}
-                </p>
               </motion.div>
             ))}
           </div>
@@ -160,13 +173,28 @@ const Ambassador = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6 }}
           viewport={{ once: true }}
-          className="mb-20"
+          className="mb-24"
         >
-          <h3 className="text-3xl font-semibold text-gray-900 mb-8 text-center">
-            Portfolio Preview
-          </h3>
-          
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-12">
+            <div>
+              <span className="text-green-600 font-semibold tracking-wider uppercase text-sm mb-2 block">Portfolio</span>
+              <h3 className="text-3xl font-bold text-gray-900">
+                Featured Works
+              </h3>
+            </div>
+            <motion.a
+              href="https://gallery.misscultureglobalkenya.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="hidden md:inline-flex items-center bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-full font-semibold transition-all duration-300 shadow-lg hover:shadow-green-500/30"
+            >
+              View Full Gallery
+            </motion.a>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
             {[
               {
                 title: 'Cultural Event 1',
@@ -190,30 +218,30 @@ const Ambassador = () => {
                 whileInView={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="relative overflow-hidden rounded-2xl shadow-elegant hover:shadow-elegant-lg transition-all duration-300 group cursor-pointer transform hover:-translate-y-1"
+                className="relative overflow-hidden rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 group cursor-pointer h-80"
               >
                 <img
                   src={item.image}
                   alt={item.title}
-                  className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                <div className="absolute bottom-4 left-4 right-4 text-white">
-                  <h4 className="font-semibold">{item.title}</h4>
-                  <p className="text-sm text-gray-200">{item.subtitle}</p>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-90" />
+                <div className="absolute bottom-0 left-0 right-0 p-8 text-white transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                  <h4 className="text-2xl font-bold mb-2">{item.title}</h4>
+                  <p className="text-green-200 font-medium">{item.subtitle}</p>
                 </div>
               </motion.div>
             ))}
           </div>
-          
-          <div className="text-center mt-8">
+
+          <div className="text-center mt-8 md:hidden">
             <motion.a
               href="https://gallery.misscultureglobalkenya.com"
               target="_blank"
               rel="noopener noreferrer"
-              whileHover={{ scale: 1.05, boxShadow: "0 20px 60px rgba(16, 185, 129, 0.4)" }}
+              whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="inline-flex items-center bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 shadow-colored-green"
+              className="inline-flex items-center bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-full font-semibold transition-all duration-300 shadow-lg"
             >
               View Full Gallery
             </motion.a>
@@ -226,9 +254,9 @@ const Ambassador = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.8 }}
           viewport={{ once: true }}
-          className="mb-20"
+          className="mb-24"
         >
-          <h3 className="text-3xl font-semibold text-gray-900 mb-8 text-center">
+          <h3 className="text-3xl font-bold text-gray-900 mb-12 text-center">
             Susan's Journey in Photos
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
@@ -252,12 +280,12 @@ const Ambassador = () => {
                 whileInView={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5, delay: index * 0.05 }}
                 viewport={{ once: true }}
-                className="relative overflow-hidden rounded-lg shadow-elegant hover:shadow-elegant-lg transition-all duration-300 group cursor-pointer transform hover:-translate-y-1"
+                className="relative overflow-hidden rounded-xl shadow-md hover:shadow-xl transition-all duration-300 group cursor-pointer"
               >
                 <img
                   src={image}
                   alt={`Susan ${index + 1}`}
-                  className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
                 />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
               </motion.div>
@@ -271,26 +299,26 @@ const Ambassador = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 1.0 }}
           viewport={{ once: true }}
-          className="mb-20"
+          className="mb-24"
         >
-          <h3 className="text-3xl font-semibold text-gray-900 mb-8 text-center">
+          <h3 className="text-3xl font-bold text-gray-900 mb-12 text-center">
             Susan's Story
           </h3>
           <div className="grid md:grid-cols-2 gap-8">
-            <div className="relative overflow-hidden rounded-2xl shadow-lg">
+            <div className="relative overflow-hidden rounded-3xl shadow-2xl group">
               <iframe
                 src="https://www.youtube.com/embed/dQw4w9WgXcQ"
                 title="Susan's Journey"
-                className="w-full h-80 rounded-2xl"
+                className="w-full h-80 rounded-3xl"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
               />
             </div>
-            <div className="relative overflow-hidden rounded-2xl shadow-lg">
+            <div className="relative overflow-hidden rounded-3xl shadow-2xl group">
               <iframe
                 src="https://www.youtube.com/embed/dQw4w9WgXcQ"
                 title="Cultural Ambassador Work"
-                className="w-full h-80 rounded-2xl"
+                className="w-full h-80 rounded-3xl"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
               />
@@ -304,11 +332,12 @@ const Ambassador = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.8 }}
           viewport={{ once: true }}
+          className="mb-24"
         >
-          <h3 className="text-3xl font-semibold text-gray-900 mb-8 text-center">
+          <h3 className="text-3xl font-bold text-gray-900 mb-12 text-center">
             Partners & Sponsors
           </h3>
-          
+
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 items-center">
             {partners.map((partner, index) => (
               <motion.div
@@ -317,12 +346,12 @@ const Ambassador = () => {
                 whileInView={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="flex items-center justify-center p-4 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 group cursor-pointer"
+                className="flex items-center justify-center p-6 bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 group cursor-pointer border border-gray-50"
               >
                 <img
                   src={partner.logo}
                   alt={partner.name}
-                  className="h-12 w-auto object-contain group-hover:scale-110 transition-transform duration-300"
+                  className="h-12 w-auto object-contain group-hover:scale-110 transition-transform duration-300 filter grayscale group-hover:grayscale-0"
                 />
               </motion.div>
             ))}
@@ -335,25 +364,25 @@ const Ambassador = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 1.0 }}
           viewport={{ once: true }}
-          className="bg-gradient-to-r from-green-600 via-emerald-600 to-yellow-500 rounded-3xl p-12 text-white text-center shadow-elegant-lg relative overflow-hidden"
+          className="bg-gradient-to-br from-green-900 via-emerald-900 to-teal-900 rounded-[2.5rem] p-12 md:p-20 text-white text-center shadow-2xl relative overflow-hidden"
         >
           {/* Decorative circles */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl" />
-          <div className="absolute bottom-0 left-0 w-40 h-40 bg-white/10 rounded-full blur-2xl" />
-          
+          <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-96 h-96 bg-black/20 rounded-full blur-3xl" />
+
           <div className="relative z-10">
-            <h3 className="text-3xl font-bold mb-4 drop-shadow-lg">
+            <h3 className="text-3xl md:text-4xl font-bold mb-6">
               Connect with Susan
             </h3>
-            <p className="text-xl text-green-100 mb-8 max-w-2xl mx-auto drop-shadow-md">
-              Interested in collaborating with Susan or having her speak at your event? 
+            <p className="text-xl text-green-100 mb-10 max-w-2xl mx-auto leading-relaxed font-light">
+              Interested in collaborating with Susan or having her speak at your event?
               Get in touch to discuss opportunities and partnerships.
             </p>
             <motion.button
               onClick={() => setIsContactModalOpen(true)}
-              whileHover={{ scale: 1.05, boxShadow: "0 20px 60px rgba(255, 255, 255, 0.3)" }}
+              whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="bg-white text-green-600 hover:bg-gray-100 px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 flex items-center space-x-2 mx-auto shadow-elegant"
+              className="bg-white text-green-900 hover:bg-green-50 px-10 py-4 rounded-full font-bold text-lg transition-all duration-300 flex items-center space-x-3 mx-auto shadow-lg"
             >
               <Mail className="w-5 h-5" />
               <span>Contact Susan</span>

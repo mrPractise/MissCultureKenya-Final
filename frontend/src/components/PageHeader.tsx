@@ -10,34 +10,41 @@ interface PageHeaderProps {
 
 const PageHeader = ({ title, subtitle, backgroundImage }: PageHeaderProps) => {
   return (
-    <section className="relative h-80 sm:h-96 flex items-center justify-center overflow-hidden">
-      {/* Background Image */}
+    <section className="relative h-[50vh] min-h-[400px] flex items-center justify-center overflow-hidden">
+      {/* Parallax Background */}
       <div className="absolute inset-0 z-0">
-        <div className="w-full h-full bg-gradient-to-br from-red-900/80 via-black/70 to-green-800/80">
-          <div 
-            className="w-full h-full bg-cover bg-center bg-no-repeat"
+        <motion.div
+          initial={{ scale: 1.1 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 10, repeat: Infinity, repeatType: "reverse" }}
+          className="w-full h-full"
+        >
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/60 z-10" />
+          <div
+            className="w-full h-full bg-cover bg-center"
             style={{ backgroundImage: `url(${backgroundImage})` }}
           />
-        </div>
+        </motion.div>
       </div>
 
       {/* Decorative Elements */}
-      <div className="absolute inset-0 z-[1] pointer-events-none">
-        <div className="absolute top-5 right-10 w-32 h-32 bg-yellow-400/10 rounded-full blur-3xl animate-float" />
-        <div className="absolute bottom-10 left-10 w-40 h-40 bg-green-400/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }} />
+      <div className="absolute inset-0 z-[1] pointer-events-none overflow-hidden">
+        <div className="absolute top-[-10%] right-[-5%] w-96 h-96 bg-yellow-500/20 rounded-full blur-3xl animate-pulse-glow" />
+        <div className="absolute bottom-[-10%] left-[-5%] w-96 h-96 bg-green-600/20 rounded-full blur-3xl animate-pulse-glow" style={{ animationDelay: '1s' }} />
       </div>
 
       {/* Content */}
-      <div className="relative z-10 text-center text-white px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
+      <div className="relative z-10 text-center text-white px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
         >
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 leading-tight drop-shadow-2xl">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight drop-shadow-2xl tracking-tight">
             {title}
           </h1>
-          <p className="text-lg sm:text-xl md:text-2xl text-gray-100 max-w-3xl mx-auto px-4 drop-shadow-lg">
+          <div className="w-24 h-1 bg-gradient-to-r from-yellow-400 to-red-500 mx-auto mb-8 rounded-full" />
+          <p className="text-lg sm:text-xl md:text-2xl text-gray-100 max-w-3xl mx-auto px-4 drop-shadow-lg font-light leading-relaxed">
             {subtitle}
           </p>
         </motion.div>

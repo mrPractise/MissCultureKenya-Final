@@ -250,35 +250,55 @@ const VotingPage = () => {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gray-50">
       {/* Page Header */}
-      <section className="relative h-96 flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-red-600/90 to-green-600/90"></div>
-        <div className="absolute inset-0 bg-black/30"></div>
-        <div className="relative z-10 text-center text-white px-4">
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-5xl md:text-6xl font-bold mb-6"
+      <section className="relative h-[50vh] min-h-[400px] flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <motion.div
+            initial={{ scale: 1.1 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 10, repeat: Infinity, repeatType: "reverse" }}
+            className="w-full h-full"
           >
-            Vote for Participants
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-xl md:text-2xl max-w-3xl mx-auto"
-          >
-            Support your favorite participants in our cultural events and competitions
-          </motion.p>
+            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/60 z-10" />
+            <div
+              className="w-full h-full bg-cover bg-center"
+              style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=1920&h=600&fit=crop)' }}
+            />
+          </motion.div>
         </div>
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=1920&h=600&fit=crop')] bg-cover bg-center"></div>
+
+        {/* Decorative Elements */}
+        <div className="absolute inset-0 z-[1] pointer-events-none overflow-hidden">
+          <div className="absolute top-[-10%] right-[-5%] w-96 h-96 bg-yellow-500/20 rounded-full blur-3xl animate-pulse-glow" />
+          <div className="absolute bottom-[-10%] left-[-5%] w-96 h-96 bg-green-600/20 rounded-full blur-3xl animate-pulse-glow" style={{ animationDelay: '1s' }} />
+        </div>
+
+        <div className="relative z-10 text-center text-white px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+          >
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight drop-shadow-2xl tracking-tight">
+              Vote for <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400">Participants</span>
+            </h1>
+            <div className="w-24 h-1 bg-gradient-to-r from-yellow-500 to-orange-500 mx-auto mb-8 rounded-full" />
+            <p className="text-lg sm:text-xl md:text-2xl text-gray-100 max-w-3xl mx-auto px-4 drop-shadow-lg font-light leading-relaxed">
+              Support your favorite participants in our cultural events and competitions
+            </p>
+          </motion.div>
+        </div>
       </section>
 
       {/* Voting Content */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-24 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
+        {/* Decorative Background */}
+        <div className="absolute inset-0 decorative-pattern opacity-[0.03]" />
+        <div className="absolute top-20 right-10 w-96 h-96 bg-green-500/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-20 left-10 w-96 h-96 bg-yellow-500/5 rounded-full blur-3xl" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -286,9 +306,9 @@ const VotingPage = () => {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Vote for Event Participants</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Browse through our cultural events and vote for your favorite participants. 
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Vote for Event Participants</h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              Browse through our cultural events and vote for your favorite participants.
               Each event features talented individuals and groups showcasing Kenya's diverse cultural heritage.
             </p>
           </motion.div>
@@ -299,18 +319,17 @@ const VotingPage = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
             viewport={{ once: true }}
-            className="mb-12"
+            className="mb-16"
           >
-            <div className="flex flex-wrap justify-center gap-2 sm:gap-4 mb-8">
+            <div className="flex flex-wrap justify-center gap-3 sm:gap-4 mb-10">
               {events.map((event) => (
                 <button
                   key={event.id}
                   onClick={() => setSelectedEvent(event.id)}
-                  className={`px-3 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold transition-all duration-300 text-sm sm:text-base ${
-                    selectedEvent === event.id
-                      ? 'bg-red-600 text-white shadow-lg'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
+                  className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 text-sm sm:text-base shadow-md hover:shadow-lg transform hover:-translate-y-1 ${selectedEvent === event.id
+                      ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white'
+                      : 'bg-white text-gray-700 hover:bg-green-50 hover:text-green-600 border border-gray-100'
+                    }`}
                 >
                   {event.title}
                 </button>
@@ -320,35 +339,33 @@ const VotingPage = () => {
             {/* Category Filter */}
             {selectedEvent && (
               <div className="flex justify-center">
-                <div className="flex flex-wrap justify-center gap-1 sm:gap-2 bg-gray-100 p-1 rounded-lg max-w-full overflow-x-auto">
+                <div className="flex flex-wrap justify-center gap-2 bg-white p-2 rounded-2xl shadow-lg border border-gray-100 max-w-full overflow-x-auto">
                   <button
                     onClick={() => setSelectedCategory('all')}
-                    className={`px-2 sm:px-4 py-1 sm:py-2 rounded-md font-semibold transition-colors duration-200 text-xs sm:text-sm ${
-                      selectedCategory === 'all'
-                        ? 'bg-red-600 text-white'
-                        : 'text-gray-600 hover:text-red-600'
-                    }`}
+                    className={`px-4 py-2 rounded-xl font-semibold transition-colors duration-200 text-sm ${selectedCategory === 'all'
+                        ? 'bg-green-600 text-white shadow-md'
+                        : 'text-gray-600 hover:text-green-600 hover:bg-green-50'
+                      }`}
                   >
                     All Participants
                   </button>
-                  {events.find(e => e.id === selectedEvent)?.participants && 
-                   Array.from(new Set(events.find(e => e.id === selectedEvent)?.participants?.map(p => p.category))).map(category => (
-                    <button
-                      key={category}
-                      onClick={() => setSelectedCategory(category)}
-                      className={`px-2 sm:px-4 py-1 sm:py-2 rounded-md font-semibold transition-colors duration-200 text-xs sm:text-sm ${
-                        selectedCategory === category
-                          ? 'bg-red-600 text-white'
-                          : 'text-gray-600 hover:text-red-600'
-                      }`}
-                    >
-                      {category === 'adult' ? 'Adults' : 
-                       category === 'teens' ? 'Teens' :
-                       category === 'group' ? 'Groups' :
-                       category === 'solo' ? 'Solo' :
-                       category === 'designer' ? 'Designers' : category}
-                    </button>
-                  ))}
+                  {events.find(e => e.id === selectedEvent)?.participants &&
+                    Array.from(new Set(events.find(e => e.id === selectedEvent)?.participants?.map(p => p.category))).map(category => (
+                      <button
+                        key={category}
+                        onClick={() => setSelectedCategory(category)}
+                        className={`px-4 py-2 rounded-xl font-semibold transition-colors duration-200 text-sm ${selectedCategory === category
+                            ? 'bg-green-600 text-white shadow-md'
+                            : 'text-gray-600 hover:text-green-600 hover:bg-green-50'
+                          }`}
+                      >
+                        {category === 'adult' ? 'Adults' :
+                          category === 'teens' ? 'Teens' :
+                            category === 'group' ? 'Groups' :
+                              category === 'solo' ? 'Solo' :
+                                category === 'designer' ? 'Designers' : category}
+                      </button>
+                    ))}
                 </div>
               </div>
             )}
@@ -365,24 +382,24 @@ const VotingPage = () => {
               {(() => {
                 const event = events.find(e => e.id === selectedEvent)
                 if (!event) return null
-                
+
                 return (
                   <div>
                     {/* Event Header */}
-                    <div className="text-center mb-8">
-                      <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">{event.title}</h3>
-                      <p className="text-base sm:text-lg text-gray-600 max-w-3xl mx-auto mb-4">{event.description}</p>
-                      <div className="flex flex-wrap justify-center gap-3 sm:gap-6 text-xs sm:text-sm text-gray-600">
-                        <div className="flex items-center">
-                          <Calendar className="w-4 h-4 mr-2 text-red-600" />
+                    <div className="text-center mb-12">
+                      <h3 className="text-3xl font-bold text-gray-900 mb-4">{event.title}</h3>
+                      <p className="text-lg text-gray-600 max-w-3xl mx-auto mb-6">{event.description}</p>
+                      <div className="flex flex-wrap justify-center gap-4 sm:gap-8 text-sm font-medium text-gray-600">
+                        <div className="flex items-center bg-white px-4 py-2 rounded-full shadow-sm border border-gray-100">
+                          <Calendar className="w-4 h-4 mr-2 text-green-600" />
                           <span>{new Date(event.date).toLocaleDateString()}</span>
                         </div>
-                        <div className="flex items-center">
-                          <Clock className="w-4 h-4 mr-2 text-red-600" />
+                        <div className="flex items-center bg-white px-4 py-2 rounded-full shadow-sm border border-gray-100">
+                          <Clock className="w-4 h-4 mr-2 text-green-600" />
                           <span>{event.time}</span>
                         </div>
-                        <div className="flex items-center">
-                          <MapPin className="w-4 h-4 mr-2 text-red-600" />
+                        <div className="flex items-center bg-white px-4 py-2 rounded-full shadow-sm border border-gray-100">
+                          <MapPin className="w-4 h-4 mr-2 text-green-600" />
                           <span>{event.venue}, {event.location}</span>
                         </div>
                       </div>
@@ -397,82 +414,85 @@ const VotingPage = () => {
                           whileInView={{ opacity: 1, y: 0 }}
                           transition={{ duration: 0.5, delay: index * 0.1 }}
                           viewport={{ once: true }}
-                          className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group"
+                          className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group border border-gray-100 flex flex-col h-full"
                         >
                           {/* Participant Image */}
-                          <div className="relative">
+                          <div className="relative h-80 overflow-hidden">
                             <img
                               src={participant.image}
                               alt={participant.name}
-                              className="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-300"
+                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                             />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-80" />
                             <div className="absolute top-4 left-4">
-                              <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                                participant.category === 'adult' 
-                                  ? 'bg-purple-600 text-white' 
+                              <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide shadow-sm ${participant.category === 'adult'
+                                  ? 'bg-purple-600 text-white'
                                   : participant.category === 'teens'
-                                  ? 'bg-pink-600 text-white'
-                                  : participant.category === 'group'
-                                  ? 'bg-blue-600 text-white'
-                                  : participant.category === 'solo'
-                                  ? 'bg-green-600 text-white'
-                                  : participant.category === 'designer'
-                                  ? 'bg-orange-600 text-white'
-                                  : 'bg-gray-600 text-white'
-                              }`}>
-                                {participant.category === 'adult' ? 'Adult' : 
-                                 participant.category === 'teens' ? 'Teens' :
-                                 participant.category === 'group' ? 'Group' :
-                                 participant.category === 'solo' ? 'Solo' :
-                                 participant.category === 'designer' ? 'Designer' : participant.category}
+                                    ? 'bg-pink-600 text-white'
+                                    : participant.category === 'group'
+                                      ? 'bg-blue-600 text-white'
+                                      : participant.category === 'solo'
+                                        ? 'bg-green-600 text-white'
+                                        : participant.category === 'designer'
+                                          ? 'bg-orange-600 text-white'
+                                          : 'bg-gray-600 text-white'
+                                }`}>
+                                {participant.category === 'adult' ? 'Adult' :
+                                  participant.category === 'teens' ? 'Teens' :
+                                    participant.category === 'group' ? 'Group' :
+                                      participant.category === 'solo' ? 'Solo' :
+                                        participant.category === 'designer' ? 'Designer' : participant.category}
                               </span>
                             </div>
                             <div className="absolute top-4 right-4">
-                              <span className="bg-white/90 text-gray-900 px-3 py-1 rounded-full text-sm font-semibold">
+                              <span className="bg-white/90 backdrop-blur-md text-gray-900 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide shadow-sm">
                                 Age {participant.age}
                               </span>
                             </div>
                           </div>
 
                           {/* Participant Content */}
-                          <div className="p-6">
-                            <h4 className="text-2xl font-bold text-gray-900 mb-2">
+                          <div className="p-8 flex-grow flex flex-col">
+                            <h4 className="text-2xl font-bold text-gray-900 mb-2 group-hover:text-green-600 transition-colors duration-300">
                               {participant.name}
                             </h4>
-                            <p className="text-gray-600 mb-2">
-                              <span className="font-semibold">From:</span> {participant.hometown}
+                            <p className="text-gray-500 mb-6 text-sm font-medium flex items-center">
+                              <MapPin className="w-3 h-3 mr-1" />
+                              {participant.hometown}
                             </p>
-                            
-                            <div className="mb-4">
-                              <h5 className="font-semibold text-gray-900 mb-2">Ideology:</h5>
-                              <p className="text-sm text-gray-600 mb-3">
-                                {participant.ideology}
-                              </p>
-                              <h5 className="font-semibold text-gray-900 mb-2">Why Vote for Me:</h5>
-                              <p className="text-sm text-gray-600">
-                                {participant.whyVote}
-                              </p>
+
+                            <div className="mb-8 space-y-4 flex-grow">
+                              <div>
+                                <h5 className="font-bold text-gray-900 mb-1 text-sm uppercase tracking-wide">Ideology</h5>
+                                <p className="text-sm text-gray-600 leading-relaxed">
+                                  {participant.ideology}
+                                </p>
+                              </div>
+                              <div>
+                                <h5 className="font-bold text-gray-900 mb-1 text-sm uppercase tracking-wide">Why Vote for Me</h5>
+                                <p className="text-sm text-gray-600 leading-relaxed">
+                                  {participant.whyVote}
+                                </p>
+                              </div>
                             </div>
 
                             {/* Voting Section */}
-                            <div className="flex items-center justify-center">
+                            <div className="mt-auto">
                               <button
                                 onClick={() => handleParticipantVote(participant.id)}
-                                className={`w-full px-6 py-3 rounded-lg font-semibold text-sm transition-colors duration-200 flex items-center justify-center space-x-2 ${
-                                  votedParticipants.has(participant.id)
-                                    ? 'bg-red-100 text-red-600 hover:bg-red-200'
-                                    : 'bg-green-100 text-green-600 hover:bg-green-200'
-                                }`}
-                              >
-                                <Heart 
-                                  className={`w-5 h-5 ${
-                                    votedParticipants.has(participant.id) 
-                                      ? 'text-red-500 fill-current' 
-                                      : 'text-green-500'
+                                className={`w-full px-6 py-4 rounded-xl font-bold text-sm uppercase tracking-wider transition-all duration-300 flex items-center justify-center space-x-3 shadow-md hover:shadow-lg transform hover:-translate-y-1 ${votedParticipants.has(participant.id)
+                                    ? 'bg-red-50 text-red-600 border border-red-100'
+                                    : 'bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700'
                                   }`}
+                              >
+                                <Heart
+                                  className={`w-5 h-5 ${votedParticipants.has(participant.id)
+                                      ? 'text-red-500 fill-current'
+                                      : 'text-white'
+                                    }`}
                                 />
                                 <span>
-                                  {votedParticipants.has(participant.id) ? 'Voted' : 'Vote'}
+                                  {votedParticipants.has(participant.id) ? 'Voted' : 'Vote for Participant'}
                                 </span>
                               </button>
                             </div>
@@ -492,21 +512,27 @@ const VotingPage = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
             viewport={{ once: true }}
-            className="mt-16 bg-gradient-to-r from-red-600 to-green-600 rounded-3xl p-8 text-white text-center"
+            className="mt-20 bg-gradient-to-br from-green-900 via-emerald-900 to-teal-900 rounded-[2.5rem] p-12 text-white text-center shadow-2xl relative overflow-hidden"
           >
-            <h3 className="text-2xl font-bold mb-4">Your Voting Summary</h3>
-            <p className="text-xl text-green-100 mb-6 max-w-2xl mx-auto">
-              Your votes help us understand which participants are most popular with our community. 
-              We use this feedback to improve our cultural programs and create better experiences for everyone.
-            </p>
-            <div className="grid md:grid-cols-2 gap-8 mt-8">
-              <div>
-                <div className="text-4xl font-bold mb-2">{votedParticipants.size}</div>
-                <div className="text-green-100">Participants You Voted For</div>
-              </div>
-              <div>
-                <div className="text-4xl font-bold mb-2">{events.length}</div>
-                <div className="text-green-100">Events Available</div>
+            {/* Decorative circles */}
+            <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
+            <div className="absolute bottom-0 left-0 w-96 h-96 bg-black/20 rounded-full blur-3xl" />
+
+            <div className="relative z-10">
+              <h3 className="text-3xl font-bold mb-6">Your Voting Summary</h3>
+              <p className="text-xl text-green-100 mb-10 max-w-2xl mx-auto font-light leading-relaxed">
+                Your votes help us understand which participants are most popular with our community.
+                We use this feedback to improve our cultural programs and create better experiences for everyone.
+              </p>
+              <div className="grid md:grid-cols-2 gap-12 max-w-3xl mx-auto">
+                <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/10">
+                  <div className="text-5xl font-bold mb-2 text-yellow-400">{votedParticipants.size}</div>
+                  <div className="text-green-100 font-medium uppercase tracking-wide text-sm">Participants You Voted For</div>
+                </div>
+                <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/10">
+                  <div className="text-5xl font-bold mb-2 text-yellow-400">{events.length}</div>
+                  <div className="text-green-100 font-medium uppercase tracking-wide text-sm">Events Available</div>
+                </div>
               </div>
             </div>
           </motion.div>

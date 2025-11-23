@@ -175,61 +175,45 @@ const AboutPage = () => {
     }
   ]
 
-  const beneficiaryTestimonials = [
-    {
-      name: 'Esther Mwangi',
-      role: 'Artisan',
-      location: 'Nairobi, Kenya',
-      quote: 'Thanks to the support from Miss Culture Global Kenya, I\'ve been able to pass on my pottery skills to young women in my community. This has not only preserved our tradition but also provided income for many families.',
-      image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&h=200&fit=crop'
-    },
-    {
-      name: 'David Kimani',
-      role: 'Youth Participant',
-      location: 'Mombasa, Kenya',
-      quote: 'The cultural education program opened my eyes to the richness of our heritage. I now actively participate in preserving and sharing our traditions with others.',
-      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop'
-    },
-    {
-      name: 'Sarah Akinyi',
-      role: 'Community Leader',
-      location: 'Kisumu, Kenya',
-      quote: 'Our partnership with Miss Culture Global Kenya has brought international recognition to our traditional dances. This has boosted tourism and provided economic opportunities for our community.',
-      image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&h=200&fit=crop'
-    }
-  ]
-
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-white">
       {/* Page Header */}
-      <section className="relative h-96 flex items-center justify-center overflow-hidden">
+      <section className="relative h-[60vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <div className="w-full h-full bg-gradient-to-br from-green-900/80 via-green-800/70 to-yellow-600/80">
-            <div 
-              className="w-full h-full bg-cover bg-center bg-no-repeat" 
-              style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=1920&h=600&fit=crop)' }} 
+          <div className="w-full h-full bg-gradient-to-br from-green-900/90 via-black/80 to-yellow-900/90">
+            <div
+              className="w-full h-full bg-cover bg-center bg-no-repeat opacity-40 mix-blend-overlay"
+              style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1532375810709-75b1da00537c?w=1920&h=1080&fit=crop)' }}
             />
           </div>
         </div>
-        <div className="relative z-10 text-center text-white px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
+
+        {/* Decorative Elements */}
+        <div className="absolute top-1/4 left-10 w-32 h-32 bg-yellow-500/20 rounded-full blur-3xl animate-pulse-glow z-10" />
+        <div className="absolute bottom-1/4 right-10 w-40 h-40 bg-green-500/20 rounded-full blur-3xl animate-pulse-glow delay-1000 z-10" />
+
+        <div className="relative z-20 text-center px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-              About Us
+            <h1 className="text-5xl md:text-7xl font-bold mb-6 text-white tracking-tight">
+              About <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-200">Us</span>
             </h1>
-            <p className="text-xl sm:text-2xl text-gray-100 max-w-3xl mx-auto">
-              Celebrating Kenya's rich cultural heritage and promoting global understanding through authentic representation.
+            <p className="text-xl md:text-2xl text-gray-200 max-w-3xl mx-auto font-light leading-relaxed">
+              Celebrating Kenya's rich cultural heritage and empowering communities through preservation, education, and global representation.
             </p>
+            <div className="mt-8 flex justify-center">
+              <div className="h-1 w-24 bg-gradient-to-r from-transparent via-yellow-500 to-transparent rounded-full" />
+            </div>
           </motion.div>
         </div>
       </section>
 
       {/* Mission & Vision */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-24 bg-white relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <motion.div
               initial={{ opacity: 0, x: -30 }}
@@ -237,147 +221,65 @@ const AboutPage = () => {
               transition={{ duration: 0.8 }}
               viewport={{ once: true }}
             >
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">Our Mission</h2>
-              <p className="text-lg text-gray-600 mb-6">
-                To preserve, promote, and celebrate Kenya's diverse cultural heritage while fostering unity, 
-                empowering youth, and representing our nation with pride on the global stage.
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">Our Mission</h2>
+              <p className="text-lg text-gray-600 leading-relaxed mb-8">
+                To preserve, promote, and celebrate Kenya's diverse cultural heritage while empowering communities and youth to become global ambassadors of our traditions. We strive to create a platform where culture meets innovation, fostering unity and sustainable development.
               </p>
-              <p className="text-lg text-gray-600">
-                We are committed to showcasing authentic Kenyan culture through our ambassadors, 
-                community programs, and international collaborations.
-              </p>
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-green-600">
+                  <Target className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-gray-900">Strategic Focus</h3>
+                  <p className="text-sm text-gray-500">Preservation, Education, Empowerment</p>
+                </div>
+              </div>
             </motion.div>
-            
             <motion.div
               initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
               viewport={{ once: true }}
-              className="bg-white rounded-2xl shadow-elegant p-8"
+              className="relative"
             >
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">Our Vision</h2>
-              <p className="text-lg text-gray-600 mb-6">
-                A world where Kenya's cultural richness is recognized, respected, and celebrated globally, 
-                where our youth are empowered as cultural ambassadors, and where cultural diversity strengthens 
-                our national identity.
-              </p>
-              <div className="flex items-center space-x-3">
-                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                <p className="text-gray-700 font-medium">Cultural Excellence</p>
-              </div>
-              <div className="flex items-center space-x-3 mt-2">
-                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                <p className="text-gray-700 font-medium">Global Recognition</p>
-              </div>
-              <div className="flex items-center space-x-3 mt-2">
-                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                <p className="text-gray-700 font-medium">Community Empowerment</p>
-              </div>
+              <div className="absolute inset-0 bg-gradient-to-tr from-green-600 to-yellow-500 rounded-2xl transform rotate-3 opacity-20" />
+              <img
+                src="https://images.unsplash.com/photo-1489980557514-251d61e3eeb6?w=800&h=600&fit=crop"
+                alt="Kenyan Culture"
+                className="relative rounded-2xl shadow-2xl transform -rotate-3 hover:rotate-0 transition-transform duration-500"
+              />
             </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Impact Highlights */}
-      <section className="py-16 bg-gradient-to-br from-green-50 to-yellow-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Our Impact</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Real stories of impact from communities and individuals whose lives have been transformed through our work.
-            </p>
-          </motion.div>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {impactHighlights.map((highlight, index) => (
-              <motion.div
-                key={highlight.label}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="bg-white rounded-2xl shadow-elegant p-6 text-center"
-              >
-                <div className="text-4xl font-bold text-green-600 mb-2">{highlight.number}</div>
-                <h3 className="text-lg font-bold text-gray-900 mb-2">{highlight.label}</h3>
-                <p className="text-gray-600 text-sm">{highlight.description}</p>
-              </motion.div>
-            ))}
-          </div>
-          
-          {/* Beneficiary Testimonials */}
-          <div className="mt-16">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
-              className="text-center mb-16"
-            >
-              <h3 className="text-3xl font-bold text-gray-900 mb-4">Beneficiary Testimonials</h3>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                Hear directly from those who have been impacted by our programs.
-              </p>
-            </motion.div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {beneficiaryTestimonials.map((testimonial, index) => (
-                <motion.div
-                  key={testimonial.name}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  viewport={{ once: true }}
-                  className="bg-white rounded-2xl shadow-elegant p-8 relative"
-                >
-                  <div className="flex items-center mb-6">
-                    <img 
-                      src={testimonial.image} 
-                      alt={testimonial.name} 
-                      className="w-16 h-16 rounded-full object-cover mr-4"
-                    />
-                    <div>
-                      <h4 className="font-bold text-gray-900">{testimonial.name}</h4>
-                      <p className="text-green-600">{testimonial.role}</p>
-                      <p className="text-gray-500 text-sm">{testimonial.location}</p>
-                    </div>
-                  </div>
-                  <p className="text-gray-600 italic">"{testimonial.quote}"</p>
-                </motion.div>
-              ))}
-            </div>
           </div>
         </div>
       </section>
 
       {/* History Timeline */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-24 bg-gray-50 relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+          <div className="absolute top-20 left-10 w-64 h-64 bg-green-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob" />
+          <div className="absolute bottom-20 right-10 w-64 h-64 bg-yellow-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000" />
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
-            className="text-center mb-16"
+            className="text-center mb-20"
           >
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Our Journey</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <h2 className="text-4xl font-bold text-gray-900 mb-6">Our Journey</h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto font-light">
               A timeline of our milestones and achievements in promoting Kenyan culture globally.
             </p>
           </motion.div>
 
           <div className="relative">
             {/* Vertical line */}
-            <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-green-100 hidden md:block"></div>
-            
+            <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-gradient-to-b from-green-100 via-green-200 to-green-100 hidden md:block"></div>
+
             {/* Timeline items */}
-            <div className="space-y-12">
+            <div className="space-y-16">
               {historyMilestones.map((milestone, index) => (
                 <motion.div
                   key={milestone.year}
@@ -385,22 +287,23 @@ const AboutPage = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                   viewport={{ once: true }}
-                  className={`flex flex-col md:flex-row ${index % 2 === 0 ? 'md:flex-row-reverse' : ''} items-center`}
+                  className={`flex flex-col md:flex-row ${index % 2 === 0 ? 'md:flex-row-reverse' : ''} items-center group`}
                 >
-                  <div className="md:w-1/2 mb-4 md:mb-0 md:px-8">
-                    <div className="bg-white rounded-2xl shadow-elegant p-6">
-                      <span className="text-green-600 font-bold text-lg">{milestone.year}</span>
-                      <h3 className="text-xl font-bold text-gray-900 mt-2 mb-3">{milestone.title}</h3>
-                      <p className="text-gray-600">{milestone.description}</p>
+                  <div className="md:w-1/2 mb-8 md:mb-0 md:px-12 w-full">
+                    <div className="bg-white rounded-2xl shadow-elegant p-8 border border-gray-100 group-hover:border-green-200 transition-colors duration-300 relative">
+                      <div className={`absolute top-1/2 ${index % 2 === 0 ? '-left-3' : '-right-3'} w-6 h-6 bg-white transform -translate-y-1/2 rotate-45 border-b border-l border-gray-100 hidden md:block group-hover:border-green-200 transition-colors duration-300 ${index % 2 === 0 ? 'border-r-0 border-t-0' : 'border-l-0 border-b-0 border-r border-t'}`} />
+                      <span className="inline-block px-4 py-1 bg-green-100 text-green-700 rounded-full font-bold text-sm mb-4">{milestone.year}</span>
+                      <h3 className="text-2xl font-bold text-gray-900 mb-3">{milestone.title}</h3>
+                      <p className="text-gray-600 leading-relaxed">{milestone.description}</p>
                     </div>
                   </div>
-                  
+
                   {/* Circle */}
-                  <div className="hidden md:flex md:w-16 h-16 rounded-full bg-green-500 items-center justify-center text-white font-bold text-lg z-10">
-                    {milestone.year}
+                  <div className="hidden md:flex md:w-16 h-16 rounded-full bg-white border-4 border-green-500 items-center justify-center text-green-600 font-bold text-lg z-10 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    {milestone.year.slice(2)}
                   </div>
-                  
-                  <div className="md:w-1/2 md:px-8"></div>
+
+                  <div className="md:w-1/2 md:px-12"></div>
                 </motion.div>
               ))}
             </div>
@@ -409,17 +312,18 @@ const AboutPage = () => {
       </section>
 
       {/* Core Values */}
-      <section className="py-20 bg-gradient-to-br from-green-50 to-yellow-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-24 bg-gradient-to-br from-green-50 to-yellow-50 relative overflow-hidden">
+        <div className="absolute inset-0 decorative-dots opacity-30" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
-            className="text-center mb-16"
+            className="text-center mb-20"
           >
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Our Core Values</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <h2 className="text-4xl font-bold text-gray-900 mb-6">Our Core Values</h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto font-light">
               The principles that guide our mission and shape our approach to cultural representation.
             </p>
           </motion.div>
@@ -432,13 +336,13 @@ const AboutPage = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="bg-white rounded-2xl shadow-elegant p-8 text-center hover:shadow-elegant-lg transition-all duration-300"
+                className="bg-white rounded-2xl shadow-elegant p-8 text-center hover:shadow-elegant-lg transition-all duration-300 group"
               >
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <value.icon className="w-8 h-8 text-green-600" />
+                <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-green-100 transition-colors duration-300">
+                  <value.icon className="w-10 h-10 text-green-600 group-hover:scale-110 transition-transform duration-300" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">{value.title}</h3>
-                <p className="text-gray-600">{value.description}</p>
+                <h3 className="text-xl font-bold text-gray-900 mb-4">{value.title}</h3>
+                <p className="text-gray-600 leading-relaxed">{value.description}</p>
               </motion.div>
             ))}
           </div>
@@ -446,22 +350,22 @@ const AboutPage = () => {
       </section>
 
       {/* Leadership Team */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
-            className="text-center mb-16"
+            className="text-center mb-20"
           >
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Leadership Team</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <h2 className="text-4xl font-bold text-gray-900 mb-6">Leadership Team</h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto font-light">
               The visionary leaders guiding our mission to promote Kenyan culture globally.
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
             {currentLeadership.map((leader, index) => (
               <motion.div
                 key={leader.name}
@@ -469,38 +373,29 @@ const AboutPage = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="bg-white rounded-2xl shadow-elegant overflow-hidden hover:shadow-elegant-lg transition-all duration-300"
+                className="bg-white rounded-2xl shadow-elegant overflow-hidden hover:shadow-elegant-lg transition-all duration-300 group"
               >
-                <div className="h-64 overflow-hidden">
-                  <img 
-                    src={leader.image} 
-                    alt={leader.name} 
-                    className="w-full h-full object-cover"
+                <div className="h-80 overflow-hidden relative">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10" />
+                  <img
+                    src={leader.image}
+                    alt={leader.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-gray-900">{leader.name}</h3>
-                  <p className="text-green-600 font-medium mb-3">{leader.title}</p>
-                  <p className="text-gray-600 mb-4">{leader.bio}</p>
+                <div className="p-8">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-1">{leader.name}</h3>
+                  <p className="text-green-600 font-medium mb-4">{leader.title}</p>
+                  <p className="text-gray-600 mb-6 leading-relaxed text-sm">{leader.bio}</p>
                   <div className="flex space-x-4">
-                    <a href={leader.social.instagram} className="text-gray-400 hover:text-green-600 transition-colors">
-                      <span className="sr-only">Instagram</span>
-                      <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 6.62 5.367 11.987 11.988 11.987c6.62 0 11.987-5.367 11.987-11.987C24.014 5.367 18.637.001 12.017.001zM8.449 16.988c-1.297 0-2.448-.49-3.323-1.297C4.198 14.895 3.708 13.744 3.708 12.447s.49-2.448 1.297-3.323C5.801 8.198 6.952 7.708 8.249 7.708s2.448.49 3.323 1.297c.875.875 1.365 2.026 1.365 3.323s-.49 2.448-1.297 3.323c-.875.875-2.026 1.365-3.323 1.365zm7.711-2.831c-.635 0-1.141-.506-1.141-1.141s.506-1.141 1.141-1.141s1.141.506 1.141 1.141s-.506 1.141-1.141 1.141zm-2.565-6.446c-.635 0-1.141-.506-1.141-1.141s.506-1.141 1.141-1.141s1.141.506 1.141 1.141s-.506 1.141-1.141 1.141z"/>
-                      </svg>
-                    </a>
-                    <a href={leader.social.twitter} className="text-gray-400 hover:text-green-600 transition-colors">
-                      <span className="sr-only">Twitter</span>
-                      <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"/>
-                      </svg>
-                    </a>
-                    <a href={leader.social.linkedin} className="text-gray-400 hover:text-green-600 transition-colors">
-                      <span className="sr-only">LinkedIn</span>
-                      <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-                      </svg>
-                    </a>
+                    {Object.entries(leader.social).map(([platform, link]) => (
+                      <a key={platform} href={link} className="text-gray-400 hover:text-green-600 transition-colors">
+                        <span className="sr-only">{platform}</span>
+                        <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center hover:bg-green-50 transition-colors">
+                          <div className="w-4 h-4 bg-current rounded-sm" />
+                        </div>
+                      </a>
+                    ))}
                   </div>
                 </div>
               </motion.div>
@@ -510,7 +405,7 @@ const AboutPage = () => {
       </section>
 
       {/* Organizing Committee */}
-      <section className="py-20 bg-white">
+      <section className="py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -520,12 +415,12 @@ const AboutPage = () => {
             className="text-center mb-16"
           >
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Organizing Committee</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto font-light">
               The dedicated professionals who make our programs and events possible.
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {organizingCommittee.map((member, index) => (
               <motion.div
                 key={member.name}
@@ -533,11 +428,11 @@ const AboutPage = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="bg-gray-50 rounded-2xl p-6 hover:shadow-elegant transition-all duration-300"
+                className="bg-white rounded-xl p-6 hover:shadow-lg transition-all duration-300 border border-gray-100 hover:border-green-100"
               >
-                <h3 className="text-xl font-bold text-gray-900">{member.name}</h3>
-                <p className="text-green-600 font-medium mb-3">{member.role}</p>
-                <p className="text-gray-600">{member.bio}</p>
+                <h3 className="text-lg font-bold text-gray-900">{member.name}</h3>
+                <p className="text-green-600 font-medium text-sm mb-2">{member.role}</p>
+                <p className="text-gray-600 text-sm">{member.bio}</p>
               </motion.div>
             ))}
           </div>
@@ -545,7 +440,7 @@ const AboutPage = () => {
       </section>
 
       {/* Advisory Board */}
-      <section className="py-20 bg-gradient-to-br from-green-50 to-yellow-50">
+      <section className="py-24 bg-gradient-to-br from-green-50 to-yellow-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -555,7 +450,7 @@ const AboutPage = () => {
             className="text-center mb-16"
           >
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Advisory Board</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto font-light">
               Esteemed experts guiding our strategic direction and cultural initiatives.
             </p>
           </motion.div>
@@ -568,11 +463,34 @@ const AboutPage = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="bg-white rounded-2xl shadow-elegant p-6"
+                className="bg-white rounded-xl p-8 hover:shadow-lg transition-all duration-300 border-t-4 border-green-500"
               >
-                <h3 className="text-xl font-bold text-gray-900">{advisor.name}</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">{advisor.name}</h3>
                 <p className="text-green-600 font-medium mb-3">{advisor.role}</p>
-                <p className="text-gray-600">{advisor.bio}</p>
+                <p className="text-gray-600 text-sm leading-relaxed">{advisor.bio}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Impact Highlights */}
+      <section className="py-24 bg-green-900 text-white relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 text-center">
+            {impactHighlights.map((item, index) => (
+              <motion.div
+                key={item.label}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className="p-6"
+              >
+                <div className="text-4xl md:text-5xl font-bold text-yellow-400 mb-2">{item.number}</div>
+                <div className="text-xl font-bold mb-2">{item.label}</div>
+                <div className="text-green-200 text-sm">{item.description}</div>
               </motion.div>
             ))}
           </div>

@@ -78,26 +78,33 @@ const GlobalStage = () => {
   ]
 
   return (
-    <section className="py-20 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-24 bg-gradient-to-b from-white via-gray-50 to-white relative overflow-hidden">
+      {/* Decorative Background */}
+      <div className="absolute inset-0 decorative-pattern opacity-[0.03]" />
+      <div className="absolute top-20 left-10 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl" />
+      <div className="absolute bottom-20 right-10 w-96 h-96 bg-green-500/5 rounded-full blur-3xl" />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="text-center mb-20"
         >
+          <span className="text-blue-600 font-semibold tracking-wider uppercase text-sm mb-2 block">Global Impact</span>
           <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-6">
-            Our Global Stage — The Vision
+            Our Global Stage — <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-green-600 to-black">The Vision</span>
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Kenya's presence on the world stage is marked by excellence, innovation, 
+          <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-green-500 mx-auto mb-8 rounded-full" />
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed font-light">
+            Kenya's presence on the world stage is marked by excellence, innovation,
             and a commitment to making a positive global impact.
           </p>
         </motion.div>
 
         {/* Achievements Grid */}
-        <div className="grid md:grid-cols-2 gap-8 mb-20">
+        <div className="grid md:grid-cols-2 gap-8 mb-24">
           {achievements.map((achievement, index) => (
             <motion.div
               key={achievement.title}
@@ -107,29 +114,30 @@ const GlobalStage = () => {
               viewport={{ once: true }}
               className="group"
             >
-              <div className="relative overflow-hidden rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
+              <div className="relative overflow-hidden rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 h-[400px]">
                 <img
                   src={achievement.image}
                   alt={achievement.title}
-                  className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
-                
-                <div className="absolute top-4 left-4">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
-                      <achievement.icon className="w-5 h-5 text-white" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-90" />
+
+                <div className="absolute top-6 left-6">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-12 h-12 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 group-hover:bg-white/20 transition-colors duration-300">
+                      <achievement.icon className="w-6 h-6 text-white" />
                     </div>
-                    <span className="text-white font-semibold bg-black/30 px-3 py-1 rounded-full text-sm">
+                    <span className="text-white font-semibold bg-white/10 backdrop-blur-md px-4 py-1.5 rounded-full text-sm border border-white/10">
                       {achievement.category}
                     </span>
                   </div>
                 </div>
-                
-                <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                  <h3 className="text-2xl font-bold mb-2">{achievement.title}</h3>
-                  <p className="text-gray-200 mb-4">{achievement.description}</p>
-                  <div className="text-yellow-400 font-bold text-lg">
+
+                <div className="absolute bottom-0 left-0 right-0 p-8 text-white transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                  <h3 className="text-3xl font-bold mb-3">{achievement.title}</h3>
+                  <p className="text-gray-200 mb-4 leading-relaxed opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">{achievement.description}</p>
+                  <div className="text-yellow-400 font-bold text-xl flex items-center">
+                    <Trophy className="w-5 h-5 mr-2" />
                     {achievement.stats}
                   </div>
                 </div>
@@ -144,13 +152,18 @@ const GlobalStage = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
           viewport={{ once: true }}
-          className="bg-gradient-to-r from-green-600 to-yellow-500 rounded-3xl p-12 text-white"
+          className="bg-gradient-to-br from-blue-900 via-indigo-900 to-blue-800 rounded-[2.5rem] p-12 md:p-20 text-white shadow-2xl relative overflow-hidden mb-24"
         >
-          <h3 className="text-3xl font-bold text-center mb-12">
+          {/* Decorative elements */}
+          <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-96 h-96 bg-black/20 rounded-full blur-3xl" />
+          <div className="absolute inset-0 bg-[url('/patterns/world-map.svg')] opacity-10 bg-center bg-no-repeat bg-contain" />
+
+          <h3 className="text-3xl md:text-4xl font-bold text-center mb-16 relative z-10">
             Kenya's Global Impact
           </h3>
-          
-          <div className="grid md:grid-cols-3 gap-8">
+
+          <div className="grid md:grid-cols-3 gap-12 relative z-10">
             {globalPresence.map((item, index) => (
               <motion.div
                 key={item.title}
@@ -158,13 +171,13 @@ const GlobalStage = () => {
                 whileInView={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="text-center"
+                className="text-center group"
               >
-                <div className="text-4xl font-bold text-yellow-400 mb-4">
+                <div className="text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-400 mb-6 group-hover:scale-110 transition-transform duration-300">
                   {item.number}
                 </div>
-                <h4 className="text-xl font-semibold mb-2">{item.title}</h4>
-                <p className="text-green-100">{item.description}</p>
+                <h4 className="text-xl font-bold mb-3">{item.title}</h4>
+                <p className="text-blue-100 leading-relaxed font-light">{item.description}</p>
               </motion.div>
             ))}
           </div>
@@ -176,9 +189,9 @@ const GlobalStage = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6 }}
           viewport={{ once: true }}
-          className="mt-20"
+          className="mb-24"
         >
-          <h3 className="text-3xl font-semibold text-gray-900 mb-8 text-center">
+          <h3 className="text-3xl font-bold text-gray-900 mb-12 text-center">
             Kenya on the World Stage
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
@@ -202,12 +215,12 @@ const GlobalStage = () => {
                 whileInView={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5, delay: index * 0.05 }}
                 viewport={{ once: true }}
-                className="relative overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer"
+                className="relative overflow-hidden rounded-xl shadow-md hover:shadow-xl transition-all duration-300 group cursor-pointer"
               >
                 <img
                   src={image}
                   alt={`Global impact ${index + 1}`}
-                  className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
                 />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
               </motion.div>
@@ -221,35 +234,35 @@ const GlobalStage = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.8 }}
           viewport={{ once: true }}
-          className="mt-20"
+          className="mb-24"
         >
-          <h3 className="text-3xl font-semibold text-gray-900 mb-8 text-center">
+          <h3 className="text-3xl font-bold text-gray-900 mb-12 text-center">
             International Recognition
           </h3>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="relative overflow-hidden rounded-2xl shadow-lg">
+            <div className="relative overflow-hidden rounded-3xl shadow-2xl group">
               <iframe
                 src="https://www.youtube.com/embed/dQw4w9WgXcQ"
                 title="Kenya at the Olympics"
-                className="w-full h-64 rounded-2xl"
+                className="w-full h-64 rounded-3xl"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
               />
             </div>
-            <div className="relative overflow-hidden rounded-2xl shadow-lg">
+            <div className="relative overflow-hidden rounded-3xl shadow-2xl group">
               <iframe
                 src="https://www.youtube.com/embed/dQw4w9WgXcQ"
                 title="Tech Innovation in Kenya"
-                className="w-full h-64 rounded-2xl"
+                className="w-full h-64 rounded-3xl"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
               />
             </div>
-            <div className="relative overflow-hidden rounded-2xl shadow-lg">
+            <div className="relative overflow-hidden rounded-3xl shadow-2xl group">
               <iframe
                 src="https://www.youtube.com/embed/dQw4w9WgXcQ"
                 title="Cultural Exchange Programs"
-                className="w-full h-64 rounded-2xl"
+                className="w-full h-64 rounded-3xl"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
               />
@@ -263,18 +276,18 @@ const GlobalStage = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 1.0 }}
           viewport={{ once: true }}
-          className="text-center mt-16"
+          className="text-center"
         >
           <h3 className="text-3xl font-bold text-gray-900 mb-6">
             Join Our Global Journey
           </h3>
-          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
             Be part of Kenya's continued success story and help us showcase our culture to the world.
           </p>
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-full font-semibold text-lg transition-colors duration-300"
+            className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-10 py-4 rounded-full font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300"
           >
             Partner With Us
           </motion.button>
