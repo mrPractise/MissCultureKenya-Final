@@ -226,6 +226,42 @@ const GalleryPage = () => {
     }
   ]
 
+  const videos = [
+    {
+      id: 1,
+      title: 'Susan\'s Cultural Journey',
+      category: 'Behind the Scenes',
+      thumbnail: 'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=600&h=400&fit=crop',
+      videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+      duration: '5:32',
+      views: '12.5K',
+      date: '2024-01-15',
+      description: 'A behind-the-scenes look at Susan\'s journey as a cultural ambassador.'
+    },
+    {
+      id: 2,
+      title: 'Traditional Dance Performance',
+      category: 'Cultural Events',
+      thumbnail: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=600&h=400&fit=crop',
+      videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+      duration: '3:45',
+      views: '8.7K',
+      date: '2024-01-10',
+      description: 'Experience the beauty of traditional Kenyan dance performances.'
+    },
+    {
+      id: 3,
+      title: 'Community Impact Story',
+      category: 'Community Work',
+      thumbnail: 'https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?w=600&h=400&fit=crop',
+      videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+      duration: '7:18',
+      views: '15.2K',
+      date: '2024-01-05',
+      description: 'See how Susan\'s work impacts local communities across Kenya.'
+    }
+  ]
+
   const handlePhotoClick = (index: number) => {
     setSelectedPhotoIndex(index)
     setIsPhotoModalOpen(true)
@@ -436,8 +472,8 @@ const GalleryPage = () => {
                     </div>
                   </div>
                 </motion.div>
-              ))}
-            </div>
+                ))}
+              </div>
             )}
           </motion.div>
 
@@ -457,7 +493,7 @@ const GalleryPage = () => {
                 <p className="text-gray-600">No videos available. Add videos in Django admin.</p>
               </div>
             ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {filteredVideos.map((video, index) => (
                 <motion.div
                   key={video.id}
@@ -506,7 +542,6 @@ const GalleryPage = () => {
                 </motion.div>
               ))}
             </div>
-            )}
           </motion.div>
 
         </div>

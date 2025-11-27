@@ -134,14 +134,15 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # CORS settings
-CORS_ALLOWED_ORIGINS_STR = config('CORS_ALLOWED_ORIGINS', default='http://localhost:3000,http://127.0.0.1:3000')
-CORS_ALLOWED_ORIGINS = [origin.strip() for origin in CORS_ALLOWED_ORIGINS_STR.split(',')]
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "https://misscultureglobalkenya.com",
+    "https://gallery.misscultureglobalkenya.com",
+    "https://events.misscultureglobalkenya.com",
+]
 
-# Also allow all origins in development (for testing)
-if DEBUG:
-    CORS_ALLOW_ALL_ORIGINS = True
-else:
-    CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_CREDENTIALS = True
 
 # Media files
 MEDIA_URL = '/media/'
@@ -149,9 +150,6 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 # Static files
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-
-# WhiteNoise configuration for serving static files
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # REST Framework settings
 REST_FRAMEWORK = {

@@ -331,9 +331,9 @@ const PartnershipPage = () => {
               </div>
 
               <div className="mt-16 text-center">
-                <Link href="/contact" className="inline-block bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-10 py-4 rounded-full font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+                <button className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-10 py-4 rounded-full font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
                   Become a Sponsor
-                </Link>
+                </button>
               </div>
             </div>
           </motion.div>

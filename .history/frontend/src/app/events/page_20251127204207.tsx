@@ -2,58 +2,17 @@
 
 import { motion } from 'framer-motion'
 import { Calendar, MapPin, Clock, Users, ExternalLink } from 'lucide-react'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import EventDetailsModal from '@/components/EventDetailsModal'
 import ContactModal from '@/components/ContactModal'
-import apiClient from '@/lib/api'
 
 const EventsPage = () => {
   const [selectedEvent, setSelectedEvent] = useState(null)
   const [isEventModalOpen, setIsEventModalOpen] = useState(false)
   const [isContactModalOpen, setIsContactModalOpen] = useState(false)
-  const [upcomingEvents, setUpcomingEvents] = useState<any[]>([])
-  const [pastEvents, setPastEvents] = useState<any[]>([])
-  const [eventCategories, setEventCategories] = useState<string[]>(['All'])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        setLoading(true)
-        
-        // Fetch upcoming events
-        const upcomingData = await apiClient.getUpcomingEvents()
-        setUpcomingEvents(Array.isArray(upcomingData) ? upcomingData : [])
-
-        // Fetch past events
-        const pastData = await apiClient.getPastEvents()
-        setPastEvents(Array.isArray(pastData) ? pastData : [])
-
-        // Fetch categories
-        const categoriesData = await apiClient.getEventCategories()
-        const categories = Array.isArray(categoriesData) 
-          ? categoriesData 
-          : (categoriesData.results || [])
-        const categoryNames = ['All', ...categories.map((cat: any) => cat.name || cat.title)]
-        setEventCategories(categoryNames)
-      } catch (err) {
-        console.error('Error fetching events:', err)
-        setError('Failed to load events. Make sure the backend server is running.')
-        // Fallback to empty arrays
-        setUpcomingEvents([])
-        setPastEvents([])
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchEvents()
-  }, [])
-
-  // Fallback data structure for when API returns empty
-  const defaultUpcomingEvents = [
+  const upcomingEvents = [
     {
       id: 1,
       title: 'Cultural Heritage Festival 2024',
@@ -165,7 +124,7 @@ const EventsPage = () => {
     }
   ]
 
-  const defaultPastEvents = [
+  const pastEvents = [
     {
       id: 4,
       title: 'UNESCO Cultural Exchange Program',
@@ -188,42 +147,7 @@ const EventsPage = () => {
     }
   ]
 
-  // Helper function to transform API event data to component format
-  const transformEvent = (event: any) => {
-    // If event already has the expected format (from defaults), return as is
-    if (event.title && event.date && event.venue && !event.start_date) {
-      return event
-    }
-    
-    // Transform API format to component format
-    return {
-      id: event.id,
-      title: event.title || event.name,
-      date: event.start_date || event.date,
-      time: event.start_time || event.time || '10:00 AM',
-      venue: event.venue_name || event.venue,
-      location: `${event.city || ''}, ${event.country || 'Kenya'}`.trim().replace(/^,\s*/, ''),
-      description: event.description,
-      image: event.featured_image || event.image || 'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=600&h=400&fit=crop',
-      category: event.event_type || event.category || 'Event',
-      capacity: event.capacity || 0,
-      price: event.price || 'Free',
-      organizer: event.organizer || 'Miss Culture Global Kenya',
-      contactEmail: event.contact_email || 'events@misscultureglobalkenya.com',
-      contactPhone: event.contact_phone || '+254 700 000 000',
-      ticketCategories: event.ticket_categories || [],
-      votingEnabled: event.voting_enabled || false,
-      currentVotes: event.current_votes || 0
-    }
-  }
-
-  const displayUpcomingEvents = upcomingEvents.length > 0 
-    ? upcomingEvents.map(transformEvent)
-    : defaultUpcomingEvents
-
-  const displayPastEvents = pastEvents.length > 0
-    ? pastEvents.map(transformEvent)
-    : defaultPastEvents
+  const eventCategories = ['All', 'Cultural Event', 'Conference', 'Workshop', 'International', 'Community']
 
   const handleEventClick = (event: any) => {
     setSelectedEvent(event)
@@ -316,23 +240,8 @@ const EventsPage = () => {
             <h2 className="text-3xl font-bold text-gray-900 mb-10 text-center">
               Upcoming <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-emerald-600">Events</span>
             </h2>
-            {loading ? (
-              <div className="text-center py-12">
-                <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
-                <p className="mt-4 text-gray-600">Loading events...</p>
-              </div>
-            ) : error ? (
-              <div className="text-center py-12">
-                <p className="text-red-600 mb-4">{error}</p>
-                <p className="text-gray-600 text-sm">Make sure the backend server is running at http://localhost:8000</p>
-              </div>
-            ) : displayUpcomingEvents.length === 0 ? (
-              <div className="text-center py-12">
-                <p className="text-gray-600">No upcoming events available. Add events in Django admin.</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                {displayUpcomingEvents.map((event, index) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              {upcomingEvents.map((event, index) => (
                 <motion.div
                   key={event.id}
                   initial={{ opacity: 0, y: 30 }}
@@ -399,9 +308,8 @@ const EventsPage = () => {
                     </button>
                   </div>
                 </motion.div>
-                ))}
-              </div>
-            )}
+              ))}
+            </div>
           </motion.div>
 
           {/* Past Events */}
@@ -414,13 +322,8 @@ const EventsPage = () => {
             <h2 className="text-3xl font-bold text-gray-900 mb-10 text-center">
               Past <span className="text-transparent bg-clip-text bg-gradient-to-r from-gray-600 to-gray-900">Events</span>
             </h2>
-            {displayPastEvents.length === 0 ? (
-              <div className="text-center py-12">
-                <p className="text-gray-600">No past events available.</p>
-              </div>
-            ) : (
-              <div className="grid md:grid-cols-2 gap-8">
-                {displayPastEvents.map((event, index) => (
+            <div className="grid md:grid-cols-2 gap-8">
+              {pastEvents.map((event, index) => (
                 <motion.div
                   key={event.id}
                   initial={{ opacity: 0, y: 30 }}
@@ -461,15 +364,14 @@ const EventsPage = () => {
                       </div>
                     </div>
 
-                    <Link href="/gallery" className="flex items-center text-green-600 hover:text-green-700 font-bold text-sm uppercase tracking-wide transition-colors duration-200 group/btn">
+                    <button className="flex items-center text-green-600 hover:text-green-700 font-bold text-sm uppercase tracking-wide transition-colors duration-200 group/btn">
                       <span>View Photos</span>
                       <ExternalLink className="w-4 h-4 ml-2 transform group-hover/btn:translate-x-1 transition-transform duration-200" />
-                    </Link>
+                    </button>
                   </div>
                 </motion.div>
-                ))}
-              </div>
-            )}
+              ))}
+            </div>
           </motion.div>
         </div>
       </section>

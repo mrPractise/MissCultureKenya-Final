@@ -190,12 +190,6 @@ const EventsPage = () => {
 
   // Helper function to transform API event data to component format
   const transformEvent = (event: any) => {
-    // If event already has the expected format (from defaults), return as is
-    if (event.title && event.date && event.venue && !event.start_date) {
-      return event
-    }
-    
-    // Transform API format to component format
     return {
       id: event.id,
       title: event.title || event.name,
@@ -219,7 +213,7 @@ const EventsPage = () => {
 
   const displayUpcomingEvents = upcomingEvents.length > 0 
     ? upcomingEvents.map(transformEvent)
-    : defaultUpcomingEvents
+    : defaultUpcomingEvents.map(transformEvent)
 
   const displayPastEvents = pastEvents.length > 0
     ? pastEvents.map(transformEvent)
@@ -399,9 +393,8 @@ const EventsPage = () => {
                     </button>
                   </div>
                 </motion.div>
-                ))}
-              </div>
-            )}
+              ))}
+            </div>
           </motion.div>
 
           {/* Past Events */}
@@ -414,13 +407,8 @@ const EventsPage = () => {
             <h2 className="text-3xl font-bold text-gray-900 mb-10 text-center">
               Past <span className="text-transparent bg-clip-text bg-gradient-to-r from-gray-600 to-gray-900">Events</span>
             </h2>
-            {displayPastEvents.length === 0 ? (
-              <div className="text-center py-12">
-                <p className="text-gray-600">No past events available.</p>
-              </div>
-            ) : (
-              <div className="grid md:grid-cols-2 gap-8">
-                {displayPastEvents.map((event, index) => (
+            <div className="grid md:grid-cols-2 gap-8">
+              {pastEvents.map((event, index) => (
                 <motion.div
                   key={event.id}
                   initial={{ opacity: 0, y: 30 }}
@@ -467,9 +455,8 @@ const EventsPage = () => {
                     </Link>
                   </div>
                 </motion.div>
-                ))}
-              </div>
-            )}
+              ))}
+            </div>
           </motion.div>
         </div>
       </section>

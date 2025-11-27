@@ -392,7 +392,7 @@ const Ambassador = () => {
           </h3>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 items-center">
-            {displayPartners.map((partner, index) => (
+            {partners.map((partner, index) => (
               <motion.div
                 key={partner.name}
                 initial={{ opacity: 0, scale: 0.8 }}

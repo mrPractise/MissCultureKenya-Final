@@ -190,12 +190,6 @@ const EventsPage = () => {
 
   // Helper function to transform API event data to component format
   const transformEvent = (event: any) => {
-    // If event already has the expected format (from defaults), return as is
-    if (event.title && event.date && event.venue && !event.start_date) {
-      return event
-    }
-    
-    // Transform API format to component format
     return {
       id: event.id,
       title: event.title || event.name,
@@ -219,7 +213,7 @@ const EventsPage = () => {
 
   const displayUpcomingEvents = upcomingEvents.length > 0 
     ? upcomingEvents.map(transformEvent)
-    : defaultUpcomingEvents
+    : defaultUpcomingEvents.map(transformEvent)
 
   const displayPastEvents = pastEvents.length > 0
     ? pastEvents.map(transformEvent)

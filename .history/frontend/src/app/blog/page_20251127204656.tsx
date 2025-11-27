@@ -349,29 +349,29 @@ Kenya's global impact isn't measured just in economics or politics - it's measur
 
               {/* Modal Content */}
               <div className="p-8 sm:p-12 bg-white">
-                <div className="prose prose-lg max-w-none prose-headings:font-bold prose-headings:text-gray-900 prose-p:text-gray-600 prose-p:leading-relaxed prose-a:text-green-600 hover:prose-a:text-green-700 prose-img:rounded-2xl">
-                  {selectedPost.fullContent.split('\\n\\n').map((paragraph, index) => (
-                    <p key={index} className="mb-6 first-letter:text-5xl first-letter:font-bold first-letter:text-green-600 first-letter:mr-3 first-letter:float-left">
-                      {paragraph}
-                    </p>
-                  ))}
-                </div>
+              <div className="prose prose-lg max-w-none prose-headings:font-bold prose-headings:text-gray-900 prose-p:text-gray-600 prose-p:leading-relaxed prose-a:text-green-600 hover:prose-a:text-green-700 prose-img:rounded-2xl">
+                {selectedPost.fullContent.split('\\n\\n').map((paragraph, index) => (
+                  <p key={index} className="mb-6 first-letter:text-5xl first-letter:font-bold first-letter:text-green-600 first-letter:mr-3 first-letter:float-left">
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
 
-                {/* Share Section */}
-                <div className="mt-12 pt-8 border-t border-gray-100">
-                  <h3 className="text-lg font-bold text-gray-900 mb-6 uppercase tracking-wide text-center">Share this article</h3>
-                  <div className="flex justify-center space-x-4">
-                    <button className="px-8 py-3 bg-[#1877F2] hover:bg-[#166fe5] text-white rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1 flex items-center">
-                      Facebook
-                    </button>
-                    <button className="px-8 py-3 bg-[#1DA1F2] hover:bg-[#1a91da] text-white rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1 flex items-center">
-                      Twitter
-                    </button>
-                    <button className="px-8 py-3 bg-[#25D366] hover:bg-[#20bd5a] text-white rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1 flex items-center">
-                      WhatsApp
-                    </button>
-                  </div>
+              {/* Share Section */}
+              <div className="mt-12 pt-8 border-t border-gray-100">
+                <h3 className="text-lg font-bold text-gray-900 mb-6 uppercase tracking-wide text-center">Share this article</h3>
+                <div className="flex justify-center space-x-4">
+                  <button className="px-8 py-3 bg-[#1877F2] hover:bg-[#166fe5] text-white rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1 flex items-center">
+                    Facebook
+                  </button>
+                  <button className="px-8 py-3 bg-[#1DA1F2] hover:bg-[#1a91da] text-white rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1 flex items-center">
+                    Twitter
+                  </button>
+                  <button className="px-8 py-3 bg-[#25D366] hover:bg-[#20bd5a] text-white rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1 flex items-center">
+                    WhatsApp
+                  </button>
                 </div>
+              </div>
               </div>
             </div>
           </motion.div>

@@ -226,18 +226,7 @@ const GalleryPage = () => {
     }
   ]
 
-  const handlePhotoClick = (index: number) => {
-    setSelectedPhotoIndex(index)
-    setIsPhotoModalOpen(true)
-  }
-
-  const handleVideoClick = (video: any) => {
-    setSelectedVideo(video)
-    setIsVideoModalOpen(true)
-  }
-
-  const finalPhotos = displayPhotos.length > 0 ? displayPhotos : defaultPhotos
-  const finalVideos = displayVideos.length > 0 ? displayVideos : [
+  const videos = [
     {
       id: 1,
       title: 'Susan\'s Cultural Journey',
@@ -248,16 +237,48 @@ const GalleryPage = () => {
       views: '12.5K',
       date: '2024-01-15',
       description: 'A behind-the-scenes look at Susan\'s journey as a cultural ambassador.'
+    },
+    {
+      id: 2,
+      title: 'Traditional Dance Performance',
+      category: 'Cultural Events',
+      thumbnail: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=600&h=400&fit=crop',
+      videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+      duration: '3:45',
+      views: '8.7K',
+      date: '2024-01-10',
+      description: 'Experience the beauty of traditional Kenyan dance performances.'
+    },
+    {
+      id: 3,
+      title: 'Community Impact Story',
+      category: 'Community Work',
+      thumbnail: 'https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?w=600&h=400&fit=crop',
+      videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+      duration: '7:18',
+      views: '15.2K',
+      date: '2024-01-05',
+      description: 'See how Susan\'s work impacts local communities across Kenya.'
     }
   ]
 
+  const handlePhotoClick = (index: number) => {
+    setSelectedPhotoIndex(index)
+    setIsPhotoModalOpen(true)
+  }
+
+  const handleVideoClick = (video: any) => {
+    setSelectedVideo(video)
+    setIsVideoModalOpen(true)
+  }
+
   const filteredPhotos = selectedCategory === 'All'
-    ? finalPhotos
-    : finalPhotos.filter(photo => photo.category === selectedCategory)
+    ? photos
+    : photos.filter(photo => photo.category === selectedCategory)
 
   const filteredVideos = selectedCategory === 'All'
-    ? finalVideos
-    : finalVideos.filter(video => video.category === selectedCategory)
+    ? videos
+    : videos.filter(video => video.category === selectedCategory)
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -318,17 +339,7 @@ const GalleryPage = () => {
             viewport={{ once: true }}
             className="flex flex-wrap justify-center gap-3 sm:gap-4 mb-16"
           >
-            {loading ? (
-              <div className="text-center w-full py-8">
-                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-pink-600"></div>
-                <p className="mt-2 text-gray-600 text-sm">Loading categories...</p>
-              </div>
-            ) : error ? (
-              <div className="text-center w-full py-8">
-                <p className="text-red-600 text-sm">{error}</p>
-              </div>
-            ) : (
-              displayCategories.map((category) => (
+            {categories.map((category) => (
               <button
                 key={category}
                 onClick={() => setSelectedCategory(category)}
@@ -339,8 +350,7 @@ const GalleryPage = () => {
               >
                 {category}
               </button>
-              ))
-            )}
+            ))}
           </motion.div>
 
           {/* Photo Gallery */}
@@ -363,16 +373,6 @@ const GalleryPage = () => {
               </div>
             </div>
 
-            {loading ? (
-              <div className="text-center py-12">
-                <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600"></div>
-                <p className="mt-4 text-gray-600">Loading photos...</p>
-              </div>
-            ) : filteredPhotos.length === 0 ? (
-              <div className="text-center py-12">
-                <p className="text-gray-600">No photos available. Add photos in Django admin.</p>
-              </div>
-            ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filteredPhotos.map((photo, index) => (
                 <motion.div
@@ -438,7 +438,6 @@ const GalleryPage = () => {
                 </motion.div>
               ))}
             </div>
-            )}
           </motion.div>
 
           {/* Video Gallery */}
@@ -452,13 +451,8 @@ const GalleryPage = () => {
             <h2 className="text-3xl font-bold text-gray-900 mb-10">
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-600 to-purple-600">Videos</span>
             </h2>
-            {filteredVideos.length === 0 ? (
-              <div className="text-center py-12">
-                <p className="text-gray-600">No videos available. Add videos in Django admin.</p>
-              </div>
-            ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {filteredVideos.map((video, index) => (
+              {filteredVideos.map((video, index) => (
                 <motion.div
                   key={video.id}
                   initial={{ opacity: 0, y: 30 }}
@@ -506,7 +500,6 @@ const GalleryPage = () => {
                 </motion.div>
               ))}
             </div>
-            )}
           </motion.div>
 
         </div>

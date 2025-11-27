@@ -317,61 +317,60 @@ Kenya's global impact isn't measured just in economics or politics - it's measur
                   className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-8 sm:p-10">
-                  <span className="inline-block bg-green-600 text-white px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide mb-4 shadow-lg">
-                    {selectedPost.category}
-                  </span>
-                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-6 leading-tight drop-shadow-lg">
-                    {selectedPost.title}
-                  </h2>
-                  <div className="flex flex-wrap items-center gap-6 text-sm text-gray-200 font-medium">
-                    <div className="flex items-center space-x-2">
-                      <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
-                        <User className="w-4 h-4 text-white" />
-                      </div>
-                      <span>{selectedPost.author}</span>
+              <div className="absolute bottom-0 left-0 right-0 p-8 sm:p-10">
+                <span className="inline-block bg-green-600 text-white px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide mb-4 shadow-lg">
+                  {selectedPost.category}
+                </span>
+                <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-6 leading-tight drop-shadow-lg">
+                  {selectedPost.title}
+                </h2>
+                <div className="flex flex-wrap items-center gap-6 text-sm text-gray-200 font-medium">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                      <User className="w-4 h-4 text-white" />
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
-                        <Calendar className="w-4 h-4 text-white" />
-                      </div>
-                      <span>{new Date(selectedPost.date).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                    <span>{selectedPost.author}</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                      <Calendar className="w-4 h-4 text-white" />
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
-                        <Clock className="w-4 h-4 text-white" />
-                      </div>
-                      <span>{selectedPost.readTime}</span>
+                    <span>{new Date(selectedPost.date).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                      <Clock className="w-4 h-4 text-white" />
                     </div>
+                    <span>{selectedPost.readTime}</span>
                   </div>
                 </div>
               </div>
 
               {/* Modal Content */}
               <div className="p-8 sm:p-12 bg-white">
-                <div className="prose prose-lg max-w-none prose-headings:font-bold prose-headings:text-gray-900 prose-p:text-gray-600 prose-p:leading-relaxed prose-a:text-green-600 hover:prose-a:text-green-700 prose-img:rounded-2xl">
-                  {selectedPost.fullContent.split('\\n\\n').map((paragraph, index) => (
-                    <p key={index} className="mb-6 first-letter:text-5xl first-letter:font-bold first-letter:text-green-600 first-letter:mr-3 first-letter:float-left">
-                      {paragraph}
-                    </p>
-                  ))}
-                </div>
+              <div className="prose prose-lg max-w-none prose-headings:font-bold prose-headings:text-gray-900 prose-p:text-gray-600 prose-p:leading-relaxed prose-a:text-green-600 hover:prose-a:text-green-700 prose-img:rounded-2xl">
+                {selectedPost.fullContent.split('\\n\\n').map((paragraph, index) => (
+                  <p key={index} className="mb-6 first-letter:text-5xl first-letter:font-bold first-letter:text-green-600 first-letter:mr-3 first-letter:float-left">
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
 
-                {/* Share Section */}
-                <div className="mt-12 pt-8 border-t border-gray-100">
-                  <h3 className="text-lg font-bold text-gray-900 mb-6 uppercase tracking-wide text-center">Share this article</h3>
-                  <div className="flex justify-center space-x-4">
-                    <button className="px-8 py-3 bg-[#1877F2] hover:bg-[#166fe5] text-white rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1 flex items-center">
-                      Facebook
-                    </button>
-                    <button className="px-8 py-3 bg-[#1DA1F2] hover:bg-[#1a91da] text-white rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1 flex items-center">
-                      Twitter
-                    </button>
-                    <button className="px-8 py-3 bg-[#25D366] hover:bg-[#20bd5a] text-white rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1 flex items-center">
-                      WhatsApp
-                    </button>
-                  </div>
+              {/* Share Section */}
+              <div className="mt-12 pt-8 border-t border-gray-100">
+                <h3 className="text-lg font-bold text-gray-900 mb-6 uppercase tracking-wide text-center">Share this article</h3>
+                <div className="flex justify-center space-x-4">
+                  <button className="px-8 py-3 bg-[#1877F2] hover:bg-[#166fe5] text-white rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1 flex items-center">
+                    Facebook
+                  </button>
+                  <button className="px-8 py-3 bg-[#1DA1F2] hover:bg-[#1a91da] text-white rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1 flex items-center">
+                    Twitter
+                  </button>
+                  <button className="px-8 py-3 bg-[#25D366] hover:bg-[#20bd5a] text-white rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1 flex items-center">
+                    WhatsApp
+                  </button>
                 </div>
+              </div>
               </div>
             </div>
           </motion.div>

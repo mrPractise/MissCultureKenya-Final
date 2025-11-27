@@ -226,6 +226,42 @@ const GalleryPage = () => {
     }
   ]
 
+  const videos = [
+    {
+      id: 1,
+      title: 'Susan\'s Cultural Journey',
+      category: 'Behind the Scenes',
+      thumbnail: 'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=600&h=400&fit=crop',
+      videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+      duration: '5:32',
+      views: '12.5K',
+      date: '2024-01-15',
+      description: 'A behind-the-scenes look at Susan\'s journey as a cultural ambassador.'
+    },
+    {
+      id: 2,
+      title: 'Traditional Dance Performance',
+      category: 'Cultural Events',
+      thumbnail: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=600&h=400&fit=crop',
+      videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+      duration: '3:45',
+      views: '8.7K',
+      date: '2024-01-10',
+      description: 'Experience the beauty of traditional Kenyan dance performances.'
+    },
+    {
+      id: 3,
+      title: 'Community Impact Story',
+      category: 'Community Work',
+      thumbnail: 'https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?w=600&h=400&fit=crop',
+      videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+      duration: '7:18',
+      views: '15.2K',
+      date: '2024-01-05',
+      description: 'See how Susan\'s work impacts local communities across Kenya.'
+    }
+  ]
+
   const handlePhotoClick = (index: number) => {
     setSelectedPhotoIndex(index)
     setIsPhotoModalOpen(true)
@@ -339,8 +375,7 @@ const GalleryPage = () => {
               >
                 {category}
               </button>
-              ))
-            )}
+            ))}
           </motion.div>
 
           {/* Photo Gallery */}
@@ -363,16 +398,6 @@ const GalleryPage = () => {
               </div>
             </div>
 
-            {loading ? (
-              <div className="text-center py-12">
-                <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600"></div>
-                <p className="mt-4 text-gray-600">Loading photos...</p>
-              </div>
-            ) : filteredPhotos.length === 0 ? (
-              <div className="text-center py-12">
-                <p className="text-gray-600">No photos available. Add photos in Django admin.</p>
-              </div>
-            ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filteredPhotos.map((photo, index) => (
                 <motion.div
@@ -438,7 +463,6 @@ const GalleryPage = () => {
                 </motion.div>
               ))}
             </div>
-            )}
           </motion.div>
 
           {/* Video Gallery */}
@@ -452,13 +476,8 @@ const GalleryPage = () => {
             <h2 className="text-3xl font-bold text-gray-900 mb-10">
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-600 to-purple-600">Videos</span>
             </h2>
-            {filteredVideos.length === 0 ? (
-              <div className="text-center py-12">
-                <p className="text-gray-600">No videos available. Add videos in Django admin.</p>
-              </div>
-            ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {filteredVideos.map((video, index) => (
+              {filteredVideos.map((video, index) => (
                 <motion.div
                   key={video.id}
                   initial={{ opacity: 0, y: 30 }}
@@ -506,7 +525,6 @@ const GalleryPage = () => {
                 </motion.div>
               ))}
             </div>
-            )}
           </motion.div>
 
         </div>
