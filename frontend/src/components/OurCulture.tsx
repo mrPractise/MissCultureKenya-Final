@@ -284,7 +284,7 @@ const OurCulture = () => {
           <div className="grid md:grid-cols-3 gap-8">
             <div className="relative overflow-hidden rounded-3xl shadow-2xl group">
               <iframe
-                src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+                src="https://www.youtube.com/embed/NgqljvNDPA8"
                 title="Traditional Dance Performance"
                 className="w-full h-64 rounded-3xl"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -293,7 +293,7 @@ const OurCulture = () => {
             </div>
             <div className="relative overflow-hidden rounded-3xl shadow-2xl group">
               <iframe
-                src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+                src="https://www.youtube.com/embed/NgqljvNDPA8"
                 title="Cultural Music Performance"
                 className="w-full h-64 rounded-3xl"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -302,7 +302,7 @@ const OurCulture = () => {
             </div>
             <div className="relative overflow-hidden rounded-3xl shadow-2xl group">
               <iframe
-                src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+                src="https://www.youtube.com/embed/NgqljvNDPA8"
                 title="Traditional Ceremony"
                 className="w-full h-64 rounded-3xl"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

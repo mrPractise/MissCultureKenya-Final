@@ -274,7 +274,7 @@ const OurKenya = () => {
             <div className="relative overflow-hidden rounded-3xl shadow-2xl group">
               <div className="aspect-w-16 aspect-h-9">
                 <iframe
-                  src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+                  src="https://www.youtube.com/embed/NgqljvNDPA8"
                   title="Kenya Experience Video"
                   className="w-full h-80 rounded-3xl"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -285,7 +285,7 @@ const OurKenya = () => {
             <div className="relative overflow-hidden rounded-3xl shadow-2xl group">
               <div className="aspect-w-16 aspect-h-9">
                 <iframe
-                  src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+                  src="https://www.youtube.com/embed/NgqljvNDPA8"
                   title="Cultural Heritage Video"
                   className="w-full h-80 rounded-3xl"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

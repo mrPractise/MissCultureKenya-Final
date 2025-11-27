@@ -583,3 +583,14 @@ html {
 .stagger-children>* {
   animation-delay: calc(var(--stagger-index, 0) * 0.1s);
 }
+
+/* Zoom effect for 75% view */
+.zoom-75 {
+  zoom: 0.75;
+}
+
+/* Alternative zoom using transform for better browser support */
+.transform-zoom-75 {
+  transform: scale(0.75);
+  transform-origin: top left;
+}

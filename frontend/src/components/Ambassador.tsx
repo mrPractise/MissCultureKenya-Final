@@ -360,7 +360,7 @@ const Ambassador = () => {
           <div className="grid md:grid-cols-2 gap-8">
             <div className="relative overflow-hidden rounded-3xl shadow-2xl group">
               <iframe
-                src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+                src="https://www.youtube.com/embed/NgqljvNDPA8"
                 title="Susan's Journey"
                 className="w-full h-80 rounded-3xl"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -369,7 +369,7 @@ const Ambassador = () => {
             </div>
             <div className="relative overflow-hidden rounded-3xl shadow-2xl group">
               <iframe
-                src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+                src="https://www.youtube.com/embed/NgqljvNDPA8"
                 title="Cultural Ambassador Work"
                 className="w-full h-80 rounded-3xl"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
