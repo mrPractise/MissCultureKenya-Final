@@ -18,18 +18,18 @@ const VotingPage = () => {
       venue: 'KICC Convention Centre',
       location: 'Nairobi, Kenya',
       description: 'The ultimate cultural pageant celebrating Kenya\'s diverse heritage and empowering young women to be cultural ambassadors.',
-      image: 'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=600&h=400&fit=crop',
+      image: '/images/global-stage.jpeg',
       category: 'Modeling Event',
       votingEnabled: true,
       participants: [
         {
           id: '1-1',
-          name: 'Grace Wanjiku',
+          name: 'Susan Abongo',
           age: 22,
           category: 'adult',
-          image: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=400&h=500&fit=crop',
+          image: '/images/SUE3.jpg',
           ideology: 'Promoting cultural unity through education and community engagement',
-          whyVote: 'Grace believes in using her platform to educate young people about Kenya\'s rich cultural heritage and inspire them to be proud of their roots.',
+          whyVote: 'Susan believes in using her platform to educate young people about Kenya\'s rich cultural heritage and inspire them to be proud of their roots.',
           hometown: 'Nairobi'
         },
         {
@@ -37,7 +37,7 @@ const VotingPage = () => {
           name: 'Aisha Mwangi',
           age: 23,
           category: 'adult',
-          image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=500&fit=crop',
+          image: '/images/SUE5.jpg',
           ideology: 'Empowering women through cultural entrepreneurship',
           whyVote: 'Aisha is passionate about helping women start cultural businesses and preserving traditional crafts for future generations.',
           hometown: 'Mombasa'
@@ -47,7 +47,7 @@ const VotingPage = () => {
           name: 'Faith Chebet',
           age: 19,
           category: 'adult',
-          image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=500&fit=crop',
+          image: '/images/SUE6.jpg',
           ideology: 'Youth leadership in cultural preservation',
           whyVote: 'Faith is dedicated to engaging young people in cultural activities and creating innovative ways to keep traditions alive.',
           hometown: 'Nakuru'
@@ -57,7 +57,7 @@ const VotingPage = () => {
           name: 'Zawadi Makena',
           age: 17,
           category: 'teens',
-          image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=500&fit=crop',
+          image: '/images/SUE7.jpg',
           ideology: 'Inspiring the next generation through cultural pride',
           whyVote: 'Zawadi wants to show other teenagers that being culturally aware and proud is cool and important for our future.',
           hometown: 'Kisumu'
@@ -67,7 +67,7 @@ const VotingPage = () => {
           name: 'Neema Akinyi',
           age: 16,
           category: 'teens',
-          image: 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=400&h=500&fit=crop',
+          image: '/images/SUE8.jpg',
           ideology: 'Cultural diversity as a strength',
           whyVote: 'Neema believes that Kenya\'s diversity is its greatest strength and wants to promote unity among all communities.',
           hometown: 'Eldoret'
@@ -77,7 +77,7 @@ const VotingPage = () => {
           name: 'Wanjiku Kamau',
           age: 18,
           category: 'teens',
-          image: 'https://images.unsplash.com/photo-1506863530036-1efeddceb993?w=400&h=500&fit=crop',
+          image: '/images/The ambassodor.jpg',
           ideology: 'Environmental conservation through cultural practices',
           whyVote: 'Wanjiku combines traditional environmental knowledge with modern conservation efforts to protect Kenya\'s natural heritage.',
           hometown: 'Thika'

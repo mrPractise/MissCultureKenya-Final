@@ -10,7 +10,7 @@ const GlobalStage = () => {
       title: 'Athletics Excellence',
       description: 'Kenya\'s dominance in long-distance running has brought home countless Olympic and World Championship medals.',
       icon: Trophy,
-      image: 'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=600&h=400&fit=crop',
+      image: '/images/global-athletics.jpg',
       stats: '50+ Olympic Medals',
       gallery: [
         'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=400&h=300&fit=crop',
@@ -23,7 +23,7 @@ const GlobalStage = () => {
       title: 'Magical Kenya',
       description: 'From the Maasai Mara to Mount Kenya, our natural beauty attracts millions of visitors annually.',
       icon: Plane,
-      image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=600&h=400&fit=crop',
+      image: '/images/global-magical kenya.jpg',
       stats: '2M+ Annual Visitors',
       gallery: [
         'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop',
@@ -36,7 +36,7 @@ const GlobalStage = () => {
       title: 'Silicon Savannah',
       description: 'M-Pesa revolutionized mobile payments, and Nairobi\'s tech scene continues to innovate globally.',
       icon: Lightbulb,
-      image: 'https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?w=600&h=400&fit=crop',
+      image: '/images/global-silicon savannah.webp',
       stats: '40M+ M-Pesa Users',
       gallery: [
         'https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?w=400&h=300&fit=crop',
@@ -49,7 +49,7 @@ const GlobalStage = () => {
       title: 'Creative Expression',
       description: 'From literature to film, Kenyan artists are making their mark on the global cultural landscape.',
       icon: Camera,
-      image: 'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=600&h=400&fit=crop',
+      image: '/images/global-creative expression.jpg',
       stats: 'Award-Winning Films',
       gallery: [
         'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=400&h=300&fit=crop',
@@ -196,18 +196,18 @@ const GlobalStage = () => {
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
             {[
-              'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=400&h=300&fit=crop',
-              'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop',
-              'https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?w=400&h=300&fit=crop',
-              'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=400&h=300&fit=crop',
-              'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop',
-              'https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?w=400&h=300&fit=crop',
-              'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=400&h=300&fit=crop',
-              'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop',
-              'https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?w=400&h=300&fit=crop',
-              'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=400&h=300&fit=crop',
-              'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop',
-              'https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?w=400&h=300&fit=crop'
+              '/images/global-athletics.jpg',
+              '/images/global-magical kenya.jpg',
+              '/images/global-silicon savannah.webp',
+              '/images/global-creative expression.jpg',
+              '/images/global-stage.jpeg',
+              '/images/global-athletics.jpg',
+              '/images/global-magical kenya.jpg',
+              '/images/global-silicon savannah.webp',
+              '/images/global-creative expression.jpg',
+              '/images/global-stage.jpeg',
+              '/images/global-athletics.jpg',
+              '/images/global-magical kenya.jpg'
             ].map((image, index) => (
               <motion.div
                 key={index}

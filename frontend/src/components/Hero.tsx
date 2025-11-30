@@ -18,16 +18,16 @@ const Hero = () => {
     <section ref={ref} className="relative h-screen flex items-center justify-center overflow-hidden">
       {/* Background Image with Parallax */}
       <motion.div style={{ y, opacity }} className="absolute inset-0 z-0">
-        <div className="w-full h-full bg-gradient-to-br from-red-900/90 via-black/80 to-green-900/90">
-          <div className="w-full h-full bg-cover bg-center bg-no-repeat mix-blend-overlay" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=1920&h=1080&fit=crop)' }} />
+        <div className="w-full h-full bg-gradient-to-br from-red-900/95 via-black/90 to-green-900/95">
+          <div className="w-full h-full bg-cover bg-center bg-no-repeat mix-blend-overlay" style={{ backgroundImage: 'url(/images/backgrounds/missculture1.jpg)' }} />
         </div>
       </motion.div>
 
       {/* Decorative Elements */}
       <div className="absolute inset-0 z-[1] pointer-events-none">
-        <div className="absolute top-10 left-10 w-32 h-32 bg-yellow-500/20 rounded-full blur-[100px] animate-pulse-glow" />
-        <div className="absolute bottom-20 right-20 w-40 h-40 bg-green-500/20 rounded-full blur-[100px] animate-pulse-glow" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-red-500/20 rounded-full blur-[80px] animate-float" style={{ animationDelay: '0.5s' }} />
+        <div className="absolute top-10 left-10 w-32 h-32 bg-red-600/30 rounded-full blur-[100px] animate-pulse-glow" />
+        <div className="absolute bottom-20 right-20 w-40 h-40 bg-green-600/30 rounded-full blur-[100px] animate-pulse-glow" style={{ animationDelay: '1s' }} />
+        <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-black/40 rounded-full blur-[80px] animate-float" style={{ animationDelay: '0.5s' }} />
       </div>
 
       {/* Content */}
@@ -43,7 +43,7 @@ const Hero = () => {
             transition={{ duration: 1, delay: 0.2 }}
             className="mb-6 inline-block"
           >
-            <span className="px-4 py-1.5 rounded-full border border-white/20 bg-white/5 backdrop-blur-sm text-sm font-medium tracking-wider uppercase text-yellow-400">
+            <span className="px-4 py-1.5 rounded-full border border-white/20 bg-white/5 backdrop-blur-sm text-sm font-medium tracking-wider uppercase text-red-400">
               Welcome to Miss Culture Global Kenya
             </span>
           </motion.div>

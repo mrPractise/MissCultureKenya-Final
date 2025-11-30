@@ -8,7 +8,7 @@ const OurKenya = () => {
     {
       name: 'Nairobi',
       description: 'The vibrant capital city, a melting pot of cultures and innovation.',
-      image: 'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=800&h=600&fit=crop',
+      image: '/images/Nairobi.jpg',
       featured: true,
       gallery: [
         'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=400&h=300&fit=crop',
@@ -19,7 +19,7 @@ const OurKenya = () => {
     {
       name: 'Mombasa',
       description: 'The coastal gem where Swahili culture meets the Indian Ocean.',
-      image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=600&fit=crop',
+      image: '/images/Mombasa.jpg',
       featured: true,
       gallery: [
         'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop',
@@ -30,7 +30,7 @@ const OurKenya = () => {
     {
       name: 'Nakuru',
       description: 'Home to the Great Rift Valley and stunning natural beauty.',
-      image: 'https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?w=800&h=600&fit=crop',
+      image: '/images/Nakuru.jpg',
       featured: false,
       gallery: [
         'https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?w=400&h=300&fit=crop',
@@ -41,7 +41,7 @@ const OurKenya = () => {
     {
       name: 'Kisumu',
       description: 'The lakeside city on the shores of Lake Victoria.',
-      image: 'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=800&h=600&fit=crop',
+      image: '/images/Kisumu.jpg',
       featured: false,
       gallery: [
         'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=400&h=300&fit=crop',
@@ -231,14 +231,14 @@ const OurKenya = () => {
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=400&h=300&fit=crop',
-              'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop',
-              'https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?w=400&h=300&fit=crop',
-              'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=400&h=300&fit=crop',
-              'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop',
-              'https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?w=400&h=300&fit=crop',
-              'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=400&h=300&fit=crop',
-              'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop'
+              '/images/Nairobi.jpg',
+              '/images/Mombasa.jpg',
+              '/images/Nakuru.jpg',
+              '/images/Kisumu.jpg',
+              '/images/Nairobi.jpg',
+              '/images/Mombasa.jpg',
+              '/images/Nakuru.jpg',
+              '/images/Kisumu.jpg'
             ].map((image, index) => (
               <motion.div
                 key={index}

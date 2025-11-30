@@ -14,3 +14,4 @@ print("="*60)
 print("\nCopy this and use it as SECRET_KEY in your deployment platform.")
 print("="*60 + "\n")
 
+

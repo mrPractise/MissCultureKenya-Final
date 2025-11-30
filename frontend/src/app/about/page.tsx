@@ -67,10 +67,10 @@ const AboutPage = () => {
 
   const currentLeadership = [
     {
-      name: 'Susan Wanjiru',
+      name: 'Susan Abongo',
       title: 'Miss Culture Global Kenya',
       bio: 'A passionate cultural ambassador with over 5 years of experience promoting Kenyan heritage. Susan holds a degree in Cultural Studies and has represented Kenya in international cultural forums.',
-      image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop',
+      image: '/images/SUE8.jpg',
       social: {
         instagram: '#',
         twitter: '#',
@@ -81,7 +81,7 @@ const AboutPage = () => {
       name: 'James Mwangi',
       title: 'Director of Operations',
       bio: 'Oversees all operational aspects of the organization with a focus on community engagement and event management. James has a background in event planning and cultural tourism.',
-      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop',
+      image: '/images/SUE3.jpg',
       social: {
         instagram: '#',
         twitter: '#',
@@ -92,7 +92,7 @@ const AboutPage = () => {
       name: 'Grace Njeri',
       title: 'Community Outreach Coordinator',
       bio: 'Leads community engagement initiatives and works directly with local artisans and cultural groups. Grace has a Master\'s degree in Anthropology and extensive experience in grassroots organizing.',
-      image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop',
+      image: '/images/SUE6.jpg',
       social: {
         instagram: '#',
         twitter: '#',
@@ -244,7 +244,7 @@ const AboutPage = () => {
             >
               <div className="absolute inset-0 bg-gradient-to-tr from-green-600 to-yellow-500 rounded-2xl transform rotate-3 opacity-20" />
               <img
-                src="https://images.unsplash.com/photo-1489980557514-251d61e3eeb6?w=800&h=600&fit=crop"
+                src="/images/SUE5.jpg"
                 alt="Kenyan Culture"
                 className="relative rounded-2xl shadow-2xl transform -rotate-3 hover:rotate-0 transition-transform duration-500"
               />

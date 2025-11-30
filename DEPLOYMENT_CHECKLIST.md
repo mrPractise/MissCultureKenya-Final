@@ -68,3 +68,4 @@ git push origin main
 - **Vercel Dashboard**: https://vercel.com/dashboard
 - **Generate Secret Key**: Run `python backend/generate_secret_key.py`
 
+

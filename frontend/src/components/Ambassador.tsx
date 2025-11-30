@@ -13,12 +13,12 @@ const Ambassador = () => {
     title: 'Cultural Ambassador',
     bio: 'A passionate advocate for Kenya\'s cultural heritage, Susan represents the beauty and diversity of our nation on the global stage.',
     mission: 'To bridge cultures, promote understanding, and showcase the rich tapestry of Kenyan traditions to the world.',
-    image: 'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=500&h=600&fit=crop',
+    image: '/images/SUE8.jpg',
     gallery: [
-      'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=400&h=500&fit=crop',
-      'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=500&fit=crop',
-      'https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?w=400&h=500&fit=crop',
-      'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=400&h=500&fit=crop'
+      '/images/SUE3.jpg',
+      '/images/SUE5.jpg',
+      '/images/SUE6.jpg',
+      '/images/SUE7.jpg'
     ]
   })
   const [partners, setPartners] = useState<any[]>([])
@@ -252,17 +252,17 @@ const Ambassador = () => {
               {
                 title: 'Cultural Event 1',
                 subtitle: 'Official Photoshoot',
-                image: 'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=500&h=400&fit=crop'
+                image: '/images/SUE3.jpg'
               },
               {
                 title: 'International Conference',
                 subtitle: 'Global Stage Appearance',
-                image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=500&h=400&fit=crop'
+                image: '/images/SUE5.jpg'
               },
               {
                 title: 'Community Engagement',
                 subtitle: 'Local Impact Work',
-                image: 'https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?w=500&h=400&fit=crop'
+                image: '/images/SUE6.jpg'
               }
             ].map((item, index) => (
               <motion.div
@@ -314,18 +314,18 @@ const Ambassador = () => {
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
             {[
-              'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=300&h=400&fit=crop',
-              'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=400&fit=crop',
-              'https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?w=300&h=400&fit=crop',
-              'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=300&h=400&fit=crop',
-              'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=400&fit=crop',
-              'https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?w=300&h=400&fit=crop',
-              'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=300&h=400&fit=crop',
-              'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=400&fit=crop',
-              'https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?w=300&h=400&fit=crop',
-              'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=300&h=400&fit=crop',
-              'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=400&fit=crop',
-              'https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?w=300&h=400&fit=crop'
+              '/images/SUE3.jpg',
+              '/images/SUE5.jpg',
+              '/images/SUE6.jpg',
+              '/images/SUE7.jpg',
+              '/images/SUE8.jpg',
+              '/images/The ambassodor.jpg',
+              '/images/SUE3.jpg',
+              '/images/SUE5.jpg',
+              '/images/SUE6.jpg',
+              '/images/SUE7.jpg',
+              '/images/SUE8.jpg',
+              '/images/The ambassodor.jpg'
             ].map((image, index) => (
               <motion.div
                 key={index}

@@ -101,3 +101,4 @@ To see actual data, add some test data in Django admin:
 - ✅ API test page available at `/api-test`
 - ⏳ Other components still use hardcoded data (can be updated as needed)
 
+

@@ -15,7 +15,7 @@ const OurCulture = () => {
     {
       title: 'Traditional Attire',
       description: 'From the colorful Maasai shukas to the elegant Kikuyu dresses, each piece tells a story.',
-      image: 'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=400&h=500&fit=crop',
+      image: '/images/culture.jpg',
       icon: Palette,
       gallery: [
         'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=300&h=400&fit=crop',
@@ -26,7 +26,7 @@ const OurCulture = () => {
     {
       title: 'Music & Dance',
       description: 'Rhythmic beats and graceful movements that celebrate life and community.',
-      image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=500&fit=crop',
+      image: '/images/culture2.jpg',
       icon: Music,
       gallery: [
         'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=400&fit=crop',
@@ -238,18 +238,18 @@ const OurCulture = () => {
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {[
-              'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=300&h=400&fit=crop',
-              'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=400&fit=crop',
-              'https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?w=300&h=400&fit=crop',
-              'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=300&h=400&fit=crop',
-              'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=400&fit=crop',
-              'https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?w=300&h=400&fit=crop',
-              'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=300&h=400&fit=crop',
-              'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=400&fit=crop',
-              'https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?w=300&h=400&fit=crop',
-              'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=300&h=400&fit=crop',
-              'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=400&fit=crop',
-              'https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?w=300&h=400&fit=crop'
+              '/images/culture.jpg',
+              '/images/culture2.jpg',
+              '/images/culture.jpg',
+              '/images/culture2.jpg',
+              '/images/culture.jpg',
+              '/images/culture2.jpg',
+              '/images/culture.jpg',
+              '/images/culture2.jpg',
+              '/images/culture.jpg',
+              '/images/culture2.jpg',
+              '/images/culture.jpg',
+              '/images/culture2.jpg'
             ].map((image, index) => (
               <motion.div
                 key={index}
