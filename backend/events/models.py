@@ -63,8 +63,8 @@ class Event(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        verbose_name = "Event"
-        verbose_name_plural = "Events"
+        verbose_name = "Events - Event"
+        verbose_name_plural = "Events - Events"
         ordering = ['-start_date']
 
     def __str__(self):
@@ -146,8 +146,8 @@ class EventInquiry(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        verbose_name = "Event Inquiry"
-        verbose_name_plural = "Event Inquiries"
+        verbose_name = "Events - Inquiry"
+        verbose_name_plural = "Events - Inquiries"
         ordering = ['-created_at']
 
     def __str__(self):
@@ -163,8 +163,8 @@ class EventCategory(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        verbose_name = "Event Category"
-        verbose_name_plural = "Event Categories"
+        verbose_name = "Events - Category"
+        verbose_name_plural = "Events - Categories"
         ordering = ['name']
 
     def __str__(self):

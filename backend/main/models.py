@@ -30,8 +30,8 @@ class CulturalCommunity(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        verbose_name = "Cultural Community"
-        verbose_name_plural = "Cultural Communities"
+        verbose_name = "Our Culture - Community"
+        verbose_name_plural = "Our Culture - Communities"
 
     def __str__(self):
         return self.name
@@ -57,8 +57,8 @@ class CulturalHeritage(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        verbose_name = "Cultural Heritage"
-        verbose_name_plural = "Cultural Heritage Items"
+        verbose_name = "Our Culture - Heritage Site"
+        verbose_name_plural = "Our Culture - Heritage Sites"
 
     def __str__(self):
         return self.title
@@ -75,8 +75,8 @@ class KenyaRegion(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        verbose_name = "Kenya Region"
-        verbose_name_plural = "Kenya Regions"
+        verbose_name = "Our Kenya - Region"
+        verbose_name_plural = "Our Kenya - Regions"
 
     def __str__(self):
         return self.name
@@ -101,8 +101,8 @@ class Achievement(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        verbose_name = "Achievement"
-        verbose_name_plural = "Achievements"
+        verbose_name = "Global Stage - Achievement"
+        verbose_name_plural = "Global Stage - Achievements"
 
     def __str__(self):
         return self.title
@@ -121,8 +121,8 @@ class BlogPost(models.Model):
     published_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
-        verbose_name = "Blog Post"
-        verbose_name_plural = "Blog Posts"
+        verbose_name = "Blog - Latest Insights"
+        verbose_name_plural = "Blog - Latest Insights"
         ordering = ['-created_at']
 
     def __str__(self):
@@ -149,8 +149,8 @@ class Partner(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        verbose_name = "Partner"
-        verbose_name_plural = "Partners"
+        verbose_name = "Partnership - Partner/Sponsor"
+        verbose_name_plural = "Partnership - Partners/Sponsors"
 
     def __str__(self):
         return self.name

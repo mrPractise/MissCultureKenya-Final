@@ -12,8 +12,8 @@ class PhotoCollection(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        verbose_name = "Photo Collection"
-        verbose_name_plural = "Photo Collections"
+        verbose_name = "Gallery - Photo Collection"
+        verbose_name_plural = "Gallery - Photo Collections"
         ordering = ['-created_at']
 
     def __str__(self):
@@ -47,8 +47,8 @@ class Photo(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        verbose_name = "Photo"
-        verbose_name_plural = "Photos"
+        verbose_name = "Gallery - Photo"
+        verbose_name_plural = "Gallery - Photos"
         ordering = ['-created_at']
 
     def __str__(self):
@@ -87,8 +87,8 @@ class Video(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        verbose_name = "Video"
-        verbose_name_plural = "Videos"
+        verbose_name = "Gallery - Video"
+        verbose_name_plural = "Gallery - Videos"
         ordering = ['-created_at']
 
     def __str__(self):

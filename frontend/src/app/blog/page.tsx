@@ -2,7 +2,8 @@
 
 import { motion } from 'framer-motion'
 import { Calendar, User, ArrowRight, X, Clock } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import apiClient from '@/lib/api'
 
 interface BlogPost {
   id: number
@@ -19,7 +20,47 @@ interface BlogPost {
 const BlogPage = () => {
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const blogPosts: BlogPost[] = [
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  // Fetch blog posts from backend
+  useEffect(() => {
+    const fetchBlogPosts = async () => {
+      try {
+        setLoading(true)
+        const response = await apiClient.getBlogPosts()
+        const posts = Array.isArray(response) ? response : (response.results || [])
+        
+        // Transform backend data to frontend format
+        const transformedPosts = posts.map((post: any) => ({
+          id: post.id,
+          title: post.title,
+          excerpt: post.excerpt || post.content?.substring(0, 150) + '...',
+          fullContent: post.content || '',
+          author: post.author || 'Susan',
+          date: post.published_at || post.created_at,
+          image: post.featured_image || '/api/placeholder/400/250',
+          category: post.category || 'General',
+          readTime: `${Math.ceil((post.content?.length || 0) / 1000)} min read`
+        }))
+        
+        setBlogPosts(transformedPosts)
+      } catch (err) {
+        console.error('Error fetching blog posts:', err)
+        setError('Failed to load blog posts')
+        // Use fallback data
+        setBlogPosts(fallbackBlogPosts)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchBlogPosts()
+  }, [])
+
+  // Fallback blog posts
+  const fallbackBlogPosts: BlogPost[] = [
     {
       id: 1,
       title: 'Celebrating Kenya\'s Cultural Diversity at the International Festival',
@@ -132,7 +173,7 @@ Kenya's global impact isn't measured just in economics or politics - it's measur
     }
   ]
 
-  const categories = ['All', 'Cultural Events', 'Community', 'Heritage', 'Education', 'Global Impact', 'Traditions']
+  const categories = ['All', ...Array.from(new Set(blogPosts.map(post => post.category)))]
 
   const handlePostClick = (post: BlogPost) => {
     setSelectedPost(post)
@@ -183,11 +224,25 @@ Kenya's global impact isn't measured just in economics or politics - it's measur
 
       {/* Blog Content */}
       <section className="py-24 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
+        {loading && (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center py-12">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+            <p className="mt-4 text-gray-600">Loading blog posts...</p>
+          </div>
+        )}
+        
+        {error && !loading && (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center py-12">
+            <p className="text-red-600 mb-4">{error}</p>
+            <p className="text-gray-600 text-sm">Showing fallback content. Make sure the backend is running.</p>
+          </div>
+        )}
         {/* Decorative Background */}
         <div className="absolute inset-0 decorative-pattern opacity-[0.03]" />
         <div className="absolute top-20 right-10 w-96 h-96 bg-green-500/5 rounded-full blur-3xl" />
         <div className="absolute bottom-20 left-10 w-96 h-96 bg-yellow-500/5 rounded-full blur-3xl" />
 
+        {!loading && (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           {/* Categories Filter */}
           <motion.div
@@ -280,6 +335,7 @@ Kenya's global impact isn't measured just in economics or politics - it's measur
             </button>
           </motion.div>
         </div>
+        )}
       </section>
 
       {/* Blog Post Detail Modal */}

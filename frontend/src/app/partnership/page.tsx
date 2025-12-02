@@ -2,39 +2,43 @@
 
 import { motion } from 'framer-motion'
 import { Heart, Users, Globe, Award } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import ContactModal from '@/components/ContactModal'
+import apiClient from '@/lib/api'
 
 const PartnershipPage = () => {
-  const impactAreas = [
-    {
-      title: 'Cultural Preservation',
-      description: 'Support traditional arts, music, and cultural practices',
-      icon: Heart,
-      impact: '500+ artisans supported'
-    },
-    {
-      title: 'Youth Empowerment',
-      description: 'Educational programs and leadership development',
-      icon: Users,
-      impact: '1,000+ youth reached'
-    },
-    {
-      title: 'Global Outreach',
-      description: 'International cultural exchange programs',
-      icon: Globe,
-      impact: '50+ countries reached'
-    },
-    {
-      title: 'Community Development',
-      description: 'Local community projects and initiatives',
-      icon: Award,
-      impact: '100+ communities impacted'
-    }
-  ]
+  const [sponsors, setSponsors] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
 
-  const sponsors = [
+  useEffect(() => {
+    const fetchPartners = async () => {
+      try {
+        setLoading(true)
+        const response = await apiClient.getPartners()
+        const partnersData = Array.isArray(response) ? response : (response.results || [])
+        
+        if (partnersData.length > 0) {
+          setSponsors(partnersData.map((partner: any) => ({
+            name: partner.name,
+            logo: partner.logo || partner.logo_url || '/api/placeholder/200/100',
+            description: partner.description || `Supporting ${partner.partner_type || 'our mission'}`
+          })))
+        } else {
+          setSponsors(fallbackSponsors)
+        }
+      } catch (err) {
+        console.error('Error fetching partners:', err)
+        setSponsors(fallbackSponsors)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchPartners()
+  }, [])
+
+  const fallbackSponsors = [
     {
       name: 'Kenya Tourism Board',
       logo: '/api/placeholder/200/100',
@@ -74,6 +78,33 @@ const PartnershipPage = () => {
       name: 'Nation Media Group',
       logo: '/api/placeholder/200/100',
       description: 'Media partner for cultural visibility'
+    }
+  ]
+
+  const impactAreas = [
+    {
+      title: 'Cultural Preservation',
+      description: 'Support traditional arts, music, and cultural practices',
+      icon: Heart,
+      impact: '500+ artisans supported'
+    },
+    {
+      title: 'Youth Empowerment',
+      description: 'Educational programs and leadership development',
+      icon: Users,
+      impact: '1,000+ youth reached'
+    },
+    {
+      title: 'Global Outreach',
+      description: 'International cultural exchange programs',
+      icon: Globe,
+      impact: '50+ countries reached'
+    },
+    {
+      title: 'Community Development',
+      description: 'Local community projects and initiatives',
+      icon: Award,
+      impact: '100+ communities impacted'
     }
   ]
 
@@ -304,7 +335,17 @@ const PartnershipPage = () => {
               </div>
 
               <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {sponsors.map((sponsor, index) => (
+                {loading ? (
+                  <div className="col-span-full text-center py-12">
+                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+                    <p className="mt-4 text-green-100">Loading partners...</p>
+                  </div>
+                ) : sponsors.length === 0 ? (
+                  <div className="col-span-full text-center py-12">
+                    <p className="text-green-100">No partners available. Add partners in Django admin.</p>
+                  </div>
+                ) : (
+                  sponsors.map((sponsor, index) => (
                   <motion.div
                     key={sponsor.name}
                     initial={{ opacity: 0, y: 30 }}
@@ -327,7 +368,8 @@ const PartnershipPage = () => {
                       {sponsor.description}
                     </p>
                   </motion.div>
-                ))}
+                  ))
+                )}
               </div>
 
               <div className="mt-16 text-center">

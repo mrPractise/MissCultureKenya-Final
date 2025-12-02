@@ -4,6 +4,24 @@ import { motion } from 'framer-motion'
 import { Volume2, Palette, Music, BookOpen } from 'lucide-react'
 
 const OurCulture = () => {
+  const heritageSites = [
+    {
+      name: 'Lamu Old Town',
+      type: 'UNESCO World Heritage',
+      description: 'A living example of Swahili culture and architecture.'
+    },
+    {
+      name: 'Fort Jesus',
+      type: 'Historical Monument',
+      description: 'A testament to Kenya\'s rich colonial history.'
+    },
+    {
+      name: 'Thimlich Ohinga',
+      type: 'Archaeological Site',
+      description: 'Ancient stone structures showcasing early engineering.'
+    }
+  ]
+
   const languages = [
     { phrase: 'Jambo', meaning: 'Hello', audio: '/audio/jambo.mp3' },
     { phrase: 'Asante', meaning: 'Thank you', audio: '/audio/asante.mp3' },
@@ -44,24 +62,6 @@ const OurCulture = () => {
         'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=300&h=400&fit=crop',
         'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=400&fit=crop'
       ]
-    }
-  ]
-
-  const heritageSites = [
-    {
-      name: 'Lamu Old Town',
-      type: 'UNESCO World Heritage',
-      description: 'A living example of Swahili culture and architecture.'
-    },
-    {
-      name: 'Fort Jesus',
-      type: 'Historical Monument',
-      description: 'A testament to Kenya\'s rich colonial history.'
-    },
-    {
-      name: 'Thimlich Ohinga',
-      type: 'Archaeological Site',
-      description: 'Ancient stone structures showcasing early engineering.'
     }
   ]
 

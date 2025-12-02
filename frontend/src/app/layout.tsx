@@ -26,7 +26,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} zoom-75`}>
+      <body className={inter.className}>
         <Navigation />
         <main className="min-h-screen">
           {children}
