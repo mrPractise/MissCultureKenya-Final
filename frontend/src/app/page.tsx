@@ -137,9 +137,11 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       <Hero />
+      <MissionVision />
       <Highlights />
-      <SocialFeed />
+      <CultureImpact />
       <CoreValues />
+      <SocialFeed />
       <FollowCTA />
       
       {/* Upcoming Event Modal */}
