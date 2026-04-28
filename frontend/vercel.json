@@ -1,8 +1,7 @@
 {
-  "buildCommand": "npm run build",
-  "rootDirectory": "frontend",
-  "outputDirectory": ".next",
-  "installCommand": "npm install",
+  "buildCommand": "cd frontend && npm run build",
+  "installCommand": "cd frontend && npm install",
+  "outputDirectory": "frontend/.next",
   "framework": "nextjs",
   "rewrites": [
     {
@@ -11,6 +10,3 @@
     }
   ]
 }
-
-
-
