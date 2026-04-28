@@ -10,8 +10,10 @@ import FollowCTA from '@/components/FollowCTA'
 import SocialFeed from '@/components/SocialFeed'
 import EventDetailsModal from '@/components/EventDetailsModal'
 import apiClient from '@/lib/api'
+import { useSiteSettings } from '@/lib/useSiteSettings'
 
 export default function Home() {
+  const settings = useSiteSettings()
   const [showEventModal, setShowEventModal] = useState(false)
   const [upcomingEvent, setUpcomingEvent] = useState<any>(null)
 
@@ -32,7 +34,7 @@ export default function Home() {
             venue: event.venue_name || event.venue,
             location: `${event.city || ''}, ${event.country || 'Kenya'}`.trim().replace(/^,\s*/, ''),
             description: event.description,
-            image: event.featured_image || event.image,
+            image: event.featured_image || event.image || settings.home_upcoming_event_image_url || '',
             category: event.event_type || event.category || 'Event',
             capacity: event.capacity || 0,
             price: event.price || 'Free',
@@ -46,15 +48,15 @@ export default function Home() {
         } else {
           // Fallback event if no events from API
           setUpcomingEvent({
-    id: 1,
-    title: 'Cultural Heritage Festival 2024',
-    date: '2024-03-15',
-    time: '10:00 AM',
-    venue: 'Nairobi National Museum',
-    location: 'Nairobi, Kenya',
-    description: 'Join us for a celebration of Kenya\'s diverse cultural heritage featuring traditional performances, artisan showcases, and cultural exhibitions. This is a must-attend event for everyone passionate about Kenyan culture!',
-    image: '',
-    category: 'Cultural Event',
+            id: 1,
+            title: 'Cultural Heritage Festival 2024',
+            date: '2024-03-15',
+            time: '10:00 AM',
+            venue: 'Nairobi National Museum',
+            location: 'Nairobi, Kenya',
+            description: 'Join us for a celebration of Kenya\'s diverse cultural heritage featuring traditional performances, artisan showcases, and cultural exhibitions. This is a must-attend event for everyone passionate about Kenyan culture!',
+            image: settings.home_upcoming_event_image_url || '',
+            category: 'Cultural Event',
     capacity: 500,
     price: 'Free',
     organizer: 'Miss Culture Global Kenya',
@@ -91,8 +93,8 @@ export default function Home() {
           venue: 'Nairobi National Museum',
           location: 'Nairobi, Kenya',
           description: 'Join us for a celebration of Kenya\'s diverse cultural heritage featuring traditional performances, artisan showcases, and cultural exhibitions. This is a must-attend event for everyone passionate about Kenyan culture!',
-          image: '',
-          category: 'Cultural Event',
+        image: settings.home_upcoming_event_image_url || '',
+        category: 'Cultural Event',
           capacity: 500,
           price: 'Free',
           organizer: 'Miss Culture Global Kenya',

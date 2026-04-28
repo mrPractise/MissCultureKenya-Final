@@ -160,12 +160,22 @@ class SiteSettings(models.Model):
     """Singleton model for site-wide hero images per navbar tab"""
     # ── Home tab ──
     home_hero_image = cloudinary.models.CloudinaryField('home_hero', folder='missculture/site/home', blank=True, null=True)
+    home_hero_video_url = models.URLField('home_hero_video_url', blank=True, null=True)
+    home_upcoming_event_image = cloudinary.models.CloudinaryField('home_upcoming_event', folder='missculture/site/home', blank=True, null=True)
+    home_kenya_highlight_image = cloudinary.models.CloudinaryField('home_kenya_highlight', folder='missculture/site/home', blank=True, null=True)
+    home_ambassador_highlight_image = cloudinary.models.CloudinaryField('home_ambassador_highlight', folder='missculture/site/home', blank=True, null=True)
 
     # ── Kenya tab ──
     kenya_hero_image = cloudinary.models.CloudinaryField('kenya_hero', folder='missculture/site/kenya', blank=True, null=True)
+    kenya_artisan_1_image = cloudinary.models.CloudinaryField('kenya_artisan_1', folder='missculture/site/kenya', blank=True, null=True)
+    kenya_artisan_2_image = cloudinary.models.CloudinaryField('kenya_artisan_2', folder='missculture/site/kenya', blank=True, null=True)
+    kenya_artisan_3_image = cloudinary.models.CloudinaryField('kenya_artisan_3', folder='missculture/site/kenya', blank=True, null=True)
+    kenya_artisan_4_image = cloudinary.models.CloudinaryField('kenya_artisan_4', folder='missculture/site/kenya', blank=True, null=True)
 
     # ── Ambassador tab ──
     ambassador_hero_image = cloudinary.models.CloudinaryField('ambassador_hero', folder='missculture/site/ambassador', blank=True, null=True)
+    ambassador_profile_image = cloudinary.models.CloudinaryField('ambassador_profile', folder='missculture/site/ambassador', blank=True, null=True)
+    ambassador_video_url = models.URLField('ambassador_video_url', blank=True, null=True)
 
     # ── Events tab (header only; EventSettings.hero_image also exists)
     events_hero_image = cloudinary.models.CloudinaryField('events_hero', folder='missculture/site/events', blank=True, null=True)
@@ -175,6 +185,16 @@ class SiteSettings(models.Model):
 
     # ── Voting tab ──
     voting_hero_image = cloudinary.models.CloudinaryField('voting_hero', folder='missculture/site/voting', blank=True, null=True)
+    voting_event_1_image = cloudinary.models.CloudinaryField('voting_event_1', folder='missculture/site/voting', blank=True, null=True)
+    voting_event_2_image = cloudinary.models.CloudinaryField('voting_event_2', folder='missculture/site/voting', blank=True, null=True)
+    voting_event_3_image = cloudinary.models.CloudinaryField('voting_event_3', folder='missculture/site/voting', blank=True, null=True)
+    voting_event_4_image = cloudinary.models.CloudinaryField('voting_event_4', folder='missculture/site/voting', blank=True, null=True)
+    voting_participant_1_image = cloudinary.models.CloudinaryField('voting_participant_1', folder='missculture/site/voting', blank=True, null=True)
+    voting_participant_2_image = cloudinary.models.CloudinaryField('voting_participant_2', folder='missculture/site/voting', blank=True, null=True)
+    voting_participant_3_image = cloudinary.models.CloudinaryField('voting_participant_3', folder='missculture/site/voting', blank=True, null=True)
+    voting_participant_4_image = cloudinary.models.CloudinaryField('voting_participant_4', folder='missculture/site/voting', blank=True, null=True)
+    voting_participant_5_image = cloudinary.models.CloudinaryField('voting_participant_5', folder='missculture/site/voting', blank=True, null=True)
+    voting_participant_6_image = cloudinary.models.CloudinaryField('voting_participant_6', folder='missculture/site/voting', blank=True, null=True)
 
     # ── Partnership tab ──
     partnership_hero_image = cloudinary.models.CloudinaryField('partnership_hero', folder='missculture/site/partnership', blank=True, null=True)
@@ -191,6 +211,9 @@ class SiteSettings(models.Model):
     # ── About tab ──
     about_hero_image = cloudinary.models.CloudinaryField('about_hero', folder='missculture/site/about', blank=True, null=True)
     about_mission_image = cloudinary.models.CloudinaryField('about_mission', folder='missculture/site/about', blank=True, null=True)
+    about_leader_1_image = cloudinary.models.CloudinaryField('about_leader_1', folder='missculture/site/about', blank=True, null=True)
+    about_leader_2_image = cloudinary.models.CloudinaryField('about_leader_2', folder='missculture/site/about', blank=True, null=True)
+    about_leader_3_image = cloudinary.models.CloudinaryField('about_leader_3', folder='missculture/site/about', blank=True, null=True)
 
     # ── Privacy tab ──
     privacy_hero_image = cloudinary.models.CloudinaryField('privacy_hero', folder='missculture/site/privacy', blank=True, null=True)

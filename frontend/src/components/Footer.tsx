@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import Image from 'next/image'
-import { Mail, Phone, MapPin, Instagram, Facebook, Twitter, Youtube, ExternalLink } from 'lucide-react'
+import { Mail, Phone, MapPin, Instagram, Facebook, Twitter, Youtube, ExternalLink, Star } from 'lucide-react'
 
 const Footer = () => {
   const currentYear = new Date().getFullYear()
@@ -10,7 +10,7 @@ const Footer = () => {
   const footerLinks = {
     about: [
       { name: 'Kenya', href: '/kenya' },
-      { name: 'The Ambassador', href: '/ambassador' },
+      { name: 'The Ambassador', href: '/ambassador', highlight: true },
       { name: 'About Us', href: '/about' }
     ],
     explore: [
@@ -126,8 +126,15 @@ const Footer = () => {
                     <li key={link.name}>
                       <a
                         href={link.href}
-                        className="text-gray-400 hover:text-white transition-all duration-200 text-sm sm:text-base relative inline-block group leading-relaxed"
+                        className={`transition-all duration-200 text-sm sm:text-base relative inline-flex items-center gap-2 group leading-relaxed ${
+                          'highlight' in link && link.highlight 
+                            ? 'text-yellow-400 font-semibold' 
+                            : 'text-gray-400 hover:text-white'
+                        }`}
                       >
+                        {'highlight' in link && link.highlight && (
+                          <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
+                        )}
                         <span className="relative z-10 group-hover:translate-x-1 transition-transform duration-200 inline-block">{link.name}</span>
                       </a>
                     </li>

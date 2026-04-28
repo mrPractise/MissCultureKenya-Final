@@ -4,9 +4,11 @@ import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import {
   MapPin, Users, Landmark, Trophy, Music, Palette, ChevronDown,
-  Volume2, Mountain, Plane, Lightbulb, Camera, BookOpen, Sparkles
+  Volume2, Mountain, Plane, Lightbulb, Camera, BookOpen, Sparkles,
+  Utensils, ShieldCheck, Heart, Waves
 } from 'lucide-react'
 import apiClient from '@/lib/api'
+import { useSiteSettings } from '@/lib/useSiteSettings'
 
 type GalleryPhoto = {
   id: number
@@ -118,21 +120,21 @@ const SWAHILI_PHRASES = [
   { phrase: 'Harambee', meaning: 'Pull together' },
 ]
 
-const ARTISAN_SHOWCASE = [
-  { title: 'Wood Carving', image: '', description: 'Intricate wooden sculptures and carvings that tell stories of ancestry and spirit' },
-  { title: 'Beadwork', image: '', description: 'Colourful bead jewellery and decorations — each pattern carries meaning passed through generations' },
-  { title: 'Pottery', image: '', description: 'Traditional clay pots and vessels shaped by hands that remember techniques older than written history' },
-  { title: 'Textiles', image: '', description: 'Handwoven fabrics and kangas — wearable art that carries proverbs and cultural identity' },
-]
-
 /* ── component ── */
 const KenyaUnified = () => {
+  const settings = useSiteSettings()
   const [data, setData] = useState<DiscoverPayload | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [expandedRegion, setExpandedRegion] = useState<number | null>(null)
   const [expandedCommunity, setExpandedCommunity] = useState<number | null>(null)
-  const [expandedAchievement, setExpandedAchievement] = useState<number | null>(null)
+
+  const ARTISAN_SHOWCASE = [
+    { title: 'Wood Carving', image: settings.kenya_artisan_1_image_url || '', description: 'Intricate wooden sculptures and carvings that tell stories of ancestry and spirit' },
+    { title: 'Beadwork', image: settings.kenya_artisan_2_image_url || '', description: 'Colourful bead jewellery and decorations — each pattern carries meaning passed through generations' },
+    { title: 'Pottery', image: settings.kenya_artisan_3_image_url || '', description: 'Traditional clay pots and vessels shaped by hands that remember techniques older than written history' },
+    { title: 'Textiles', image: settings.kenya_artisan_4_image_url || '', description: 'Handwoven fabrics and kangas — wearable art that carries proverbs and cultural identity' },
+  ]
 
   useEffect(() => {
     const fetchData = async () => {
@@ -201,12 +203,18 @@ const KenyaUnified = () => {
     <section className="bg-white">
 
       {/* ===================== INTRO ===================== */}
-      <div className="py-14 sm:py-16 bg-white">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div className="py-20 sm:py-24 bg-white relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
           <motion.div {...fadeInUp}>
-            <p className="text-lg text-gray-600 leading-relaxed font-light">
-              Forty-four ethnic communities, one nation — united by the spirit of{' '}
-              <span className="font-semibold text-green-700">Harambee</span>.
+            <span className="text-green-600 font-bold tracking-widest uppercase text-xs mb-4 block">The Spirit of a Nation</span>
+            <h2 className="text-3xl sm:text-5xl font-bold text-gray-900 mb-8 tracking-tight">
+              One People, <span className="text-red-600">Many Stories</span>
+            </h2>
+            <p className="text-xl text-gray-600 leading-relaxed font-light max-w-2xl mx-auto">
+              Kenya is a tapestry of forty-four ethnic communities, united by the sacred spirit of{' '}
+              <span className="font-semibold text-green-700 border-b-2 border-green-200">Harambee</span>. 
+              From the cradle of mankind to the silicon savannah, we are a nation that pulls together to shape the future.
             </p>
           </motion.div>
         </div>
@@ -507,118 +515,115 @@ const KenyaUnified = () => {
         </div>
       </div>
 
-      {/* ===================== GLOBAL STAGE ===================== */}
-      <div className="py-16 sm:py-20 bg-gray-50/50">
+      {/* ===================== GUARDIANS OF THE WILD ===================== */}
+      <div className="py-16 sm:py-20 bg-green-50/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div {...fadeInUp} className="text-center mb-6">
-            <span className="inline-flex items-center gap-2 text-blue-700 font-semibold tracking-wider uppercase text-sm mb-3">
-              <Trophy className="w-4 h-4" /> Global Stage
+            <span className="inline-flex items-center gap-2 text-green-700 font-semibold tracking-wider uppercase text-sm mb-3">
+              <Camera className="w-4 h-4" /> Nature's Sanctuary
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">
-              The Vision
+              Guardians of the Wild
             </h2>
           </motion.div>
           <motion.div {...fadeInUp} className="text-center mb-14">
             <p className="text-gray-600 max-w-2xl mx-auto">
-              From Olympic tracks to mobile banking revolutions — Kenya shapes the world.
+              From the pioneering rhino sanctuaries to the world-renowned elephant orphanages — we are the stewards of Africa's greatest treasures.
             </p>
           </motion.div>
 
-          {/* Achievement cards — photo-led */}
-          <div className="grid md:grid-cols-2 gap-6">
-            {achievements.map((achievement, idx) => {
-              const img = getImage(achievement)
-              const gallery = getGalleryImages(achievement)
-              const isExpanded = expandedAchievement === achievement.id
-              const iconMap: Record<string, any> = { Sports: Trophy, Tourism: Plane, Innovation: Lightbulb, Arts: Camera, Technology: Lightbulb }
-              const Icon = iconMap[achievement.achievement_type] || Trophy
-              return (
-                <motion.div
-                  key={achievement.id}
-                  {...stagger}
-                  transition={{ duration: 0.5, delay: idx * 0.1 }}
-                  className="group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500"
-                  onClick={() => setExpandedAchievement(isExpanded ? null : achievement.id)}
-                >
-                  <div className="h-64 sm:h-72">
-                    {img && (
-                      <img
-                        src={img}
-                        alt={achievement.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                      />
-                    )}
-                    <div className="absolute inset-0 bg-black/40" />
-                  </div>
-                  <div className="absolute top-4 left-4 flex items-center gap-2">
-                    <div className="w-10 h-10 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 group-hover:bg-white/20 transition-colors duration-300">
-                      <Icon className="w-5 h-5 text-white" />
-                    </div>
-                    <span className="bg-white/90 backdrop-blur-sm text-blue-700 text-xs font-semibold px-3 py-1.5 rounded-full">
-                      {achievement.achievement_type} • {achievement.year}
-                    </span>
-                  </div>
-                  <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                    <h3 className="text-xl font-bold mb-2">{achievement.title}</h3>
-                    <p className="text-gray-200 text-sm leading-relaxed line-clamp-2">{achievement.description}</p>
-                    {gallery.length > 0 && (
-                      <button className="mt-2 inline-flex items-center gap-1 text-xs text-white/70 hover:text-white transition-colors">
-                        <ChevronDown className={`w-3 h-3 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
-                        {gallery.length} more photo{gallery.length > 1 ? 's' : ''}
-                      </button>
-                    )}
-                  </div>
-                  {isExpanded && gallery.length > 0 && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      className="bg-white p-4"
-                    >
-                      <div className="grid grid-cols-3 gap-2">
-                        {gallery.map((src, gi) => (
-                          <div key={gi} className="rounded-lg overflow-hidden">
-                            <img src={src} alt={`${achievement.title} ${gi + 1}`} className="w-full h-24 object-cover" />
-                          </div>
-                        ))}
-                      </div>
-                    </motion.div>
-                  )}
-                </motion.div>
-              )
-            })}
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                title: 'Rhino Conservation',
+                desc: 'Leading the way in protecting the critically endangered Black and White Rhinos through community-led sanctuaries.',
+                icon: ShieldCheck,
+                stat: '80% of world population'
+              },
+              {
+                title: 'Elephant Guardians',
+                desc: 'Home to some of the world\'s most successful rehabilitation programs, ensuring a future for these gentle giants.',
+                icon: Heart,
+                stat: 'Growing populations'
+              },
+              {
+                title: 'Marine Protection',
+                desc: 'Pristine coral reefs and marine parks along the Swahili coast, protected for generations to come.',
+                icon: Waves,
+                stat: '6 Marine Parks'
+              }
+            ].map((item, idx) => (
+              <motion.div
+                key={item.title}
+                {...stagger}
+                transition={{ duration: 0.5, delay: idx * 0.1 }}
+                className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 border border-green-100 flex flex-col items-center text-center group"
+              >
+                <div className="w-14 h-14 bg-green-100 rounded-xl flex items-center justify-center mb-6 group-hover:bg-green-600 transition-colors duration-300">
+                  <item.icon className="w-7 h-7 text-green-700 group-hover:text-white transition-colors duration-300" />
+                </div>
+                <h4 className="text-xl font-bold text-gray-900 mb-3">{item.title}</h4>
+                <p className="text-gray-600 text-sm mb-4 leading-relaxed">{item.desc}</p>
+                <span className="text-xs font-bold text-green-700 uppercase tracking-widest">{item.stat}</span>
+              </motion.div>
+            ))}
           </div>
+        </div>
+      </div>
 
-          {/* Global presence stats bar */}
+          {/* Natural & Culinary Heritage Section - Replaced Global Impact with evocative Kenyan experiences */}
           <motion.div
             {...fadeInUp}
-            className="mt-14 bg-black rounded-2xl p-10 sm:p-14 text-white relative overflow-hidden"
+            className="mt-14 bg-green-900 rounded-3xl p-10 sm:p-14 text-white relative overflow-hidden shadow-2xl"
           >
-            <div className="absolute top-0 right-0 w-72 h-72 bg-white/5 rounded-full blur-3xl" />
-            <div className="absolute bottom-0 left-0 w-72 h-72 bg-black/20 rounded-full blur-3xl" />
-            <h3 className="text-2xl sm:text-3xl font-bold text-center mb-10 relative z-10">Kenya&apos;s Global Impact</h3>
-            <div className="grid sm:grid-cols-3 gap-8 relative z-10">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
+            <div className="absolute bottom-0 left-0 w-96 h-96 bg-black/30 rounded-full blur-3xl" />
+            
+            <div className="relative z-10 text-center mb-12">
+              <span className="inline-flex items-center gap-2 text-green-400 font-semibold tracking-wider uppercase text-sm mb-3">
+                <Sparkles className="w-4 h-4" /> The Kenyan Experience
+              </span>
+              <h3 className="text-3xl sm:text-4xl font-bold">Beyond the Horizon</h3>
+            </div>
+
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-10 relative z-10">
               {[
-                { number: '4,000+', label: 'UN Peacekeepers', desc: 'Top contributor to peacekeeping missions worldwide' },
-                { number: '150+', label: 'Trade Partners', desc: 'Coffee, tea & flowers reaching markets across the globe' },
-                { number: '100+', label: 'Diplomatic Relations', desc: 'Strong partnerships with countries on every continent' },
-              ].map((stat, idx) => (
+                { 
+                  title: 'The Great Migration', 
+                  desc: 'The Eighth Wonder of the World — a rhythmic journey of millions across the golden savannah.',
+                  icon: Plane 
+                },
+                { 
+                  title: 'Culinary Soul', 
+                  desc: 'From the spice-scented Coast to the hearty Nyama Choma — a journey of flavors and hospitality.',
+                  icon: Utensils 
+                },
+                { 
+                  title: 'Majestic Peaks', 
+                  desc: 'Snow-capped Mount Kenya, the "Seat of God," standing tall over the Great Rift Valley.',
+                  icon: Mountain 
+                },
+                { 
+                  title: 'Silicon Savannah', 
+                  desc: 'A global hub of innovation where mobile banking was born and tech dreams take flight.',
+                  icon: Lightbulb 
+                },
+              ].map((item, idx) => (
                 <motion.div
-                  key={stat.label}
+                  key={item.title}
                   {...stagger}
                   transition={{ duration: 0.5, delay: idx * 0.1 }}
-                  className="text-center"
+                  className="flex flex-col items-center text-center group"
                 >
-                  <div className="text-4xl sm:text-5xl font-bold text-red-600">
-                    {stat.number}
+                  <div className="w-16 h-16 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center mb-6 border border-white/20 group-hover:bg-white/20 transition-all duration-300 transform group-hover:-translate-y-1">
+                    <item.icon className="w-8 h-8 text-yellow-400" />
                   </div>
-                  <h4 className="mt-3 text-lg font-bold">{stat.label}</h4>
-                  <p className="mt-1 text-blue-200 text-sm">{stat.desc}</p>
+                  <h4 className="text-xl font-bold mb-3">{item.title}</h4>
+                  <p className="text-green-100 text-sm leading-relaxed">{item.desc}</p>
                 </motion.div>
               ))}
             </div>
           </motion.div>
-        </div>
-      </div>
 
       {/* ===================== PHOTO MOSAIC ===================== */}
       {allPhotos.length > 0 && (

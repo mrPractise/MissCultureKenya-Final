@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
-import { Menu, X, Plus, Globe } from 'lucide-react'
+import { Menu, X, Plus, Globe, Star } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const Navigation = () => {
@@ -24,7 +24,7 @@ const Navigation = () => {
   const navItems = [
     { name: 'Home', href: '/' },
     { name: 'Kenya', href: '/kenya' },
-    { name: 'Ambassador', href: '/ambassador' },
+    { name: 'Ambassador', href: '/ambassador', highlight: true },
     { name: 'Events', href: '/events' },
     { name: 'Gallery', href: '/gallery' },
     { name: 'Voting', href: '/voting' },
@@ -41,7 +41,7 @@ const Navigation = () => {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        className={`sticky top-0 left-0 right-0 z-50 transition-all duration-300 ${
           scrolled 
             ? 'bg-white/95 backdrop-blur-xl shadow-elegant py-1' 
             : 'bg-white border-b border-gray-100 py-2'
@@ -67,16 +67,25 @@ const Navigation = () => {
             <div className="hidden xl:flex items-center space-x-1 2xl:space-x-2">
               {navItems.map((item) => {
                 const isActive = pathname === item.href
+                const isHighlighted = 'highlight' in item && item.highlight
+                
                 return (
                   <Link
                     key={item.name}
                     href={item.href}
-                    className={`relative px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 group overflow-hidden ${
-                      isActive ? 'text-red-600 bg-red-50' : 'text-gray-700 hover:text-red-600'
+                    className={`relative px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 group overflow-hidden flex items-center gap-1.5 ${
+                      isActive 
+                        ? 'text-red-600 bg-red-50' 
+                        : isHighlighted
+                          ? 'text-green-700 bg-green-50/50 hover:bg-green-100 border border-green-200/50'
+                          : 'text-gray-700 hover:text-red-600'
                     }`}
                   >
+                    {isHighlighted && (
+                      <Star className={`w-3.5 h-3.5 ${isActive ? 'fill-red-500 text-red-500' : 'fill-green-600 text-green-600'}`} />
+                    )}
                     <span className="relative z-10">{item.name}</span>
-                    {!isActive && (
+                    {!isActive && !isHighlighted && (
                       <span className="absolute inset-0 bg-red-600/10 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left rounded-full" />
                     )}
                   </Link>
@@ -149,6 +158,7 @@ const Navigation = () => {
                 <div className="space-y-1">
                   {navItems.map((item, index) => {
                     const isActive = pathname === item.href
+                    const isHighlighted = 'highlight' in item && item.highlight
                     return (
                       <motion.div
                         key={item.name}
@@ -158,12 +168,17 @@ const Navigation = () => {
                       >
                         <Link
                           href={item.href}
-                          className={`block px-4 py-3 rounded-xl transition-all duration-200 font-semibold text-lg ${isActive
+                          className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-semibold text-lg ${isActive
                             ? 'text-red-600 bg-red-50 border-l-4 border-red-600'
-                            : 'text-gray-700 hover:text-red-600 hover:bg-gray-50'
+                            : isHighlighted
+                              ? 'text-green-700 bg-green-50 border-l-4 border-green-600'
+                              : 'text-gray-700 hover:text-red-600 hover:bg-gray-50'
                             }`}
                           onClick={() => setIsOpen(false)}
                         >
+                          {isHighlighted && (
+                            <Star className={`w-5 h-5 ${isActive ? 'fill-red-600 text-red-600' : 'fill-green-600 text-green-600'}`} />
+                          )}
                           {item.name}
                         </Link>
                       </motion.div>

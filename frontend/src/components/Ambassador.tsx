@@ -5,15 +5,17 @@ import { User, BookOpen, Award, Heart, Mail } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import ContactModal from '@/components/ContactModal'
 import apiClient from '@/lib/api'
+import { useSiteSettings } from '@/lib/useSiteSettings'
 
 const Ambassador = () => {
+  const settings = useSiteSettings()
   const [isContactModalOpen, setIsContactModalOpen] = useState(false)
   const [ambassadorInfo, setAmbassadorInfo] = useState<any>({
     name: 'Susan',
     title: 'Cultural Ambassador',
     bio: 'A passionate advocate for Kenya\'s cultural heritage, Susan represents the beauty and diversity of our nation on the global stage.',
     mission: 'To bridge cultures, promote understanding, and showcase the rich tapestry of Kenyan traditions to the world.',
-    image: '',
+    image: settings.ambassador_profile_image_url || '',
     gallery: [] as string[]
   })
   const [partners, setPartners] = useState<any[]>([])
@@ -34,7 +36,7 @@ const Ambassador = () => {
             title: ambassadorData.title || 'Cultural Ambassador',
             bio: ambassadorData.bio || ambassadorData.description || prev.bio,
             mission: ambassadorData.mission_statement || ambassadorData.mission || prev.mission,
-            image: ambassadorData.profile_image || ambassadorData.image || ambassadorData.featured_image || prev.image,
+            image: settings.ambassador_profile_image_url || ambassadorData.profile_image || ambassadorData.image || ambassadorData.featured_image || prev.image,
           }))
         }
 
@@ -58,8 +60,22 @@ const Ambassador = () => {
           const videosData = Array.isArray(videosResponse)
             ? videosResponse
             : (videosResponse.results || [])
-          if (videosData.length > 0) {
-            setAmbassadorInfo((prev: any) => ({ ...prev, videos: videosData }))
+          
+          let allVideos = [...videosData]
+          if (settings.ambassador_video_url) {
+            allVideos = [
+              {
+                id: 'featured-video',
+                title: 'Featured Ambassador Video',
+                video_url: settings.ambassador_video_url,
+                is_featured: true
+              },
+              ...allVideos
+            ]
+          }
+          
+          if (allVideos.length > 0) {
+            setAmbassadorInfo((prev: any) => ({ ...prev, videos: allVideos }))
           }
         } catch {}
 
@@ -154,6 +170,7 @@ const Ambassador = () => {
 
         {/* Ambassador Profile */}
         <motion.div
+          id="profile"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
@@ -202,6 +219,7 @@ const Ambassador = () => {
 
         {/* Journey Highlights */}
         <motion.div
+          id="journey"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
@@ -242,6 +260,7 @@ const Ambassador = () => {
 
         {/* Portfolio Preview */}
         <motion.div
+          id="portfolio"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6 }}
@@ -310,6 +329,7 @@ const Ambassador = () => {
 
         {/* Ambassador Photo Gallery */}
         <motion.div
+          id="photos"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.8 }}
@@ -349,6 +369,7 @@ const Ambassador = () => {
 
         {/* Ambassador Videos */}
         <motion.div
+          id="videos"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 1.0 }}
@@ -396,6 +417,7 @@ const Ambassador = () => {
 
         {/* Partners & Sponsors */}
         <motion.div
+          id="partners"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.8 }}

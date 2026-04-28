@@ -3,15 +3,17 @@
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { Compass, User, ArrowRight, Globe } from 'lucide-react'
+import { useSiteSettings } from '@/lib/useSiteSettings'
 
 const Highlights = () => {
+  const settings = useSiteSettings()
   const highlights = [
     {
       title: 'Kenya Overview',
       description: 'Explore Our Kenya, Our Culture, and Global Stage in one clean, photo-led page.',
       icon: Compass,
       href: '/kenya',
-      image: 'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?auto=format&fit=crop&q=80&w=800',
+      image: settings.home_kenya_highlight_image_url || '',
       color: 'bg-green-600'
     },
     {
@@ -19,7 +21,7 @@ const Highlights = () => {
       description: 'Meet Susan, the inspiring individual who represents Kenya\'s cultural heritage and values globally.',
       icon: User,
       href: '/ambassador',
-      image: 'https://images.unsplash.com/photo-1523824921871-d6f1a15151f1?auto=format&fit=crop&q=80&w=800',
+      image: settings.home_ambassador_highlight_image_url || '',
       color: 'bg-red-600'
     }
   ]

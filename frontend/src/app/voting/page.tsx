@@ -20,7 +20,7 @@ const VotingPage = () => {
       venue: 'KICC Convention Centre',
       location: 'Nairobi, Kenya',
       description: 'The ultimate cultural pageant celebrating Kenya\'s diverse heritage and empowering young women to be cultural ambassadors.',
-      image: '',
+      image: settings.voting_event_1_image_url || '',
       category: 'Modeling Event',
       votingEnabled: true,
       participants: [
@@ -29,7 +29,7 @@ const VotingPage = () => {
           name: 'Susan Abongo',
           age: 22,
           category: 'adult',
-          image: '',
+          image: settings.voting_participant_1_image_url || '',
           ideology: 'Promoting cultural unity through education and community engagement',
           whyVote: 'Susan believes in using her platform to educate young people about Kenya\'s rich cultural heritage and inspire them to be proud of their roots.',
           hometown: 'Nairobi'
@@ -39,7 +39,7 @@ const VotingPage = () => {
           name: 'Aisha Mwangi',
           age: 23,
           category: 'adult',
-          image: '',
+          image: settings.voting_participant_2_image_url || '',
           ideology: 'Empowering women through cultural entrepreneurship',
           whyVote: 'Aisha is passionate about helping women start cultural businesses and preserving traditional crafts for future generations.',
           hometown: 'Mombasa'
@@ -49,7 +49,7 @@ const VotingPage = () => {
           name: 'Faith Chebet',
           age: 19,
           category: 'adult',
-          image: '',
+          image: settings.voting_participant_3_image_url || '',
           ideology: 'Youth leadership in cultural preservation',
           whyVote: 'Faith is dedicated to engaging young people in cultural activities and creating innovative ways to keep traditions alive.',
           hometown: 'Nakuru'
@@ -59,7 +59,7 @@ const VotingPage = () => {
           name: 'Zawadi Makena',
           age: 17,
           category: 'teens',
-          image: '',
+          image: settings.voting_participant_4_image_url || '',
           ideology: 'Inspiring the next generation through cultural pride',
           whyVote: 'Zawadi wants to show other teenagers that being culturally aware and proud is cool and important for our future.',
           hometown: 'Kisumu'
@@ -69,7 +69,7 @@ const VotingPage = () => {
           name: 'Neema Akinyi',
           age: 16,
           category: 'teens',
-          image: '',
+          image: settings.voting_participant_5_image_url || '',
           ideology: 'Cultural diversity as a strength',
           whyVote: 'Neema believes that Kenya\'s diversity is its greatest strength and wants to promote unity among all communities.',
           hometown: 'Eldoret'
@@ -79,7 +79,7 @@ const VotingPage = () => {
           name: 'Wanjiku Kamau',
           age: 18,
           category: 'teens',
-          image: '',
+          image: settings.voting_participant_6_image_url || '',
           ideology: 'Environmental conservation through cultural practices',
           whyVote: 'Wanjiku combines traditional environmental knowledge with modern conservation efforts to protect Kenya\'s natural heritage.',
           hometown: 'Thika'
@@ -94,7 +94,7 @@ const VotingPage = () => {
       venue: 'Alliance Française',
       location: 'Nairobi, Kenya',
       description: 'A vibrant showcase of traditional Kenyan dances featuring talented performers from across the country.',
-      image: '',
+      image: settings.voting_event_2_image_url || '',
       category: 'Dance Competition',
       votingEnabled: true,
       participants: [
@@ -138,7 +138,7 @@ const VotingPage = () => {
       venue: 'Carnivore Grounds',
       location: 'Nairobi, Kenya',
       description: 'Discovering the next generation of traditional Kenyan musicians and vocalists.',
-      image: '',
+      image: settings.voting_event_3_image_url || '',
       category: 'Music Competition',
       votingEnabled: true,
       participants: [
@@ -182,7 +182,7 @@ const VotingPage = () => {
       venue: 'Sarit Centre',
       location: 'Nairobi, Kenya',
       description: 'Showcasing contemporary fashion inspired by Kenya\'s diverse cultural heritage.',
-      image: '',
+      image: settings.voting_event_4_image_url || '',
       category: 'Fashion Show',
       votingEnabled: true,
       participants: [

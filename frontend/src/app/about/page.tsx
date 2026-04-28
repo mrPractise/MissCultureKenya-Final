@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Heart, Globe, Award, Target, User, BookOpen, Mail, ExternalLink } from 'lucide-react'
+import { Heart, Globe, Award, Target, User, BookOpen, Mail, ExternalLink, Sparkles, Handshake, Dumbbell } from 'lucide-react'
 import { useSiteSettings } from '@/lib/useSiteSettings'
 
 const AboutPage = () => {
@@ -67,7 +67,7 @@ const AboutPage = () => {
       name: 'Susan Abongo',
       title: 'Miss Culture Global Kenya',
       bio: 'A passionate cultural ambassador with over 5 years of experience promoting Kenyan heritage. Susan holds a degree in Cultural Studies and has represented Kenya in international cultural forums.',
-      image: settings.about_hero_image_url || '',
+      image: settings.about_leader_1_image_url || '',
       social: {
         instagram: '#',
         twitter: '#',
@@ -78,7 +78,7 @@ const AboutPage = () => {
       name: 'James Mwangi',
       title: 'Director of Operations',
       bio: 'Oversees all operational aspects of the organization with a focus on community engagement and event management. James has a background in event planning and cultural tourism.',
-      image: settings.about_mission_image_url || '',
+      image: settings.about_leader_2_image_url || '',
       social: {
         instagram: '#',
         twitter: '#',
@@ -89,7 +89,7 @@ const AboutPage = () => {
       name: 'Grace Njeri',
       title: 'Community Outreach Coordinator',
       bio: 'Leads community engagement initiatives and works directly with local artisans and cultural groups. Grace has a Master\'s degree in Anthropology and extensive experience in grassroots organizing.',
-      image: '',
+      image: settings.about_leader_3_image_url || '',
       social: {
         instagram: '#',
         twitter: '#',
@@ -328,9 +328,9 @@ const AboutPage = () => {
 
           <div className="grid md:grid-cols-3 gap-8">
             {[
-              { title: 'Heritage & Fashion', description: 'Showcasing the evolution of Kenyan textiles and craftsmanship — where tradition meets the modern creative economy.', icon: '\u2728' },
-              { title: 'Diplomacy & Peace', description: 'Using culture as a tool for national cohesion and international relations — building bridges across borders.', icon: '\U0001F91D' },
-              { title: 'Economic Empowerment', description: 'Supporting the "Made in Kenya" movement through brand endorsements and entrepreneurial training.', icon: '\U0001F4AA' },
+              { title: 'Heritage & Fashion', description: 'Showcasing the evolution of Kenyan textiles and craftsmanship — where tradition meets the modern creative economy.', icon: Sparkles },
+              { title: 'Diplomacy & Peace', description: 'Using culture as a tool for national cohesion and international relations — building bridges across borders.', icon: Handshake },
+              { title: 'Economic Empowerment', description: 'Supporting the "Made in Kenya" movement through brand endorsements and entrepreneurial training.', icon: Dumbbell },
             ].map((pillar, index) => (
               <motion.div
                 key={pillar.title}
@@ -340,7 +340,9 @@ const AboutPage = () => {
                 viewport={{ once: true }}
                 className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 p-10 text-center group border border-gray-100 hover:border-green-100"
               >
-                <div className="text-5xl mb-6">{pillar.icon}</div>
+                <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-red-100 transition-colors duration-300">
+                  <pillar.icon className="w-8 h-8 text-red-600 group-hover:scale-110 transition-transform duration-300" />
+                </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-green-700 transition-colors duration-300">{pillar.title}</h3>
                 <p className="text-gray-600 leading-relaxed">{pillar.description}</p>
               </motion.div>

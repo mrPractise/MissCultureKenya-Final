@@ -2,13 +2,29 @@
 
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { ChevronDown, Play, ExternalLink } from 'lucide-react'
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { useSiteSettings } from '@/lib/useSiteSettings'
+import VideoModal from './VideoModal'
 
 const Hero = () => {
   const ref = useRef(null)
   const settings = useSiteSettings()
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false)
+  
   const heroImage = settings.home_hero_image_url || '/hero-bg.png'
+  const heroVideo = settings.home_hero_video_url || 'https://www.youtube.com/embed/NgqljvNDPA8'
+
+  const videoData = {
+    id: 1,
+    title: 'Miss Culture Global Kenya - Journey',
+    thumbnail: heroImage,
+    videoUrl: heroVideo,
+    duration: '5:00',
+    views: '10K',
+    date: new Date().toISOString(),
+    category: 'Culture',
+    description: 'Celebrating Kenyan heritage through the Beauty of Purpose.'
+  }
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end start"]
@@ -18,7 +34,7 @@ const Hero = () => {
   const opacity = useTransform(scrollYProgress, [0, 1], [1, 0])
 
   return (
-    <section ref={ref} className="relative min-h-[calc(100vh-3.5rem)] sm:min-h-[calc(100vh-4rem)] flex flex-col lg:flex-row items-stretch overflow-hidden bg-black">
+    <section ref={ref} className="relative min-h-screen flex flex-col lg:flex-row items-stretch overflow-hidden bg-black">
       {/* Background Image Container */}
       <motion.div 
         style={{ y, opacity }} 
@@ -33,8 +49,8 @@ const Hero = () => {
               />
               {/* Mobile Overlay */}
               <div className="absolute inset-0 bg-black/40 lg:hidden" />
-              {/* Desktop subtle fade to merge with left side if needed, or keep it clean */}
-              <div className="absolute inset-y-0 left-0 w-32 bg-black/20 hidden lg:block" />
+              {/* Desktop subtle fade to merge with left side */}
+              <div className="absolute inset-y-0 left-0 w-64 bg-gradient-to-r from-black via-black/50 to-transparent hidden lg:block" />
             </>
           ) : (
             <div className="w-full h-full bg-black" />
