@@ -213,7 +213,7 @@ const KenyaUnified = () => {
       </div>
 
       {/* ===================== OUR KENYA ===================== */}
-      <div className="py-16 sm:py-20 bg-gradient-to-b from-white via-green-50/30 to-white">
+      <div className="py-16 sm:py-20 bg-green-50/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div {...fadeInUp} className="text-center mb-6">
             <span className="inline-flex items-center gap-2 text-green-700 font-semibold tracking-wider uppercase text-sm mb-3">
@@ -251,7 +251,7 @@ const KenyaUnified = () => {
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                       />
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                    <div className="absolute inset-0 bg-black/40" />
                   </div>
                   <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
                     <div className="flex items-center gap-2 mb-2">
@@ -296,7 +296,7 @@ const KenyaUnified = () => {
       </div>
 
       {/* ===================== SWAHILI PHRASES ===================== */}
-      <div className="py-14 sm:py-16 bg-gradient-to-b from-green-50/30 via-white to-yellow-50/30">
+      <div className="py-14 sm:py-16 bg-white">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div {...fadeInUp} className="text-center mb-10">
             <span className="inline-flex items-center gap-2 text-green-700 font-semibold tracking-wider uppercase text-sm mb-3">
@@ -317,7 +317,7 @@ const KenyaUnified = () => {
                 transition={{ duration: 0.4, delay: idx * 0.06 }}
                 className="bg-white p-5 rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 text-center border border-gray-100 group cursor-pointer"
               >
-                <div className="text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-emerald-600 mb-2">
+                <div className="text-2xl sm:text-3xl font-bold text-green-700 mb-2">
                   {item.phrase}
                 </div>
                 <div className="text-gray-600 text-sm font-medium">{item.meaning}</div>
@@ -328,7 +328,7 @@ const KenyaUnified = () => {
       </div>
 
       {/* ===================== OUR CULTURE ===================== */}
-      <div className="py-16 sm:py-20 bg-gradient-to-b from-white via-yellow-50/30 to-white">
+      <div className="py-16 sm:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div {...fadeInUp} className="text-center mb-6">
             <span className="inline-flex items-center gap-2 text-yellow-700 font-semibold tracking-wider uppercase text-sm mb-3">
@@ -449,7 +449,7 @@ const KenyaUnified = () => {
                           <img src={img} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                         </div>
                       ) : (
-                        <div className="h-36 bg-gradient-to-br from-yellow-100 to-orange-50 flex items-center justify-center">
+                        <div className="h-36 bg-yellow-100 flex items-center justify-center">
                           <Music className="w-8 h-8 text-yellow-400" />
                         </div>
                       )}
@@ -508,7 +508,7 @@ const KenyaUnified = () => {
       </div>
 
       {/* ===================== GLOBAL STAGE ===================== */}
-      <div className="py-16 sm:py-20 bg-gradient-to-b from-white via-blue-50/30 to-white">
+      <div className="py-16 sm:py-20 bg-gray-50/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div {...fadeInUp} className="text-center mb-6">
             <span className="inline-flex items-center gap-2 text-blue-700 font-semibold tracking-wider uppercase text-sm mb-3">
@@ -548,7 +548,7 @@ const KenyaUnified = () => {
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                       />
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                    <div className="absolute inset-0 bg-black/40" />
                   </div>
                   <div className="absolute top-4 left-4 flex items-center gap-2">
                     <div className="w-10 h-10 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 group-hover:bg-white/20 transition-colors duration-300">
@@ -591,7 +591,7 @@ const KenyaUnified = () => {
           {/* Global presence stats bar */}
           <motion.div
             {...fadeInUp}
-            className="mt-14 bg-gradient-to-r from-blue-900 via-indigo-900 to-blue-800 rounded-2xl p-10 sm:p-14 text-white relative overflow-hidden"
+            className="mt-14 bg-black rounded-2xl p-10 sm:p-14 text-white relative overflow-hidden"
           >
             <div className="absolute top-0 right-0 w-72 h-72 bg-white/5 rounded-full blur-3xl" />
             <div className="absolute bottom-0 left-0 w-72 h-72 bg-black/20 rounded-full blur-3xl" />
@@ -608,7 +608,7 @@ const KenyaUnified = () => {
                   transition={{ duration: 0.5, delay: idx * 0.1 }}
                   className="text-center"
                 >
-                  <div className="text-4xl sm:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-400">
+                  <div className="text-4xl sm:text-5xl font-bold text-red-600">
                     {stat.number}
                   </div>
                   <h4 className="mt-3 text-lg font-bold">{stat.label}</h4>
@@ -658,12 +658,12 @@ const KenyaUnified = () => {
         </div>
       )}
 
-      {/* ===================== FAITH & UNITY CTA ===================== */}
-      <div className="py-16 sm:py-20 bg-gradient-to-b from-white to-green-50/30">
+      {/* ===================== CALL TO ACTION ===================== */}
+      <div className="py-16 sm:py-20 bg-white">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             {...fadeInUp}
-            className="bg-gradient-to-br from-green-700 via-emerald-800 to-green-900 rounded-3xl p-10 sm:p-16 text-white text-center relative overflow-hidden shadow-2xl"
+            className="bg-green-800 rounded-3xl p-10 sm:p-16 text-white text-center relative overflow-hidden shadow-2xl"
           >
             <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl" />
             <div className="absolute bottom-0 left-0 w-64 h-64 bg-black/20 rounded-full blur-3xl" />

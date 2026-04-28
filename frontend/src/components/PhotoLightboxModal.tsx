@@ -54,8 +54,11 @@ const PhotoLightboxModal = ({
   if (!isOpen || !currentPhoto) return null
 
   return (
-    <div 
-      className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex flex-col"
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-sm flex flex-col"
       onClick={onClose}
       onKeyDown={handleKeyDown}
       tabIndex={0}
@@ -165,7 +168,7 @@ const PhotoLightboxModal = ({
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   )
 }
 

@@ -247,7 +247,7 @@ const EventsPage = () => {
             transition={{ duration: 10, repeat: Infinity, repeatType: "reverse" }}
             className="w-full h-full"
           >
-            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/60 z-10" />
+            <div className="absolute inset-0 bg-black/50 z-10" />
             <div
               className="w-full h-full bg-cover bg-center"
               style={settings.events_hero_image_url ? { backgroundImage: `url(${settings.events_hero_image_url})` } : undefined}
@@ -268,9 +268,9 @@ const EventsPage = () => {
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight drop-shadow-2xl tracking-tight">
-              Events & <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400">Appearances</span>
+              Events & <span className="text-red-600">Appearances</span>
             </h1>
-            <div className="w-24 h-1 bg-gradient-to-r from-yellow-500 to-orange-500 mx-auto mb-8 rounded-full" />
+            <div className="w-24 h-1 bg-red-600 mx-auto mb-8 rounded-full" />
             <p className="text-lg sm:text-xl md:text-2xl text-gray-100 max-w-3xl mx-auto px-4 drop-shadow-lg font-light leading-relaxed">
               Join Susan at cultural events, conferences, and community engagements as she represents Kenya on the global stage.
             </p>
@@ -279,7 +279,7 @@ const EventsPage = () => {
       </section>
 
       {/* Events Content */}
-      <section className="py-24 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
+      <section className="py-24 bg-white relative overflow-hidden">
         {/* Decorative Background */}
         <div className="absolute inset-0 decorative-pattern opacity-[0.03]" />
         <div className="absolute top-20 right-10 w-96 h-96 bg-yellow-500/5 rounded-full blur-3xl" />
@@ -298,8 +298,8 @@ const EventsPage = () => {
               <button
                 key={category}
                 className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 text-sm sm:text-base transform hover:-translate-y-1 ${category === 'All'
-                    ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg'
-                    : 'bg-white text-gray-700 hover:bg-green-50 hover:text-green-600 shadow-md hover:shadow-lg border border-gray-100'
+                    ? 'bg-red-600 text-white shadow-lg'
+                    : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-100'
                   }`}
               >
                 {category}
@@ -313,10 +313,11 @@ const EventsPage = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
             viewport={{ once: true }}
-            className="mb-24"
+            className="mb-20"
           >
-            <h2 className="text-3xl font-bold text-gray-900 mb-10 text-center">
-              Upcoming <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-emerald-600">Events</span>
+            <h2 className="text-3xl font-bold text-gray-900 mb-10 flex items-center gap-3">
+              <Calendar className="w-4 h-4 text-green-600" />
+              Upcoming <span className="text-green-600">Events</span>
             </h2>
             {loading ? (
               <div className="text-center py-12">
@@ -350,7 +351,7 @@ const EventsPage = () => {
                       alt={event.title}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60" />
+                    <div className="absolute inset-0 bg-black/40 opacity-60" />
                     <div className="absolute top-4 left-4">
                       <span className="bg-white/90 backdrop-blur-md text-green-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide shadow-sm">
                         {event.category}
@@ -395,7 +396,7 @@ const EventsPage = () => {
                         e.stopPropagation()
                         handleEventClick(event)
                       }}
-                      className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white py-3.5 rounded-xl font-bold text-sm uppercase tracking-wider transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-[1.02]"
+                      className="w-full bg-green-600 hover:bg-green-700 text-white py-3.5 rounded-xl font-bold text-sm uppercase tracking-wider transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-[1.02]"
                     >
                       Get Tickets
                     </button>
@@ -414,7 +415,7 @@ const EventsPage = () => {
             viewport={{ once: true }}
           >
             <h2 className="text-3xl font-bold text-gray-900 mb-10 text-center">
-              Past <span className="text-transparent bg-clip-text bg-gradient-to-r from-gray-600 to-gray-900">Events</span>
+              Past <span className="text-gray-900">Events</span>
             </h2>
             {displayPastEvents.length === 0 ? (
               <div className="text-center py-12">

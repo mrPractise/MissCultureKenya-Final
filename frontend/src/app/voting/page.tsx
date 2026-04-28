@@ -262,7 +262,7 @@ const VotingPage = () => {
             transition={{ duration: 10, repeat: Infinity, repeatType: "reverse" }}
             className="w-full h-full"
           >
-            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/60 z-10" />
+            <div className="absolute inset-0 bg-black/50 z-10" />
             <div
               className="w-full h-full bg-cover bg-center"
               style={settings.voting_hero_image_url ? { backgroundImage: `url(${settings.voting_hero_image_url})` } : undefined}
@@ -283,9 +283,9 @@ const VotingPage = () => {
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight drop-shadow-2xl tracking-tight">
-              Vote for <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400">Participants</span>
+              Vote for <span className="text-red-600">Participants</span>
             </h1>
-            <div className="w-24 h-1 bg-gradient-to-r from-yellow-500 to-orange-500 mx-auto mb-8 rounded-full" />
+            <div className="w-24 h-1 bg-red-600 mx-auto mb-8 rounded-full" />
             <p className="text-lg sm:text-xl md:text-2xl text-gray-100 max-w-3xl mx-auto px-4 drop-shadow-lg font-light leading-relaxed">
               Support your favorite participants in our cultural events and competitions
             </p>
@@ -294,7 +294,7 @@ const VotingPage = () => {
       </section>
 
       {/* Voting Content */}
-      <section className="py-24 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
+      <section className="py-24 bg-white relative overflow-hidden">
         {/* Decorative Background */}
         <div className="absolute inset-0 decorative-pattern opacity-[0.03]" />
         <div className="absolute top-20 right-10 w-96 h-96 bg-green-500/5 rounded-full blur-3xl" />
@@ -329,8 +329,8 @@ const VotingPage = () => {
                   key={event.id}
                   onClick={() => setSelectedEvent(event.id)}
                   className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 text-sm sm:text-base shadow-md hover:shadow-lg transform hover:-translate-y-1 ${selectedEvent === event.id
-                      ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white'
-                      : 'bg-white text-gray-700 hover:bg-green-50 hover:text-green-600 border border-gray-100'
+                      ? 'bg-green-600 text-white'
+                      : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-100'
                     }`}
                 >
                   {event.title}
@@ -425,7 +425,7 @@ const VotingPage = () => {
                               alt={participant.name}
                               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-80" />
+                            <div className="absolute inset-0 bg-black/40 opacity-80" />
                             <div className="absolute top-4 left-4">
                               <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide shadow-sm ${participant.category === 'adult'
                                   ? 'bg-purple-600 text-white'
@@ -484,7 +484,7 @@ const VotingPage = () => {
                                 onClick={() => handleParticipantVote(participant.id)}
                                 className={`w-full px-6 py-4 rounded-xl font-bold text-sm uppercase tracking-wider transition-all duration-300 flex items-center justify-center space-x-3 shadow-md hover:shadow-lg transform hover:-translate-y-1 ${votedParticipants.has(participant.id)
                                     ? 'bg-red-50 text-red-600 border border-red-100'
-                                    : 'bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700'
+                                    : 'bg-green-600 text-white hover:bg-green-700'
                                   }`}
                               >
                                 <Heart
@@ -514,7 +514,7 @@ const VotingPage = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
             viewport={{ once: true }}
-            className="mt-20 bg-gradient-to-br from-green-900 via-emerald-900 to-teal-900 rounded-[2.5rem] p-12 text-white text-center shadow-2xl relative overflow-hidden"
+            className="mt-20 bg-green-900 rounded-[2.5rem] p-12 text-white text-center shadow-2xl relative overflow-hidden"
           >
             {/* Decorative circles */}
             <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl" />

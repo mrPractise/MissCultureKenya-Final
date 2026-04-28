@@ -88,7 +88,7 @@ const ContributePage = () => {
       {/* Page Header */}
       <section className="relative h-[60vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-gradient-to-br from-green-900/90 via-black/80 to-yellow-900/90 z-10" />
+          <div className="absolute inset-0 bg-black/80 z-10" />
           <motion.div
             initial={{ scale: 1.1 }}
             animate={{ scale: 1 }}
@@ -109,13 +109,13 @@ const ContributePage = () => {
             transition={{ duration: 0.8 }}
           >
             <h1 className="text-5xl md:text-7xl font-bold mb-6 text-white tracking-tight">
-              Support Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-200">Mission</span>
+              Support Our <span className="text-red-600">Mission</span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-200 max-w-3xl mx-auto font-light leading-relaxed">
-              Your contribution helps transform cultural heritage into a global asset for socio-economic empowerment and international diplomacy.
+              Your contribution helps us preserve cultural heritage and empower Kenyan youth through mentorship and social impact projects.
             </p>
             <div className="mt-8 flex justify-center">
-              <div className="h-1 w-24 bg-gradient-to-r from-transparent via-yellow-500 to-transparent rounded-full" />
+              <div className="h-1 w-24 bg-red-600 rounded-full" />
             </div>
           </motion.div>
         </div>
@@ -177,7 +177,7 @@ const ContributePage = () => {
             viewport={{ once: true }}
             className="bg-white rounded-[2.5rem] shadow-2xl p-8 md:p-12 max-w-4xl mx-auto border border-gray-100 relative overflow-hidden"
           >
-            <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-green-500 via-yellow-500 to-red-500" />
+            <div className="absolute top-0 left-0 w-full h-2 bg-green-600" />
 
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -305,7 +305,7 @@ const ContributePage = () => {
                 <button
                   type="submit"
                   disabled={isProcessing}
-                  className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold py-5 px-8 rounded-xl text-lg transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-3"
+                  className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-5 px-8 rounded-xl text-lg transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-3"
                 >
                   {isProcessing ? (
                     <>
@@ -434,7 +434,7 @@ const ContributePage = () => {
                 <button
                   type="submit"
                   disabled={isProcessing}
-                  className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold py-5 px-8 rounded-xl text-lg transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-3"
+                  className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-5 px-8 rounded-xl text-lg transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-3"
                 >
                   {isProcessing ? (
                     <>

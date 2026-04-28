@@ -8,7 +8,7 @@ import { useSiteSettings } from '@/lib/useSiteSettings'
 const Hero = () => {
   const ref = useRef(null)
   const settings = useSiteSettings()
-  const heroImage = settings.home_hero_image_url
+  const heroImage = settings.home_hero_image_url || '/hero-bg.png'
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end start"]
@@ -18,36 +18,44 @@ const Hero = () => {
   const opacity = useTransform(scrollYProgress, [0, 1], [1, 0])
 
   return (
-    <section ref={ref} className="relative min-h-[calc(100vh-5rem)] flex items-center justify-center overflow-hidden">
-      {/* Background Image with Parallax */}
-      <motion.div style={{ y, opacity }} className="absolute inset-0 z-0">
-        <div className="w-full h-full bg-gradient-to-br from-red-900/95 via-black/90 to-green-900/95">
+    <section ref={ref} className="relative min-h-[calc(100vh-3.5rem)] sm:min-h-[calc(100vh-4rem)] flex flex-col lg:flex-row items-stretch overflow-hidden bg-black">
+      {/* Background Image Container */}
+      <motion.div 
+        style={{ y, opacity }} 
+        className="absolute inset-0 lg:relative lg:inset-auto lg:w-1/2 lg:order-2 z-0"
+      >
+        <div className="w-full h-full relative">
           {heroImage ? (
-            <div className="w-full h-full bg-cover bg-center bg-no-repeat mix-blend-overlay" style={{ backgroundImage: `url(${heroImage})` }} />
-          ) : null}
+            <>
+              <div 
+                className="absolute inset-0 bg-cover bg-center lg:bg-[center_top] bg-no-repeat transition-opacity duration-1000" 
+                style={{ backgroundImage: `url(${heroImage})`, opacity: 1.0 }} 
+              />
+              {/* Mobile Overlay */}
+              <div className="absolute inset-0 bg-black/40 lg:hidden" />
+              {/* Desktop subtle fade to merge with left side if needed, or keep it clean */}
+              <div className="absolute inset-y-0 left-0 w-32 bg-black/20 hidden lg:block" />
+            </>
+          ) : (
+            <div className="w-full h-full bg-black" />
+          )}
         </div>
       </motion.div>
 
-      {/* Decorative Elements */}
-      <div className="absolute inset-0 z-[1] pointer-events-none">
-        <div className="absolute top-10 left-10 w-32 h-32 bg-red-600/30 rounded-full blur-[100px] animate-pulse-glow" />
-        <div className="absolute bottom-20 right-20 w-40 h-40 bg-green-600/30 rounded-full blur-[100px] animate-pulse-glow" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-black/40 rounded-full blur-[80px] animate-float" style={{ animationDelay: '0.5s' }} />
-      </div>
-
-      {/* Content */}
-      <div className="relative z-10 text-center text-white px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto py-12 sm:py-16">
+      {/* Content Container */}
+      <div className="relative z-10 flex-1 flex items-center justify-center lg:justify-start lg:order-1 px-4 sm:px-6 lg:px-8 xl:pl-24 pt-12 pb-12 sm:pt-16 sm:pb-16 lg:py-0">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, x: -30 }}
+          animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
+          className="max-w-2xl lg:max-w-xl xl:max-w-2xl text-center lg:text-left"
         >
           {/* Franchise Badge */}
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.1 }}
-            className="mb-5"
+            className="mb-5 flex justify-center lg:justify-start"
           >
             <a
               href="https://misscultureglobal.org/"
@@ -72,20 +80,20 @@ const Hero = () => {
             </span>
           </motion.div>
 
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold mb-6 sm:mb-8 leading-tight drop-shadow-2xl tracking-tight">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-bold mb-6 sm:mb-8 leading-tight drop-shadow-2xl tracking-tight text-white">
             Embodying the Spirit of
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-white to-green-500 mt-2 pb-2">Kenya</span>
+            <span className="block text-red-600 mt-2 pb-2 filter drop-shadow-[0_0_20px_rgba(220,38,38,0.3)]">Kenya</span>
           </h1>
 
-          <p className="text-base sm:text-lg md:text-xl lg:text-2xl mb-8 sm:mb-10 text-gray-200 max-w-3xl mx-auto px-2 sm:px-4 drop-shadow-lg font-light leading-relaxed">
-            Celebrating Global Culture through The Beauty of Purpose and The Power of Heritage
+          <p className="text-base sm:text-lg md:text-xl lg:text-xl xl:text-2xl mb-8 sm:mb-10 text-gray-200 max-w-3xl lg:mx-0 mx-auto px-2 sm:px-0 drop-shadow-lg font-light leading-relaxed">
+            Celebrating <span className="text-white font-medium">Global Culture</span> through The Beauty of Purpose and The Power of Heritage
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center">
+          <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center lg:justify-start items-center">
             <motion.button
               whileHover={{ scale: 1.05, boxShadow: "0 20px 60px rgba(220, 38, 38, 0.4)" }}
               whileTap={{ scale: 0.95 }}
-              className="group relative bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white px-7 sm:px-8 py-3.5 sm:py-4 rounded-full font-bold text-base sm:text-lg transition-all duration-300 flex items-center space-x-3 shadow-colored-red overflow-hidden"
+              className="group relative bg-red-600 hover:bg-red-700 text-white px-7 sm:px-8 py-3.5 sm:py-4 rounded-full font-bold text-base sm:text-lg transition-all duration-300 flex items-center space-x-3 shadow-colored-red overflow-hidden border border-white/20"
             >
               <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
               <Play size={24} className="fill-current" />
@@ -108,7 +116,7 @@ const Hero = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.5, duration: 1 }}
-        className="absolute bottom-6 sm:bottom-10 left-1/2 transform -translate-x-1/2 z-10 cursor-pointer"
+        className="absolute bottom-6 sm:bottom-10 left-1/2 transform -translate-x-1/2 z-10 cursor-pointer lg:left-1/4"
         onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
       >
         <motion.div

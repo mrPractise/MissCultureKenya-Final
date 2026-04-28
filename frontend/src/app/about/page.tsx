@@ -177,7 +177,7 @@ const AboutPage = () => {
       {/* Page Header */}
       <section className="relative h-[60vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <div className="w-full h-full bg-gradient-to-br from-green-900/90 via-black/80 to-yellow-900/90">
+          <div className="w-full h-full bg-black/80">
             {settings.about_hero_image_url ? (
               <div
                 className="w-full h-full bg-cover bg-center bg-no-repeat opacity-40 mix-blend-overlay"
@@ -198,13 +198,13 @@ const AboutPage = () => {
             transition={{ duration: 0.8 }}
           >
             <h1 className="text-5xl md:text-7xl font-bold mb-6 text-white tracking-tight">
-              About <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-200">Us</span>
+              About <span className="text-red-600">Us</span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-200 max-w-3xl mx-auto font-light leading-relaxed">
               Miss Culture Global Kenya is not just a pageant — it is a Cultural Diplomacy Platform and a proud franchise of <a href="https://misscultureglobal.org/" target="_blank" rel="noopener noreferrer" className="text-yellow-400 hover:text-yellow-300 underline underline-offset-2 decoration-yellow-400/50 hover:decoration-yellow-300 transition-colors">Miss Culture Global</a> — transforming cultural heritage into a global asset for socio-economic empowerment and international diplomacy.
             </p>
             <div className="mt-8 flex justify-center">
-              <div className="h-1 w-24 bg-gradient-to-r from-transparent via-yellow-500 to-transparent rounded-full" />
+              <div className="h-1 w-24 bg-red-600 rounded-full" />
             </div>
           </motion.div>
         </div>
@@ -244,7 +244,7 @@ const AboutPage = () => {
               viewport={{ once: true }}
               className="relative"
             >
-              <div className="absolute inset-0 bg-gradient-to-tr from-green-600 to-yellow-500 rounded-2xl transform rotate-3 opacity-20" />
+              <div className="absolute inset-0 bg-green-600/10 rounded-2xl transform rotate-3" />
               <img
                 src={settings.about_mission_image_url || ''}
                 alt="Kenyan Culture"
@@ -256,7 +256,7 @@ const AboutPage = () => {
       </section>
 
       {/* Vision */}
-      <section className="py-24 bg-gradient-to-br from-green-900 via-emerald-900 to-teal-900 text-white relative overflow-hidden">
+      <section className="py-24 bg-green-900 text-white relative overflow-hidden">
         <div className="absolute inset-0 decorative-pattern opacity-5" />
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-[100px]" />
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-yellow-500/5 rounded-full blur-[100px]" />
@@ -267,7 +267,7 @@ const AboutPage = () => {
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-4xl font-bold mb-8">Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-200">Vision</span></h2>
+            <h2 className="text-4xl font-bold mb-8">Our <span className="text-red-600">Vision</span></h2>
             <p className="text-xl md:text-2xl text-green-100 font-light leading-relaxed max-w-3xl mx-auto">
               To be Africa\u2019s premier leadership platform that transforms cultural heritage into a global asset for socio-economic empowerment and international diplomacy.
             </p>
@@ -276,7 +276,7 @@ const AboutPage = () => {
       </section>
 
       {/* Part of Miss Culture Global */}
-      <section className="py-16 bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 relative overflow-hidden">
+      <section className="py-16 bg-black relative overflow-hidden">
         <div className="absolute inset-0 decorative-pattern opacity-5" />
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <motion.div
@@ -287,7 +287,7 @@ const AboutPage = () => {
             className="flex flex-col md:flex-row items-center gap-6 md:gap-10 text-center md:text-left"
           >
             <div className="flex-shrink-0">
-              <div className="w-20 h-20 bg-gradient-to-br from-red-600 to-green-600 rounded-2xl flex items-center justify-center shadow-2xl">
+              <div className="w-20 h-20 bg-red-600 rounded-2xl flex items-center justify-center shadow-2xl">
                 <Globe className="w-10 h-10 text-white" />
               </div>
             </div>
@@ -320,7 +320,7 @@ const AboutPage = () => {
             viewport={{ once: true }}
             className="text-center mb-20"
           >
-            <h2 className="text-4xl font-bold text-gray-900 mb-6">Culture with <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-orange-500">Impact</span></h2>
+            <h2 className="text-4xl font-bold text-gray-900 mb-6">Culture with <span className="text-red-600">Impact</span></h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto font-light">
               Three pillars that define how culture drives sustainable development and global unity.
             </p>
@@ -338,7 +338,7 @@ const AboutPage = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="bg-gradient-to-br from-gray-50 to-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 p-10 text-center group border border-gray-100 hover:border-green-100"
+                className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 p-10 text-center group border border-gray-100 hover:border-green-100"
               >
                 <div className="text-5xl mb-6">{pillar.icon}</div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-green-700 transition-colors duration-300">{pillar.title}</h3>
@@ -372,7 +372,7 @@ const AboutPage = () => {
 
           <div className="relative">
             {/* Vertical line */}
-            <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-gradient-to-b from-green-100 via-green-200 to-green-100 hidden md:block"></div>
+            <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-green-100 hidden md:block"></div>
 
             {/* Timeline items */}
             <div className="space-y-16">
@@ -408,7 +408,7 @@ const AboutPage = () => {
       </section>
 
       {/* Core Values */}
-      <section className="py-24 bg-gradient-to-br from-green-50 to-yellow-50 relative overflow-hidden">
+      <section className="py-24 bg-gray-50 relative overflow-hidden">
         <div className="absolute inset-0 decorative-dots opacity-30" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <motion.div
@@ -472,7 +472,7 @@ const AboutPage = () => {
                 className="bg-white rounded-2xl shadow-elegant overflow-hidden hover:shadow-elegant-lg transition-all duration-300 group"
               >
                 <div className="h-80 overflow-hidden relative">
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10" />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10" />
                   <img
                     src={leader.image}
                     alt={leader.name}
@@ -536,7 +536,7 @@ const AboutPage = () => {
       </section>
 
       {/* Advisory Board */}
-      <section className="py-24 bg-gradient-to-br from-green-50 to-yellow-50">
+      <section className="py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 30 }}

@@ -93,7 +93,7 @@ const FAQPage = () => {
       {/* Page Header */}
       <section className="relative h-[60vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-gradient-to-br from-green-900/90 via-black/80 to-yellow-900/90 z-10" />
+          <div className="absolute inset-0 bg-black/80 z-10" />
           <motion.div
             initial={{ scale: 1.1 }}
             animate={{ scale: 1 }}
@@ -114,13 +114,13 @@ const FAQPage = () => {
             transition={{ duration: 0.8 }}
           >
             <h1 className="text-5xl md:text-7xl font-bold mb-6 text-white tracking-tight">
-              Frequently Asked <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-200">Questions</span>
+              Frequently Asked <span className="text-red-600">Questions</span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-200 max-w-3xl mx-auto font-light leading-relaxed">
-              Find answers to common questions about Miss Culture Global Kenya and our programs.
+              Find answers to common questions about Miss Culture Kenya and how you can get involved.
             </p>
             <div className="mt-8 flex justify-center">
-              <div className="h-1 w-24 bg-gradient-to-r from-transparent via-yellow-500 to-transparent rounded-full" />
+              <div className="h-1 w-24 bg-red-600 rounded-full" />
             </div>
           </motion.div>
         </div>
@@ -157,7 +157,7 @@ const FAQPage = () => {
                 viewport={{ once: true }}
                 className="bg-white rounded-2xl shadow-elegant overflow-hidden border border-gray-100 hover:shadow-elegant-lg transition-shadow duration-300"
               >
-                <div className="bg-gradient-to-r from-green-50 to-white px-8 py-6 border-b border-green-100">
+                <div className="bg-green-50 px-8 py-6 border-b border-green-100">
                   <h3 className="text-xl font-bold text-gray-900 flex items-center">
                     <span className="mr-4 p-2 bg-white rounded-lg shadow-sm text-green-600">{category.icon}</span>
                     {category.title}
@@ -212,7 +212,7 @@ const FAQPage = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
             viewport={{ once: true }}
-            className="mt-20 bg-gradient-to-br from-green-600 to-emerald-700 rounded-3xl shadow-2xl p-10 md:p-16 text-center relative overflow-hidden"
+            className="mt-20 bg-green-900 rounded-3xl shadow-2xl p-10 md:p-16 text-center relative overflow-hidden"
           >
             <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2" />
             <div className="absolute bottom-0 left-0 w-64 h-64 bg-yellow-500/10 rounded-full blur-3xl transform -translate-x-1/2 translate-y-1/2" />

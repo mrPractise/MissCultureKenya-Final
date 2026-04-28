@@ -121,7 +121,7 @@ const PartnershipPage = () => {
             transition={{ duration: 10, repeat: Infinity, repeatType: "reverse" }}
             className="w-full h-full"
           >
-            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/60 z-10" />
+            <div className="absolute inset-0 bg-black/50 z-10" />
             <div
               className="w-full h-full bg-cover bg-center"
               style={settings.partnership_hero_image_url ? { backgroundImage: `url(${settings.partnership_hero_image_url})` } : undefined}
@@ -142,9 +142,9 @@ const PartnershipPage = () => {
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight drop-shadow-2xl tracking-tight">
-              Partnership & <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400">Sponsorship</span>
+              Partnership & <span className="text-red-600">Sponsorship</span>
             </h1>
-            <div className="w-24 h-1 bg-gradient-to-r from-yellow-500 to-orange-500 mx-auto mb-8 rounded-full" />
+            <div className="w-24 h-1 bg-red-600 mx-auto mb-8 rounded-full" />
             <p className="text-lg sm:text-xl md:text-2xl text-gray-100 max-w-3xl mx-auto px-4 drop-shadow-lg font-light leading-relaxed">
               Join us in promoting Kenya's cultural heritage and empowering communities worldwide through meaningful partnerships that create tangible impact.
             </p>
@@ -153,7 +153,7 @@ const PartnershipPage = () => {
       </section>
 
       {/* Partnership Content */}
-      <section className="py-24 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
+      <section className="py-24 bg-white relative overflow-hidden">
         {/* Decorative Background */}
         <div className="absolute inset-0 decorative-pattern opacity-[0.03]" />
         <div className="absolute top-20 right-10 w-96 h-96 bg-green-500/5 rounded-full blur-3xl" />
@@ -217,7 +217,7 @@ const PartnershipPage = () => {
                 viewport={{ once: true }}
                 className="bg-white rounded-[2rem] shadow-xl hover:shadow-2xl transition-all duration-300 p-10 text-center border border-gray-100 relative overflow-hidden group"
               >
-                <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-green-400 to-emerald-600" />
+                <div className="absolute top-0 left-0 w-full h-2 bg-green-600" />
                 <div className="w-20 h-20 bg-green-50 rounded-2xl flex items-center justify-center mx-auto mb-8 rotate-3 group-hover:rotate-6 transition-transform duration-300">
                   <Heart className="w-10 h-10 text-green-600" />
                 </div>
@@ -251,7 +251,7 @@ const PartnershipPage = () => {
                 viewport={{ once: true }}
                 className="bg-white rounded-[2rem] shadow-xl hover:shadow-2xl transition-all duration-300 p-10 text-center border border-gray-100 relative overflow-hidden group"
               >
-                <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-400 to-indigo-600" />
+                <div className="absolute top-0 left-0 w-full h-2 bg-red-600" />
                 <div className="w-20 h-20 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-8 rotate-3 group-hover:rotate-6 transition-transform duration-300">
                   <Users className="w-10 h-10 text-blue-600" />
                 </div>
@@ -285,7 +285,7 @@ const PartnershipPage = () => {
                 viewport={{ once: true }}
                 className="bg-white rounded-[2rem] shadow-xl hover:shadow-2xl transition-all duration-300 p-10 text-center border border-gray-100 relative overflow-hidden group"
               >
-                <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-purple-400 to-pink-600" />
+                <div className="absolute top-0 left-0 w-full h-2 bg-black" />
                 <div className="w-20 h-20 bg-purple-50 rounded-2xl flex items-center justify-center mx-auto mb-8 rotate-3 group-hover:rotate-6 transition-transform duration-300">
                   <Globe className="w-10 h-10 text-purple-600" />
                 </div>
@@ -320,7 +320,7 @@ const PartnershipPage = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
             viewport={{ once: true }}
-            className="mt-24 bg-gradient-to-br from-green-900 via-emerald-900 to-teal-900 rounded-[3rem] p-12 md:p-20 relative overflow-hidden"
+            className="mt-24 bg-green-900 rounded-[3rem] p-12 md:p-20 relative overflow-hidden"
           >
             {/* Decorative circles */}
             <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
@@ -329,7 +329,7 @@ const PartnershipPage = () => {
             <div className="relative z-10">
               <div className="text-center mb-16">
                 <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">
-                  Our Valued <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-400">Sponsors</span>
+                  Our Valued <span className="text-red-600">Sponsors</span>
                 </h2>
                 <p className="text-xl text-green-100 max-w-3xl mx-auto font-light leading-relaxed">
                   We are grateful to our sponsors who believe in our mission and support us in promoting Kenya's cultural heritage worldwide.
@@ -379,7 +379,7 @@ const PartnershipPage = () => {
               </div>
 
               <div className="mt-16 text-center">
-                <Link href="/contact" className="inline-block bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-10 py-4 rounded-full font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+                <Link href="/contact" className="inline-block bg-red-600 text-white px-10 py-4 rounded-full font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
                   Become a Sponsor
                 </Link>
               </div>

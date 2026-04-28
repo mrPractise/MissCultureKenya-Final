@@ -7,7 +7,7 @@ import { useSiteSettings } from '@/lib/useSiteSettings'
 export default function PrivacyPolicy() {
   const settings = useSiteSettings()
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <div className="min-h-screen bg-white">
       <PageHeader 
         title="Privacy Policy" 
         subtitle="Your privacy is important to us"

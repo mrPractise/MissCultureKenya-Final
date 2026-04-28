@@ -78,7 +78,7 @@ const EventDetailsModal = ({ isOpen, onClose, event }: EventDetailsModalProps) =
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -101,7 +101,7 @@ const EventDetailsModal = ({ isOpen, onClose, event }: EventDetailsModalProps) =
             alt={event.title}
             className="w-full h-40 sm:h-48 lg:h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent lg:bg-gradient-to-r lg:from-transparent lg:via-transparent lg:to-black/30" />
+          <div className="absolute inset-0 bg-black/40" />
           <div className="absolute top-3 left-3">
             <span className="bg-green-600 text-white px-2.5 py-0.5 rounded-full text-xs font-semibold">
               {event.category}

@@ -86,7 +86,7 @@ const ContactPage = () => {
       {/* Page Header */}
       <section className="relative h-[60vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-gradient-to-br from-green-900/90 via-black/80 to-yellow-900/90 z-10" />
+          <div className="absolute inset-0 bg-black/80 z-10" />
           <motion.div
             initial={{ scale: 1.1 }}
             animate={{ scale: 1 }}
@@ -107,13 +107,13 @@ const ContactPage = () => {
             transition={{ duration: 0.8 }}
           >
             <h1 className="text-5xl md:text-7xl font-bold mb-6 text-white tracking-tight">
-              Get In <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-200">Touch</span>
+              Get In <span className="text-red-600">Touch</span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-200 max-w-3xl mx-auto font-light leading-relaxed">
-              We'd love to hear from you. Reach out to us for partnerships, media inquiries, or general questions — we blend the Beauty of Purpose with the Power of Heritage.
+              Have questions or want to collaborate? We'd love to hear from you.
             </p>
             <div className="mt-8 flex justify-center">
-              <div className="h-1 w-24 bg-gradient-to-r from-transparent via-yellow-500 to-transparent rounded-full" />
+              <div className="h-1 w-24 bg-red-600 rounded-full" />
             </div>
           </motion.div>
         </div>
@@ -169,7 +169,7 @@ const ContactPage = () => {
               viewport={{ once: true }}
               className="bg-white rounded-[2rem] shadow-2xl p-8 md:p-10 border border-gray-100 relative overflow-hidden"
             >
-              <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-green-500 via-yellow-500 to-red-500" />
+              <div className="absolute top-0 left-0 w-full h-2 bg-green-600" />
 
               <h2 className="text-3xl font-bold text-gray-900 mb-8">
                 Send us a Message
@@ -311,7 +311,7 @@ const ContactPage = () => {
                   disabled={isSubmitting}
                   whileHover={{ scale: isSubmitting ? 1 : 1.02 }}
                   whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
-                  className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 disabled:from-gray-400 disabled:to-gray-500 text-white px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl"
+                  className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl"
                 >
                   {isSubmitting ? (
                     <>
@@ -397,7 +397,7 @@ const ContactPage = () => {
       </section>
 
       {/* Social Media Section */}
-      <section className="py-24 bg-gradient-to-br from-gray-900 to-black relative overflow-hidden text-white">
+      <section className="py-24 bg-black relative overflow-hidden text-white">
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10" />
 
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
@@ -409,7 +409,7 @@ const ContactPage = () => {
             className="mb-16"
           >
             <h2 className="text-3xl sm:text-4xl font-bold mb-6">
-              Follow Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-yellow-400">Journey</span>
+              Follow Our <span className="text-red-600">Journey</span>
             </h2>
             <p className="text-lg text-gray-400 max-w-2xl mx-auto mb-8">
               Stay connected with us on social media for the latest updates, behind-the-scenes content, and cultural highlights.

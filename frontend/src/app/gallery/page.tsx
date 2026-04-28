@@ -266,7 +266,7 @@ const GalleryPage = () => {
             transition={{ duration: 10, repeat: Infinity, repeatType: "reverse" }}
             className="w-full h-full"
           >
-            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/60 z-10" />
+            <div className="absolute inset-0 bg-black/50 z-10" />
             <div
               className="w-full h-full bg-cover bg-center"
               style={settings.gallery_hero_image_url ? { backgroundImage: `url(${settings.gallery_hero_image_url})` } : undefined}
@@ -287,9 +287,9 @@ const GalleryPage = () => {
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight drop-shadow-2xl tracking-tight">
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400">Gallery</span>
+              <span className="text-red-600">Gallery</span>
             </h1>
-            <div className="w-24 h-1 bg-gradient-to-r from-pink-500 to-purple-500 mx-auto mb-8 rounded-full" />
+            <div className="w-24 h-1 bg-red-600 mx-auto mb-8 rounded-full" />
             <p className="text-lg sm:text-xl md:text-2xl text-gray-100 max-w-3xl mx-auto px-4 drop-shadow-lg font-light leading-relaxed">
               Explore Susan's journey through stunning photographs and videos capturing cultural moments,
               official events, and behind-the-scenes glimpses.
@@ -299,7 +299,7 @@ const GalleryPage = () => {
       </section>
 
       {/* Gallery Content */}
-      <section className="py-24 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
+      <section className="py-24 bg-white relative overflow-hidden">
         {/* Decorative Background */}
         <div className="absolute inset-0 decorative-pattern opacity-[0.03]" />
         <div className="absolute top-20 left-10 w-96 h-96 bg-pink-500/5 rounded-full blur-3xl" />
@@ -329,8 +329,8 @@ const GalleryPage = () => {
                 key={category}
                 onClick={() => setSelectedCategory(category)}
                 className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 text-sm sm:text-base transform hover:-translate-y-1 ${selectedCategory === category
-                    ? 'bg-gradient-to-r from-pink-600 to-purple-600 text-white shadow-lg'
-                    : 'bg-white text-gray-700 hover:bg-pink-50 hover:text-pink-600 shadow-md hover:shadow-lg border border-gray-100'
+                    ? 'bg-red-600 text-white shadow-lg'
+                    : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-100'
                   }`}
               >
                 {category}
@@ -348,8 +348,9 @@ const GalleryPage = () => {
             className="mb-24"
           >
             <div className="flex flex-col sm:flex-row items-center justify-between mb-10 gap-4">
-              <h2 className="text-3xl font-bold text-gray-900">
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-600 to-purple-600">Photos</span>
+              <h2 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                <Camera className="w-8 h-8 text-red-600" />
+                <span className="text-red-600">Photos</span>
               </h2>
               <div className="flex items-center space-x-4">
                 <button className="flex items-center space-x-2 text-gray-600 hover:text-pink-600 transition-colors duration-200 font-medium">
@@ -387,7 +388,7 @@ const GalleryPage = () => {
                   />
 
                   {/* Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
                   {/* Featured Badge */}
                   {photo.featured && (
@@ -445,8 +446,9 @@ const GalleryPage = () => {
             viewport={{ once: true }}
             className="mb-16"
           >
-            <h2 className="text-3xl font-bold text-gray-900 mb-10">
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-600 to-purple-600">Videos</span>
+            <h2 className="text-3xl font-bold text-gray-900 flex items-center gap-3 mb-10">
+              <Video className="w-8 h-8 text-red-600" />
+              <span className="text-red-600">Videos</span>
             </h2>
             {filteredVideos.length === 0 ? (
               <div className="text-center py-12">
@@ -488,7 +490,7 @@ const GalleryPage = () => {
                   </div>
 
                   <div className="p-6">
-                    <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-pink-600 transition-colors duration-300">
+                    <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-red-600 transition-colors duration-300">
                       {video.title}
                     </h3>
                     <p className="text-gray-600 text-sm mb-4 line-clamp-2">{video.description}</p>

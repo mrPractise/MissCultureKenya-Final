@@ -25,7 +25,7 @@ const VideoModal = ({ isOpen, onClose, video }: VideoModalProps) => {
   if (!isOpen || !video) return null
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm">
+    <div className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-sm">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

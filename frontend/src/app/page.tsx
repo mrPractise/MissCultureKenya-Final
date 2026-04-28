@@ -3,7 +3,11 @@
 import { useState, useEffect } from 'react'
 import Hero from '@/components/Hero'
 import Highlights from '@/components/Highlights'
+import MissionVision from '@/components/MissionVision'
+import CultureImpact from '@/components/CultureImpact'
+import CoreValues from '@/components/CoreValues'
 import FollowCTA from '@/components/FollowCTA'
+import SocialFeed from '@/components/SocialFeed'
 import EventDetailsModal from '@/components/EventDetailsModal'
 import apiClient from '@/lib/api'
 
@@ -134,6 +138,8 @@ export default function Home() {
     <div className="min-h-screen">
       <Hero />
       <Highlights />
+      <SocialFeed />
+      <CoreValues />
       <FollowCTA />
       
       {/* Upcoming Event Modal */}

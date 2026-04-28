@@ -40,8 +40,8 @@ const SocialFeed = () => {
   return (
     <section className="py-20 bg-white relative overflow-hidden">
       {/* Decorative Background */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-pink-100 to-purple-100 rounded-full blur-3xl opacity-30" />
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-green-100 to-blue-100 rounded-full blur-3xl opacity-30" />
+      <div className="absolute top-0 right-0 w-96 h-96 bg-red-50 rounded-full blur-3xl opacity-50" />
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-green-50 rounded-full blur-3xl opacity-50" />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <motion.div
@@ -51,8 +51,8 @@ const SocialFeed = () => {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-6">
-            Live <span className="text-gradient-kenya">Updates</span>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+            Live <span className="text-red-600">Updates</span>
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Follow Susan's journey in real-time through her social media updates. 
@@ -62,7 +62,7 @@ const SocialFeed = () => {
 
         {loading ? (
           <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600" />
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-red-600" />
           </div>
         ) : socialPosts.length === 0 ? (
           <div className="text-center py-12">
@@ -91,7 +91,7 @@ const SocialFeed = () => {
                     <Instagram className="w-12 h-12 text-gray-300" />
                   </div>
                 ) : (
-                  <div className="w-full h-64 bg-gradient-to-br from-green-50 to-yellow-50 flex items-center justify-center">
+                  <div className="w-full h-64 bg-green-50 flex items-center justify-center">
                     <Instagram className="w-12 h-12 text-green-200" />
                   </div>
                 )}
@@ -139,7 +139,7 @@ const SocialFeed = () => {
             rel="noopener noreferrer"
             whileHover={{ scale: 1.05, boxShadow: "0 20px 60px rgba(168, 85, 247, 0.4)" }}
             whileTap={{ scale: 0.95 }}
-            className="inline-flex items-center bg-gradient-to-r from-pink-500 via-purple-600 to-purple-700 hover:from-pink-600 hover:via-purple-700 hover:to-purple-800 text-white px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 shadow-lg"
+            className="inline-flex items-center bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 shadow-lg"
           >
             <Instagram className="w-6 h-6 mr-2" />
             Follow @misscultureglobalkenya

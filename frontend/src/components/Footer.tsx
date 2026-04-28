@@ -37,7 +37,7 @@ const Footer = () => {
   ]
 
   return (
-    <footer className="bg-gradient-to-b from-gray-900 to-black text-white relative overflow-hidden">
+    <footer className="bg-black text-white relative overflow-hidden">
       {/* Decorative Background */}
       <div className="absolute inset-0 decorative-pattern opacity-5" />
       <div className="absolute top-0 right-0 w-96 h-96 bg-green-600/10 rounded-full blur-[100px] animate-pulse-glow" />
@@ -119,7 +119,7 @@ const Footer = () => {
               >
                 <h3 className="text-lg font-semibold mb-6 text-white relative inline-block">
                   {section.title}
-                  <span className="absolute -bottom-2 left-0 w-1/2 h-0.5 bg-gradient-to-r from-red-500 to-transparent" />
+                  <span className="absolute -bottom-2 left-0 w-1/2 h-0.5 bg-red-600" />
                 </h3>
                 <ul className="space-y-3">
                   {section.links.map((link) => (
@@ -158,7 +158,7 @@ const Footer = () => {
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-gradient-to-br hover:from-red-600 hover:to-red-700 transition-all duration-300 shadow-lg hover:shadow-red-500/30 transform hover:-translate-y-1 group"
+                  className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-red-600 transition-all duration-300 shadow-lg hover:shadow-red-500/30 transform hover:-translate-y-1 group"
                   aria-label={social.name}
                 >
                   <social.icon className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" />

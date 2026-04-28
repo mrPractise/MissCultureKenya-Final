@@ -127,7 +127,7 @@ const Ambassador = () => {
   ]
 
   return (
-    <section className="py-24 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
+    <section className="py-24 bg-white relative overflow-hidden">
       {/* Decorative Background */}
       <div className="absolute inset-0 decorative-pattern opacity-[0.03]" />
       <div className="absolute top-20 right-10 w-96 h-96 bg-green-500/5 rounded-full blur-3xl" />
@@ -142,10 +142,10 @@ const Ambassador = () => {
           className="text-center mb-20"
         >
           <span className="text-green-600 font-semibold tracking-wider uppercase text-sm mb-2 block">The Ambassador</span>
-          <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-6">
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600">Susan's Journey</span>
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+            <span className="text-green-700">Susan's Journey</span>
           </h2>
-          <div className="w-24 h-1 bg-gradient-to-r from-green-500 to-emerald-500 mx-auto mb-8 rounded-full" />
+          <div className="w-24 h-1 bg-red-600 mx-auto mb-8 rounded-full" />
           <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed font-light">
             Meet the inspiring individual who represents Kenya's cultural heritage
             and values on the global stage.
@@ -161,17 +161,17 @@ const Ambassador = () => {
           className="grid lg:grid-cols-2 gap-16 items-center mb-24"
         >
           <div className="relative group">
-            <div className="absolute inset-0 bg-gradient-to-br from-green-600 to-yellow-500 rounded-[2.5rem] rotate-3 opacity-20 group-hover:rotate-6 transition-transform duration-500" />
+            <div className="absolute inset-0 bg-green-600/10 rounded-[2.5rem] rotate-3 group-hover:rotate-6 transition-transform duration-500" />
             <div className="relative overflow-hidden rounded-[2.5rem] shadow-2xl transform transition-transform duration-500">
               <img
                 src={ambassadorInfo.image}
                 alt={ambassadorInfo.name}
                 className="w-full h-[600px] object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-black/40" />
             </div>
             <div className="absolute -bottom-8 -right-8 w-32 h-32 bg-white rounded-full flex items-center justify-center shadow-2xl animate-pulse-glow z-20">
-              <div className="w-24 h-24 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
+              <div className="w-24 h-24 bg-red-600 rounded-full flex items-center justify-center">
                 <Award className="w-12 h-12 text-white" />
               </div>
             </div>
@@ -181,14 +181,14 @@ const Ambassador = () => {
             <h3 className="text-4xl font-bold text-gray-900 mb-4">
               {ambassadorInfo.name}
             </h3>
-            <p className="text-2xl text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-emerald-600 font-bold mb-8">
+            <p className="text-2xl text-green-700 font-bold mb-8">
               {ambassadorInfo.title}
             </p>
             <p className="text-lg text-gray-600 mb-8 leading-relaxed">
               {ambassadorInfo.bio}
             </p>
             <div className="bg-white p-8 rounded-3xl shadow-lg border border-gray-100 relative overflow-hidden group hover:shadow-xl transition-shadow duration-300">
-              <div className="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-green-500 to-emerald-500" />
+              <div className="absolute top-0 left-0 w-2 h-full bg-green-600" />
               <h4 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
                 <Heart className="w-6 h-6 text-red-500 mr-3 fill-current" />
                 Mission Statement
@@ -283,7 +283,7 @@ const Ambassador = () => {
                       alt={`${ambassadorInfo.name} ${index + 1}`}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-90" />
+                    <div className="absolute inset-0 bg-black/40 opacity-90" />
                   </motion.div>
                 ))
               : [0, 1, 2].map((index) => (
@@ -436,7 +436,7 @@ const Ambassador = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 1.0 }}
           viewport={{ once: true }}
-          className="bg-gradient-to-br from-green-900 via-emerald-900 to-teal-900 rounded-[2.5rem] p-12 md:p-20 text-white text-center shadow-2xl relative overflow-hidden"
+          className="bg-green-900 rounded-[2.5rem] p-12 md:p-20 text-white text-center shadow-2xl relative overflow-hidden"
         >
           {/* Decorative circles */}
           <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
