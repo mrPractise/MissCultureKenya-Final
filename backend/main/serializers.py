@@ -110,7 +110,7 @@ class SocialMediaPostSerializer(serializers.ModelSerializer):
 class SiteSettingsSerializer(serializers.ModelSerializer):
     """Serializer for site-wide hero images per navbar tab"""
     home_hero_image_url = serializers.SerializerMethodField()
-    home_hero_video_url = serializers.URLField()
+    home_hero_video_url = serializers.URLField(allow_blank=True, allow_null=True, required=False)
     home_upcoming_event_image_url = serializers.SerializerMethodField()
     home_kenya_highlight_image_url = serializers.SerializerMethodField()
     home_ambassador_highlight_image_url = serializers.SerializerMethodField()
@@ -123,7 +123,7 @@ class SiteSettingsSerializer(serializers.ModelSerializer):
     
     ambassador_hero_image_url = serializers.SerializerMethodField()
     ambassador_profile_image_url = serializers.SerializerMethodField()
-    ambassador_video_url = serializers.URLField()
+    ambassador_video_url = serializers.URLField(allow_blank=True, allow_null=True, required=False)
     
     events_hero_image_url = serializers.SerializerMethodField()
     gallery_hero_image_url = serializers.SerializerMethodField()

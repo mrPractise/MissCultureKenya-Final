@@ -2,12 +2,14 @@
 
 import { useState, useEffect } from 'react'
 import Hero from '@/components/Hero'
-import Highlights from '@/components/Highlights'
+import ImpactStats from '@/components/ImpactStats'
 import MissionVision from '@/components/MissionVision'
 import CultureImpact from '@/components/CultureImpact'
 import CoreValues from '@/components/CoreValues'
-import FollowCTA from '@/components/FollowCTA'
+import AmbassadorSpotlight from '@/components/AmbassadorSpotlight'
+import SupportBlocks from '@/components/SupportBlocks'
 import SocialFeed from '@/components/SocialFeed'
+import FollowCTA from '@/components/FollowCTA'
 import EventDetailsModal from '@/components/EventDetailsModal'
 import apiClient from '@/lib/api'
 import { useSiteSettings } from '@/lib/useSiteSettings'
@@ -34,7 +36,7 @@ export default function Home() {
             venue: event.venue_name || event.venue,
             location: `${event.city || ''}, ${event.country || 'Kenya'}`.trim().replace(/^,\s*/, ''),
             description: event.description,
-            image: event.featured_image || event.image || settings.home_upcoming_event_image_url || '',
+            image: event.featured_image_url || event.featured_image || event.image || settings.home_upcoming_event_image_url || '',
             category: event.event_type || event.category || 'Event',
             capacity: event.capacity || 0,
             price: event.price || 'Free',
@@ -125,12 +127,12 @@ export default function Home() {
     fetchUpcomingEvent()
   }, [])
 
-  // Show event modal after 2 seconds on initial page load (only if event exists)
+  // Show event modal after 4.5 seconds on initial page load (only if event exists)
   useEffect(() => {
     if (upcomingEvent) {
       const timer = setTimeout(() => {
         setShowEventModal(true)
-      }, 2000)
+      }, 4500)
 
       return () => clearTimeout(timer)
     }
@@ -139,11 +141,12 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       <Hero />
+      <ImpactStats />
       <MissionVision />
-      <Highlights />
       <CultureImpact />
       <CoreValues />
-      <SocialFeed />
+      <AmbassadorSpotlight />
+      <SupportBlocks />
       <FollowCTA />
       
       {/* Upcoming Event Modal */}

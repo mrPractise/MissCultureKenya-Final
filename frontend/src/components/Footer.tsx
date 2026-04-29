@@ -4,10 +4,12 @@ import { motion } from 'framer-motion'
 import Image from 'next/image'
 import { Mail, Phone, MapPin, Instagram, Facebook, Twitter, Youtube, ExternalLink, Star } from 'lucide-react'
 
+type FooterLink = { name: string; href: string; highlight?: boolean }
+
 const Footer = () => {
   const currentYear = new Date().getFullYear()
 
-  const footerLinks = {
+  const footerLinks: { about: FooterLink[]; explore: FooterLink[]; connect: FooterLink[] } = {
     about: [
       { name: 'Kenya', href: '/kenya' },
       { name: 'The Ambassador', href: '/ambassador', highlight: true },
@@ -122,7 +124,7 @@ const Footer = () => {
                   <span className="absolute -bottom-2 left-0 w-1/2 h-0.5 bg-red-600" />
                 </h3>
                 <ul className="space-y-3">
-                  {section.links.map((link) => (
+                  {section.links.map((link: FooterLink) => (
                     <li key={link.name}>
                       <a
                         href={link.href}

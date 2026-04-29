@@ -27,7 +27,6 @@ const Navigation = () => {
     { name: 'Ambassador', href: '/ambassador', highlight: true },
     { name: 'Events', href: '/events' },
     { name: 'Gallery', href: '/gallery' },
-    { name: 'Voting', href: '/voting' },
     { name: 'Partnership', href: '/partnership' },
     { name: 'Contribute', href: '/contribute' },
     { name: 'Contact', href: '/contact' },

@@ -1,18 +1,76 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Camera, Video, Download, Share2, Heart, Filter } from 'lucide-react'
+import { Camera, Video, Download, Share2, Heart, Filter, MapPin, Calendar, Play, ChevronRight } from 'lucide-react'
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import PhotoLightboxModal from '@/components/PhotoLightboxModal'
 import VideoModal from '@/components/VideoModal'
 import apiClient from '@/lib/api'
 import { useSiteSettings } from '@/lib/useSiteSettings'
 
+const galleryCategories = [
+  {
+    id: 'pageant-nights',
+    title: 'Pageant Nights',
+    description: 'Stage moments, crowning ceremonies, talent performances — the glamour and purpose combined.',
+    signal: 'This is a real, prestigious event',
+    color: 'bg-red-600',
+    lightColor: 'bg-red-50',
+    textColor: 'text-red-600'
+  },
+  {
+    id: 'cultural-events',
+    title: 'Cultural Events',
+    description: 'Traditional showcases, heritage festivals, artisan exhibitions — culture in its authentic form.',
+    signal: 'This is about real heritage',
+    color: 'bg-green-600',
+    lightColor: 'bg-green-50',
+    textColor: 'text-green-600'
+  },
+  {
+    id: 'behind-the-scenes',
+    title: 'Behind the Scenes',
+    description: 'Rehearsals, fittings, prep work, candid moments — humanizes the ambassadors and team.',
+    signal: 'Real people, real effort',
+    color: 'bg-purple-600',
+    lightColor: 'bg-purple-50',
+    textColor: 'text-purple-600'
+  },
+  {
+    id: 'community-work',
+    title: 'Community Work',
+    description: 'Outreach programs, youth mentorship, artisan support — the impact beyond the stage.',
+    signal: 'This creates real change',
+    color: 'bg-yellow-600',
+    lightColor: 'bg-yellow-50',
+    textColor: 'text-yellow-600'
+  },
+  {
+    id: 'global-diplomacy',
+    title: 'Global Diplomacy',
+    description: 'International conferences, cross-border events, diplomatic forums — Kenya on the world stage.',
+    signal: 'This has global reach',
+    color: 'bg-blue-600',
+    lightColor: 'bg-blue-50',
+    textColor: 'text-blue-600'
+  },
+  {
+    id: 'awards-recognition',
+    title: 'Awards & Recognition',
+    description: 'Trophies, certificates, media features, partner acknowledgements — external validation.',
+    signal: 'This is credible & recognized',
+    color: 'bg-emerald-600',
+    lightColor: 'bg-emerald-50',
+    textColor: 'text-emerald-600'
+  }
+]
+
 const GalleryPage = () => {
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0)
   const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false)
-  const [selectedVideo, setSelectedVideo] = useState(null)
+  const [selectedVideo, setSelectedVideo] = useState<any>(null)
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false)
   const [photos, setPhotos] = useState<any[]>([])
   const [videos, setVideos] = useState<any[]>([])
@@ -25,22 +83,14 @@ const GalleryPage = () => {
     const fetchGalleryData = async () => {
       try {
         setLoading(true)
-        
-        // Fetch photos
         const photosResponse = await apiClient.getPhotos()
-        const photosData = Array.isArray(photosResponse) 
-          ? photosResponse 
-          : (photosResponse.results || [])
+        const photosData = Array.isArray(photosResponse) ? photosResponse : (photosResponse.results || [])
         setPhotos(photosData)
 
-        // Fetch videos
         const videosResponse = await apiClient.getVideos()
-        const videosData = Array.isArray(videosResponse)
-          ? videosResponse
-          : (videosResponse.results || [])
+        const videosData = Array.isArray(videosResponse) ? videosResponse : (videosResponse.results || [])
         setVideos(videosData)
 
-        // Extract unique categories from photos and videos
         const allCategories = new Set<string>(['All'])
         photosData.forEach((photo: any) => {
           if (photo.category) allCategories.add(photo.category)
@@ -52,173 +102,106 @@ const GalleryPage = () => {
       } catch (err) {
         console.error('Error fetching gallery data:', err)
         setError('Failed to load gallery. Make sure the backend server is running.')
-        // Keep default categories
-        setCategories(['All', 'Official Photoshoots', 'Cultural Events', 'Behind the Scenes', 'Community Work', 'Travel', 'Awards'])
+        setCategories(['All', 'Pageant Nights', 'Cultural Events', 'Behind the Scenes', 'Community Work', 'Global Diplomacy', 'Awards & Recognition'])
       } finally {
         setLoading(false)
       }
     }
-
     fetchGalleryData()
   }, [])
 
-  // Default categories fallback
-  const defaultCategories = ['All', 'Official Photoshoots', 'Cultural Events', 'Behind the Scenes', 'Community Work', 'Travel', 'Awards']
+  const defaultCategories = ['All', 'Pageant Nights', 'Cultural Events', 'Behind the Scenes', 'Community Work', 'Global Diplomacy', 'Awards & Recognition']
 
-  // Helper function to transform API photo data
-  const transformPhoto = (photo: any) => {
-    return {
-      id: photo.id,
-      title: photo.title,
-      category: photo.category || 'Uncategorized',
-      image: photo.image_url || photo.thumbnail_url || photo.image || '',
-      photographer: photo.photographer || 'Unknown',
-      date: photo.date_taken || photo.created_at || photo.date,
-      likes: photo.likes || 0,
-      featured: photo.featured || false
-    }
-  }
+  const transformPhoto = (photo: any) => ({
+    id: photo.id,
+    title: photo.title,
+    category: photo.category || 'Uncategorized',
+    image: photo.image_url || photo.thumbnail_url || photo.image || '',
+    photographer: photo.photographer || 'Unknown',
+    date: photo.date_taken || photo.created_at || photo.date,
+    location: photo.location || '',
+    caption: photo.caption || photo.description || '',
+    likes: photo.likes || 0,
+    featured: photo.featured || false
+  })
 
-  // Helper function to transform API video data
-  const transformVideo = (video: any) => {
-    return {
-      id: video.id,
-      title: video.title,
-      category: video.category || 'Uncategorized',
-      thumbnail: video.thumbnail_url || video.thumbnail || '',
-      videoUrl: video.video_url || video.videoUrl || video.url || '',
-      duration: video.duration || '0:00',
-      views: video.views || '0',
-      date: video.created_at || video.date,
-      description: video.description || ''
-    }
-  }
+  const transformVideo = (video: any) => ({
+    id: video.id,
+    title: video.title,
+    category: video.category || 'Uncategorized',
+    thumbnail: video.thumbnail_url || video.thumbnail || '',
+    videoUrl: video.video_url || video.videoUrl || video.url || '',
+    duration: video.duration || '0:00',
+    views: video.views || '0',
+    date: video.created_at || video.date,
+    description: video.description || '',
+    caption: video.caption || ''
+  })
 
   const displayCategories = categories.length > 1 ? categories : defaultCategories
   const displayPhotos = photos.length > 0 ? photos.map(transformPhoto) : []
   const displayVideos = videos.length > 0 ? videos.map(transformVideo) : []
 
-  // Default photos for fallback
   const defaultPhotos = [
     {
-      id: 1,
-      title: 'Traditional Attire Photoshoot',
-      category: 'Official Photoshoots',
-      image: '',
-      photographer: '',
-      date: '2024-01-15',
-      likes: 245,
-      featured: true
+      id: 1, title: 'Crowning Ceremony — Miss Culture Global Kenya 2024', category: 'Pageant Nights',
+      image: '', photographer: 'Official Photographer', date: '2024-06-15', location: 'KICC, Nairobi',
+      caption: '800 guests, 12 designers, one unforgettable night celebrating Kenya\'s textile traditions', likes: 312, featured: true
     },
     {
-      id: 2,
-      title: 'Cultural Festival Performance',
-      category: 'Cultural Events',
-      image: '',
-      photographer: '',
-      date: '2024-01-10',
-      likes: 189,
-      featured: false
+      id: 2, title: 'Heritage Gala — Traditional Attire Showcase', category: 'Cultural Events',
+      image: '', photographer: 'Cultural Media Team', date: '2024-03-20', location: 'National Museum, Nairobi',
+      caption: 'Over 200 guests witnessed 15 communities showcase their heritage through fashion', likes: 245, featured: true
     },
     {
-      id: 3,
-      title: 'Behind the Scenes - Preparation',
-      category: 'Behind the Scenes',
-      image: '',
-      photographer: '',
-      date: '2024-01-08',
-      likes: 156,
-      featured: true
+      id: 3, title: 'Rehearsal Moments — Behind the Glamour', category: 'Behind the Scenes',
+      image: '', photographer: 'Studio Team', date: '2024-06-14', location: 'KICC Backstage',
+      caption: '48 hours of preparation condensed into moments of focus, laughter, and determination', likes: 156, featured: false
     },
     {
-      id: 4,
-      title: 'Community Outreach Program',
-      category: 'Community Work',
-      image: '',
-      photographer: '',
-      date: '2024-01-05',
-      likes: 203,
-      featured: false
+      id: 4, title: 'Youth Mentorship Workshop — Nyeri County', category: 'Community Work',
+      image: '', photographer: 'Outreach Team', date: '2024-02-10', location: 'Nyeri, Kenya',
+      caption: '45 young leaders trained in cultural preservation and community advocacy', likes: 203, featured: false
     },
     {
-      id: 5,
-      title: 'International Conference',
-      category: 'Travel',
-      image: '',
-      photographer: '',
-      date: '2024-01-01',
-      likes: 178,
-      featured: true
+      id: 5, title: 'Kenya at the Global Cultural Forum — Dubai', category: 'Global Diplomacy',
+      image: '', photographer: 'Press Corps', date: '2024-01-25', location: 'Dubai, UAE',
+      caption: 'Representing Kenya among 50+ nations at the international cultural diplomacy summit', likes: 278, featured: true
     },
     {
-      id: 6,
-      title: 'Award Ceremony',
-      category: 'Awards',
-      image: '',
-      photographer: '',
-      date: '2023-12-28',
-      likes: 312,
-      featured: false
+      id: 6, title: 'Excellence in Cultural Preservation Award', category: 'Awards & Recognition',
+      image: '', photographer: 'Events Team', date: '2023-12-10', location: 'Nairobi, Kenya',
+      caption: 'Recognized by the Ministry of Culture for outstanding contribution to heritage preservation', likes: 334, featured: true
     },
     {
-      id: 7,
-      title: 'Traditional Dance Performance',
-      category: 'Cultural Events',
-      image: '',
-      photographer: '',
-      date: '2023-12-25',
-      likes: 167,
-      featured: false
+      id: 7, title: 'Traditional Dance Finals — Cultural Competition', category: 'Cultural Events',
+      image: '', photographer: 'Performance Media', date: '2024-04-08', location: 'Alliance Française, Nairobi',
+      caption: '8 dance troupes from across Kenya competed in a celebration of movement and rhythm', likes: 189, featured: false
     },
     {
-      id: 8,
-      title: 'UNESCO Event',
-      category: 'Official Photoshoots',
-      image: '',
-      photographer: '',
-      date: '2023-12-20',
-      likes: 234,
-      featured: true
+      id: 8, title: 'Ambassador Fitting — Designer Collaboration', category: 'Behind the Scenes',
+      image: '', photographer: 'Fashion Desk', date: '2024-06-12', location: 'Nairobi Fashion Hub',
+      caption: '3 Kenyan designers, 6 outfits, and a vision to showcase modern heritage on stage', likes: 167, featured: false
     },
     {
-      id: 9,
-      title: 'Community Workshop',
-      category: 'Community Work',
-      image: '',
-      photographer: '',
-      date: '2023-12-15',
-      likes: 145,
-      featured: false
+      id: 9, title: 'Artisan Market — Community Economic Empowerment', category: 'Community Work',
+      image: '', photographer: 'Field Team', date: '2024-01-18', location: 'Mombasa, Kenya',
+      caption: '30 artisans showcased handcrafted goods, generating KES 2.5M in direct sales', likes: 145, featured: false
     },
     {
-      id: 10,
-      title: 'Fashion Show',
-      category: 'Official Photoshoots',
-      image: '',
-      photographer: '',
-      date: '2023-12-10',
-      likes: 198,
-      featured: false
+      id: 10, title: 'Talent Performance Night — Solo Showcase', category: 'Pageant Nights',
+      image: '', photographer: 'Stage Media', date: '2024-06-14', location: 'KICC, Nairobi',
+      caption: 'Contestants performed original pieces blending traditional and contemporary art forms', likes: 221, featured: false
     },
     {
-      id: 11,
-      title: 'Cultural Exchange Program',
-      category: 'Travel',
-      image: '',
-      photographer: '',
-      date: '2023-12-05',
-      likes: 221,
-      featured: true
+      id: 11, title: 'Cross-Border Cultural Exchange — Tanzania', category: 'Global Diplomacy',
+      image: '', photographer: 'Diplomatic Corps', date: '2023-11-05', location: 'Dar es Salaam, Tanzania',
+      caption: 'Strengthening East African cultural ties through shared heritage and collaboration', likes: 198, featured: false
     },
     {
-      id: 12,
-      title: 'Youth Empowerment Event',
-      category: 'Community Work',
-      image: '',
-      photographer: '',
-      date: '2023-11-30',
-      likes: 176,
-      featured: false
+      id: 12, title: 'Media Feature — National Television Spotlight', category: 'Awards & Recognition',
+      image: '', photographer: 'Media Relations', date: '2024-05-20', location: 'Nairobi, Kenya',
+      caption: 'Featured on KTN News for transforming cultural pageantry into community empowerment', likes: 256, featured: false
     }
   ]
 
@@ -235,15 +218,19 @@ const GalleryPage = () => {
   const finalPhotos = displayPhotos.length > 0 ? displayPhotos : defaultPhotos
   const finalVideos = displayVideos.length > 0 ? displayVideos : [
     {
-      id: 1,
-      title: 'Susan\'s Cultural Journey',
-      category: 'Behind the Scenes',
-      thumbnail: '',
-      videoUrl: '',
-      duration: '5:32',
-      views: '12.5K',
-      date: '2024-01-15',
-      description: 'A behind-the-scenes look at Susan\'s journey as a cultural ambassador.'
+      id: 1, title: 'Watch the Crowning Moment (3:14)', category: 'Pageant Nights',
+      thumbnail: '', videoUrl: '', duration: '3:14', views: '12.5K',
+      date: '2024-06-15', description: 'The emotional crowning ceremony of Miss Culture Global Kenya 2024.', caption: 'Watch the Crowning Moment (3:14)'
+    },
+    {
+      id: 2, title: '2024 Cultural Walk Highlight Reel (5:22)', category: 'Cultural Events',
+      thumbnail: '', videoUrl: '', duration: '5:22', views: '8.3K',
+      date: '2024-03-20', description: 'A vibrant recap of our annual cultural heritage walk through Nairobi.', caption: '2024 Cultural Walk Highlight Reel (5:22)'
+    },
+    {
+      id: 3, title: 'Susan\'s Acceptance Speech (4:08)', category: 'Behind the Scenes',
+      thumbnail: '', videoUrl: '', duration: '4:08', views: '15.2K',
+      date: '2024-06-15', description: 'A powerful speech on cultural preservation and youth empowerment.', caption: 'Susan\'s Acceptance Speech (4:08)'
     }
   ]
 
@@ -255,10 +242,14 @@ const GalleryPage = () => {
     ? finalVideos
     : finalVideos.filter(video => video.category === selectedCategory)
 
+  const getCategoryInfo = (categoryName: string) => {
+    return galleryCategories.find(c => c.id === categoryName.toLowerCase().replace(/\s+/g, '-'))
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Page Header */}
-      <section className="relative h-[50vh] min-h-[400px] flex items-center justify-center overflow-hidden">
+      {/* Hero Section */}
+      <section className="relative h-[55vh] min-h-[450px] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <motion.div
             initial={{ scale: 1.1 }}
@@ -266,7 +257,7 @@ const GalleryPage = () => {
             transition={{ duration: 10, repeat: Infinity, repeatType: "reverse" }}
             className="w-full h-full"
           >
-            <div className="absolute inset-0 bg-black/50 z-10" />
+            <div className="absolute inset-0 bg-black/60 z-10" />
             <div
               className="w-full h-full bg-cover bg-center"
               style={settings.gallery_hero_image_url ? { backgroundImage: `url(${settings.gallery_hero_image_url})` } : undefined}
@@ -276,8 +267,8 @@ const GalleryPage = () => {
 
         {/* Decorative Elements */}
         <div className="absolute inset-0 z-[1] pointer-events-none overflow-hidden">
-          <div className="absolute top-[-10%] right-[-5%] w-96 h-96 bg-pink-500/20 rounded-full blur-3xl animate-pulse-glow" />
-          <div className="absolute bottom-[-10%] left-[-5%] w-96 h-96 bg-purple-600/20 rounded-full blur-3xl animate-pulse-glow" style={{ animationDelay: '1s' }} />
+          <div className="absolute top-[-10%] right-[-5%] w-96 h-96 bg-red-500/20 rounded-full blur-3xl animate-pulse-glow" />
+          <div className="absolute bottom-[-10%] left-[-5%] w-96 h-96 bg-green-600/20 rounded-full blur-3xl animate-pulse-glow" style={{ animationDelay: '1s' }} />
         </div>
 
         <div className="relative z-10 text-center text-white px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
@@ -286,27 +277,75 @@ const GalleryPage = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
+            <p className="text-sm sm:text-base uppercase tracking-[0.3em] text-red-400 mb-4 font-semibold">The Mission in Motion</p>
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight drop-shadow-2xl tracking-tight">
-              <span className="text-red-600">Gallery</span>
+              See Every <span className="text-red-600">Moment</span>
             </h1>
             <div className="w-24 h-1 bg-red-600 mx-auto mb-8 rounded-full" />
             <p className="text-lg sm:text-xl md:text-2xl text-gray-100 max-w-3xl mx-auto px-4 drop-shadow-lg font-light leading-relaxed">
-              Explore Susan's journey through stunning photographs and videos capturing cultural moments,
-              official events, and behind-the-scenes glimpses.
+              From pageant stages to community workshops, diplomatic forums to cultural celebrations — this is where words become images.
             </p>
+            <div className="mt-8 flex flex-wrap justify-center gap-3 text-sm text-gray-300">
+              <span className="bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full border border-white/10">What does this organisation actually do?</span>
+              <span className="bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full border border-white/10">Can I see proof?</span>
+              <span className="bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full border border-white/10">What does a live event look like?</span>
+            </div>
           </motion.div>
         </div>
       </section>
 
-      {/* Gallery Content */}
-      <section className="py-24 bg-white relative overflow-hidden">
-        {/* Decorative Background */}
+      {/* Gallery Categories — What They Communicate */}
+      <section className="py-16 bg-white relative overflow-hidden">
         <div className="absolute inset-0 decorative-pattern opacity-[0.03]" />
-        <div className="absolute top-20 left-10 w-96 h-96 bg-pink-500/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Every Photo Tells a <span className="text-red-600">Story</span></h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">Each category captures a different dimension of our mission. Browse by what you want to see — and understand.</p>
+          </motion.div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {galleryCategories.map((cat, index) => (
+              <motion.button
+                key={cat.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.08 }}
+                viewport={{ once: true }}
+                onClick={() => setSelectedCategory(cat.title)}
+                className={`text-left p-6 rounded-2xl border-2 transition-all duration-300 group hover:shadow-lg ${
+                  selectedCategory === cat.title
+                    ? `${cat.color} text-white border-transparent shadow-lg`
+                    : 'bg-white border-gray-100 hover:border-gray-200'
+                }`}
+              >
+                <div className={`w-10 h-10 rounded-xl ${selectedCategory === cat.title ? 'bg-white/20' : cat.lightColor} flex items-center justify-center mb-4`}>
+                  <Camera className={`w-5 h-5 ${selectedCategory === cat.title ? 'text-white' : cat.textColor}`} />
+                </div>
+                <h3 className="text-lg font-bold mb-2">{cat.title}</h3>
+                <p className={`text-sm leading-relaxed mb-3 ${selectedCategory === cat.title ? 'text-white/80' : 'text-gray-600'}`}>{cat.description}</p>
+                <div className={`text-xs font-semibold uppercase tracking-wide ${selectedCategory === cat.title ? 'text-white/60' : 'text-gray-400'}`}>
+                  Shows: &ldquo;{cat.signal}&rdquo;
+                </div>
+              </motion.button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Gallery Content */}
+      <section className="py-20 bg-gray-50 relative overflow-hidden">
+        <div className="absolute inset-0 decorative-pattern opacity-[0.03]" />
+        <div className="absolute top-20 left-10 w-96 h-96 bg-red-500/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-green-500/5 rounded-full blur-3xl" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          {/* Category Filter */}
+          {/* Category Filter Pills */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -316,7 +355,7 @@ const GalleryPage = () => {
           >
             {loading ? (
               <div className="text-center w-full py-8">
-                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-pink-600"></div>
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"></div>
                 <p className="mt-2 text-gray-600 text-sm">Loading categories...</p>
               </div>
             ) : error ? (
@@ -325,16 +364,16 @@ const GalleryPage = () => {
               </div>
             ) : (
               displayCategories.map((category) => (
-              <button
-                key={category}
-                onClick={() => setSelectedCategory(category)}
-                className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 text-sm sm:text-base transform hover:-translate-y-1 ${selectedCategory === category
+                <button
+                  key={category}
+                  onClick={() => setSelectedCategory(category)}
+                  className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 text-sm sm:text-base transform hover:-translate-y-1 ${selectedCategory === category
                     ? 'bg-red-600 text-white shadow-lg'
                     : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-100'
                   }`}
-              >
-                {category}
-              </button>
+                >
+                  {category}
+                </button>
               ))
             )}
           </motion.div>
@@ -351,23 +390,18 @@ const GalleryPage = () => {
               <h2 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
                 <Camera className="w-8 h-8 text-red-600" />
                 <span className="text-red-600">Photos</span>
+                <span className="text-lg text-gray-400 font-normal">({filteredPhotos.length})</span>
               </h2>
-              <div className="flex items-center space-x-4">
-                <button className="flex items-center space-x-2 text-gray-600 hover:text-pink-600 transition-colors duration-200 font-medium">
-                  <Filter className="w-5 h-5" />
-                  <span>Filter</span>
-                </button>
-              </div>
             </div>
 
             {loading ? (
               <div className="text-center py-12">
-                <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600"></div>
+                <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-red-600"></div>
                 <p className="mt-4 text-gray-600">Loading photos...</p>
               </div>
             ) : filteredPhotos.length === 0 ? (
               <div className="text-center py-12">
-                <p className="text-gray-600">No photos available. Add photos in Django admin.</p>
+                <p className="text-gray-600">No photos available in this category. Add photos in Django admin.</p>
               </div>
             ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -378,7 +412,7 @@ const GalleryPage = () => {
                   whileInView={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.5, delay: index * 0.05 }}
                   viewport={{ once: true }}
-                  className="relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 group cursor-pointer h-80"
+                  className="relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 group cursor-pointer h-96"
                   onClick={() => handlePhotoClick(index)}
                 >
                   <img
@@ -406,7 +440,7 @@ const GalleryPage = () => {
                     </span>
                   </div>
 
-                  {/* Hover Content */}
+                  {/* Hover Actions */}
                   <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <div className="flex space-x-4 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-150">
                       <button className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center hover:bg-white/40 transition-colors duration-200 border border-white/20">
@@ -421,13 +455,29 @@ const GalleryPage = () => {
                     </div>
                   </div>
 
-                  {/* Bottom Info */}
-                  <div className="absolute bottom-0 left-0 right-0 p-6 text-white transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-100">
-                    <h3 className="font-bold text-lg mb-2 line-clamp-1">{photo.title}</h3>
-                    <div className="flex items-center justify-between text-sm text-gray-200">
-                      <span className="font-light">{photo.photographer}</span>
+                  {/* Story Caption & Info */}
+                  <div className="absolute bottom-0 left-0 right-0 p-5 text-white transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300 delay-100">
+                    <h3 className="font-bold text-lg mb-1.5 line-clamp-2">{photo.title}</h3>
+                    {photo.caption && (
+                      <p className="text-sm text-gray-200 mb-2 line-clamp-2 font-light leading-relaxed">{photo.caption}</p>
+                    )}
+                    <div className="flex items-center justify-between text-xs text-gray-300">
+                      <div className="flex items-center gap-3">
+                        {photo.location && (
+                          <span className="flex items-center gap-1">
+                            <MapPin className="w-3 h-3" />
+                            {photo.location}
+                          </span>
+                        )}
+                        {photo.date && (
+                          <span className="flex items-center gap-1">
+                            <Calendar className="w-3 h-3" />
+                            {new Date(photo.date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                          </span>
+                        )}
+                      </div>
                       <div className="flex items-center space-x-1.5 bg-black/30 px-2 py-1 rounded-full backdrop-blur-sm">
-                        <Heart className="w-3.5 h-3.5 text-pink-500 fill-pink-500" />
+                        <Heart className="w-3.5 h-3.5 text-red-400 fill-red-400" />
                         <span className="font-medium">{photo.likes}</span>
                       </div>
                     </div>
@@ -449,10 +499,11 @@ const GalleryPage = () => {
             <h2 className="text-3xl font-bold text-gray-900 flex items-center gap-3 mb-10">
               <Video className="w-8 h-8 text-red-600" />
               <span className="text-red-600">Videos</span>
+              <span className="text-lg text-gray-400 font-normal">({filteredVideos.length})</span>
             </h2>
             {filteredVideos.length === 0 ? (
               <div className="text-center py-12">
-                <p className="text-gray-600">No videos available. Add videos in Django admin.</p>
+                <p className="text-gray-600">No videos available in this category. Add videos in Django admin.</p>
               </div>
             ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -491,12 +542,13 @@ const GalleryPage = () => {
 
                   <div className="p-6">
                     <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-red-600 transition-colors duration-300">
-                      {video.title}
+                      {video.caption || video.title}
                     </h3>
                     <p className="text-gray-600 text-sm mb-4 line-clamp-2">{video.description}</p>
                     <div className="flex items-center justify-between text-sm text-gray-500">
                       <span className="bg-gray-100 px-3 py-1 rounded-full text-xs font-medium uppercase tracking-wide">{video.category}</span>
                       <div className="flex items-center space-x-2">
+                        <Play className="w-3.5 h-3.5" />
                         <span>{video.views} views</span>
                       </div>
                     </div>
@@ -507,6 +559,35 @@ const GalleryPage = () => {
             )}
           </motion.div>
 
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 bg-green-900 text-white relative overflow-hidden">
+        <div className="absolute inset-0 decorative-pattern opacity-5" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-red-500/10 rounded-full blur-3xl" />
+
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-3xl md:text-4xl font-bold mb-6">Ready to Be Part of the <span className="text-red-600">Story</span>?</h2>
+            <p className="text-xl text-green-100 mb-10 max-w-2xl mx-auto font-light leading-relaxed">
+              These moments happen because people like you show up, contribute, and believe in the power of culture.
+            </p>
+            <div className="flex flex-col sm:flex-row justify-center gap-4">
+              <Link href="/contribute" className="inline-flex items-center justify-center bg-red-600 text-white px-8 py-4 rounded-full font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 gap-2">
+                Support the Mission <ChevronRight className="w-5 h-5" />
+              </Link>
+              <Link href="/events" className="inline-flex items-center justify-center bg-transparent border-2 border-white/30 text-white hover:bg-white/10 px-8 py-4 rounded-full font-bold text-lg transition-all duration-300 backdrop-blur-sm gap-2">
+                Attend an Event <ChevronRight className="w-5 h-5" />
+              </Link>
+            </div>
+          </motion.div>
         </div>
       </section>
 

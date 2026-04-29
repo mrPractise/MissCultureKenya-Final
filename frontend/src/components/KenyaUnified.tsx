@@ -3,10 +3,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import {
-  MapPin, Users, Landmark, Trophy, Music, Palette, ChevronDown,
-  Volume2, Mountain, Plane, Lightbulb, Camera, BookOpen, Sparkles,
-  Utensils, ShieldCheck, Heart, Waves
+  MapPin, Users, Landmark, Music, Palette, ChevronDown,
+  Volume2, Camera, BookOpen, Sparkles, ArrowRight, Heart,
+  Globe, Calendar, ChevronRight
 } from 'lucide-react'
+import Link from 'next/link'
 import apiClient from '@/lib/api'
 import { useSiteSettings } from '@/lib/useSiteSettings'
 
@@ -71,6 +72,9 @@ const getImage = (item: { image?: string | null; image_url?: string | null }) =>
 const getGalleryImages = (item: { gallery_photos?: GalleryPhoto[] }) =>
   (item.gallery_photos || []).filter(p => p.image_url).map(p => p.image_url!)
 
+const getGalleryPhotos = (item: { gallery_photos?: GalleryPhoto[] }) =>
+  (item.gallery_photos || []).filter(p => p.image_url)
+
 const fadeInUp = {
   initial: { opacity: 0, y: 30 },
   whileInView: { opacity: 1, y: 0 },
@@ -111,13 +115,44 @@ const FALLBACK_ACHIEVEMENTS = [
   { id: 3, title: 'Creative Expression', achievement_type: 'Arts', description: 'From Ngũgĩ wa Thiong\'o\'s literary genius to award-winning films and the vibrant contemporary art scene, Kenyan artists are making their mark on the global cultural landscape.', year: 2024, image_url: '', gallery_photos: [] },
 ]
 
-const SWAHILI_PHRASES = [
-  { phrase: 'Jambo', meaning: 'Hello' },
-  { phrase: 'Asante', meaning: 'Thank you' },
-  { phrase: 'Karibu', meaning: 'Welcome' },
-  { phrase: 'Hakuna Matata', meaning: 'No worries' },
-  { phrase: 'Uhuru', meaning: 'Freedom' },
-  { phrase: 'Harambee', meaning: 'Pull together' },
+const CULTURAL_FACTS = [
+  { number: '44+', label: 'Ethnic Communities', description: 'Each with distinct languages, customs, and artistic traditions' },
+  { number: '68+', label: 'Living Languages', description: 'A linguistic diversity that echoes ancient migrations and trade routes' },
+  { number: '7', label: 'UNESCO Sites', description: 'From Lamu Old Town to the Lake Turkana fossil beds' },
+  { number: '2M+', label: 'Annual Visitors', description: 'Drawn by wildlife, culture, and the warmth of Kenyan hospitality' },
+]
+
+const NARRATIVE_PHOTOS = [
+  {
+    src: '',
+    alt: 'Maasai Beadwork',
+    caption: 'Maasai beadwork — a language of colour, status, and identity worn by generations. Every pattern tells a story of age, marital status, and tribal history. This is the kind of living heritage Miss Culture Global Kenya exists to amplify on the world stage.',
+  },
+  {
+    src: '',
+    alt: 'The Great Rift Valley',
+    caption: 'The Great Rift Valley — the cradle of humankind, where our earliest ancestors walked. This land carries the memory of all humanity, and its people carry forward traditions that have endured for millennia.',
+  },
+  {
+    src: '',
+    alt: 'Swahili Coast Architecture',
+    caption: 'Coral-stone architecture of the Swahili Coast — where African, Arab, and Portuguese histories merged into a unique coastal civilization. Lamu Old Town stands as a UNESCO monument to this cultural fusion.',
+  },
+  {
+    src: '',
+    alt: 'Kalenjin Runners',
+    caption: 'The Rift Valley highlands — producing more Olympic champions per capita than anywhere on Earth. This is not just athletic excellence; it is the discipline, community support, and warrior spirit of a people written into motion.',
+  },
+  {
+    src: '',
+    alt: 'Kikuyu Agricultural Heritage',
+    caption: 'Terraced farms on Mount Kenya\'s slopes — where agricultural wisdom passed down generations feeds a nation. The Kikuyu connection to this land is spiritual as much as it is economic.',
+  },
+  {
+    src: '',
+    alt: 'Luo Fishing Traditions',
+    caption: 'Fishing boats on Lake Victoria at dawn — the Luo people have drawn life from these waters for centuries. Their music, their proverbs, their very worldview flow from this relationship with the lake.',
+  },
 ]
 
 /* ── component ── */
@@ -128,13 +163,6 @@ const KenyaUnified = () => {
   const [error, setError] = useState<string | null>(null)
   const [expandedRegion, setExpandedRegion] = useState<number | null>(null)
   const [expandedCommunity, setExpandedCommunity] = useState<number | null>(null)
-
-  const ARTISAN_SHOWCASE = [
-    { title: 'Wood Carving', image: settings.kenya_artisan_1_image_url || '', description: 'Intricate wooden sculptures and carvings that tell stories of ancestry and spirit' },
-    { title: 'Beadwork', image: settings.kenya_artisan_2_image_url || '', description: 'Colourful bead jewellery and decorations — each pattern carries meaning passed through generations' },
-    { title: 'Pottery', image: settings.kenya_artisan_3_image_url || '', description: 'Traditional clay pots and vessels shaped by hands that remember techniques older than written history' },
-    { title: 'Textiles', image: settings.kenya_artisan_4_image_url || '', description: 'Handwoven fabrics and kangas — wearable art that carries proverbs and cultural identity' },
-  ]
 
   useEffect(() => {
     const fetchData = async () => {
@@ -163,29 +191,50 @@ const KenyaUnified = () => {
   const heritage = (data?.heritage.length ? data.heritage : FALLBACK_HERITAGE) as Heritage[]
   const achievements = (data?.achievements.length ? data.achievements : FALLBACK_ACHIEVEMENTS) as Achievement[]
 
-  const allPhotos = useMemo(() => {
-    const photos: { src: string; alt: string }[] = []
+  /* Build photo grid with captions from gallery photos */
+  const galleryPhotos = useMemo(() => {
+    const photos: { src: string; alt: string; caption: string }[] = []
     regions.forEach(r => {
+      getGalleryPhotos(r).forEach(p => photos.push({
+        src: p.image_url!,
+        alt: r.name,
+        caption: p.caption || `${r.name} — ${r.description.slice(0, 80)}...`
+      }))
       const img = getImage(r)
-      if (img) photos.push({ src: img, alt: r.name })
-      getGalleryImages(r).forEach(g => photos.push({ src: g, alt: r.name }))
+      if (img) photos.push({ src: img, alt: r.name, caption: r.description })
     })
     communities.forEach(c => {
+      getGalleryPhotos(c).forEach(p => photos.push({
+        src: p.image_url!,
+        alt: c.name,
+        caption: p.caption || `${c.name} of ${c.region} — ${c.description.slice(0, 80)}...`
+      }))
       const img = getImage(c)
-      if (img) photos.push({ src: img, alt: c.name })
-      getGalleryImages(c).forEach(g => photos.push({ src: g, alt: c.name }))
+      if (img) photos.push({ src: img, alt: c.name, caption: c.description })
     })
     heritage.forEach(h => {
+      getGalleryPhotos(h).forEach(p => photos.push({
+        src: p.image_url!,
+        alt: h.title,
+        caption: p.caption || `${h.title} — ${h.description.slice(0, 80)}...`
+      }))
       const img = getImage(h)
-      if (img) photos.push({ src: img, alt: h.title })
-      getGalleryImages(h).forEach(g => photos.push({ src: g, alt: h.title }))
+      if (img) photos.push({ src: img, alt: h.title, caption: h.description })
     })
     achievements.forEach(a => {
+      getGalleryPhotos(a).forEach(p => photos.push({
+        src: p.image_url!,
+        alt: a.title,
+        caption: p.caption || `${a.title} — ${a.description.slice(0, 80)}...`
+      }))
       const img = getImage(a)
-      if (img) photos.push({ src: img, alt: a.title })
-      getGalleryImages(a).forEach(g => photos.push({ src: g, alt: a.title }))
+      if (img) photos.push({ src: img, alt: a.title, caption: a.description })
     })
-    return photos.slice(0, 16)
+    // If no API photos, use narrative fallback photos with rich captions
+    if (photos.length === 0) {
+      return NARRATIVE_PHOTOS.map(p => ({ ...p, src: p.src || '' })).filter(p => p.src)
+    }
+    return photos.slice(0, 12)
   }, [regions, communities, heritage, achievements])
 
   if (loading) {
@@ -202,42 +251,210 @@ const KenyaUnified = () => {
   return (
     <section className="bg-white">
 
-      {/* ===================== INTRO ===================== */}
-      <div className="py-20 sm:py-24 bg-white relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
+      {/* ===================== 1. WHY KENYA ===================== */}
+      <div className="py-20 sm:py-28 bg-white relative overflow-hidden">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
           <motion.div {...fadeInUp}>
-            <span className="text-green-600 font-bold tracking-widest uppercase text-xs mb-4 block">The Spirit of a Nation</span>
+            <span className="inline-block px-4 py-1.5 rounded-full border border-green-200 bg-green-50 text-green-700 text-xs sm:text-sm font-bold tracking-widest uppercase mb-6">
+              Why Kenya Specifically
+            </span>
             <h2 className="text-3xl sm:text-5xl font-bold text-gray-900 mb-8 tracking-tight">
-              One People, <span className="text-red-600">Many Stories</span>
+              Kenya: Where Heritage <span className="text-red-600">Becomes Legacy</span>
             </h2>
-            <p className="text-xl text-gray-600 leading-relaxed font-light max-w-2xl mx-auto">
-              Kenya is a tapestry of forty-four ethnic communities, united by the sacred spirit of{' '}
-              <span className="font-semibold text-green-700 border-b-2 border-green-200">Harambee</span>. 
-              From the cradle of mankind to the silicon savannah, we are a nation that pulls together to shape the future.
+            <p className="text-lg sm:text-xl text-gray-600 leading-relaxed font-light max-w-3xl mx-auto mb-6">
+              This is not just a country. It is the cradle of humankind, the meeting point of 44 distinct ethnic nations, 
+              and a living laboratory where ancient tradition and cutting-edge innovation breathe the same air.
+            </p>
+            <p className="text-lg text-gray-600 leading-relaxed font-light max-w-3xl mx-auto">
+              From the Swahili Coast to the Rift Valley, from the Maasai Mara to the Silicon Savannah — 
+              Kenya carries a cultural weight that deserves more than admiration. It deserves a <span className="font-semibold text-green-700">global stage</span>.
             </p>
           </motion.div>
         </div>
       </div>
 
-      {/* ===================== OUR KENYA ===================== */}
-      <div className="py-16 sm:py-20 bg-green-50/10">
+      {/* ===================== 2. CULTURAL FACTS STRIP ===================== */}
+      <div className="py-14 sm:py-16 bg-green-900 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-black/20 rounded-full blur-3xl" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <motion.div {...fadeInUp} className="text-center mb-10">
+            <span className="inline-flex items-center gap-2 text-green-400 font-semibold tracking-wider uppercase text-sm mb-3">
+              <Globe className="w-4 h-4" /> The Numbers Speak
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-bold text-white">
+              Heritage on a Global Scale
+            </h2>
+          </motion.div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+            {CULTURAL_FACTS.map((fact, idx) => (
+              <motion.div
+                key={fact.label}
+                {...stagger}
+                transition={{ duration: 0.5, delay: idx * 0.1 }}
+                className="text-center"
+              >
+                <div className="text-4xl sm:text-5xl font-bold text-yellow-400 mb-2">{fact.number}</div>
+                <div className="text-white font-semibold text-base mb-1">{fact.label}</div>
+                <div className="text-green-200 text-sm leading-relaxed">{fact.description}</div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ===================== 3. PHOTO NARRATIVE GRID ===================== */}
+      {galleryPhotos.length > 0 && (
+        <div className="py-16 sm:py-20 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div {...fadeInUp} className="text-center mb-10">
+              <span className="inline-flex items-center gap-2 text-green-700 font-semibold tracking-wider uppercase text-sm mb-3">
+                <Camera className="w-4 h-4" /> What Kenyan Culture Looks Like
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">A Nation in Colour</h2>
+              <p className="text-gray-600 max-w-2xl mx-auto mt-4">
+                Every image carries a story. Hover to read what you are seeing, what it means culturally, 
+                and why it matters to our mission.
+              </p>
+            </motion.div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {galleryPhotos.map((photo, idx) => (
+                <motion.div
+                  key={`${photo.src}-${idx}`}
+                  {...stagger}
+                  transition={{ duration: 0.4, delay: idx * 0.06 }}
+                  className={`relative overflow-hidden rounded-2xl group cursor-pointer bg-gray-100 ${
+                    idx === 0 ? 'sm:col-span-2 sm:row-span-2' : ''
+                  }`}
+                >
+                  {photo.src ? (
+                    <>
+                      <img
+                        src={photo.src}
+                        alt={photo.alt}
+                        className={`w-full object-cover group-hover:scale-105 transition-transform duration-700 ${
+                          idx === 0 ? 'h-64 sm:h-full min-h-[320px]' : 'h-56 sm:h-64'
+                        }`}
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/60 transition-colors duration-500" />
+                      <div className="absolute inset-0 p-5 sm:p-6 flex flex-col justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                        <span className="text-yellow-400 text-xs font-bold tracking-widest uppercase mb-2">
+                          {photo.alt}
+                        </span>
+                        <p className="text-white text-sm leading-relaxed">
+                          {photo.caption}
+                        </p>
+                      </div>
+                    </>
+                  ) : (
+                    <div className={`flex items-center justify-center bg-gray-100 ${idx === 0 ? 'h-64 sm:h-full min-h-[320px]' : 'h-56 sm:h-64'}`}>
+                      <Camera className="w-10 h-10 text-gray-300" />
+                    </div>
+                  )}
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ===================== 4. WHO CARRIES THIS CULTURE ===================== */}
+      <div className="py-16 sm:py-20 bg-green-50/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div {...fadeInUp} className="text-center mb-6">
             <span className="inline-flex items-center gap-2 text-green-700 font-semibold tracking-wider uppercase text-sm mb-3">
-              <MapPin className="w-4 h-4" /> Our Kenya
+              <Users className="w-4 h-4" /> Who Carries This Culture
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">
-              The Heartland
+              The People
             </h2>
           </motion.div>
           <motion.div {...fadeInUp} className="text-center mb-14">
             <p className="text-gray-600 max-w-2xl mx-auto">
-              From Mount Kenya to the Indian Ocean — each landscape holds a people and a way of life.
+              Behind every tradition is a community that has kept it alive. These are the guardians — 
+              the weavers, the runners, the farmers, the artists, the elders, and the youth who refuse to let heritage fade.
             </p>
           </motion.div>
 
-          {/* Regions as large photo cards */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {communities.map((community, idx) => {
+              const img = getImage(community)
+              const gallery = getGalleryImages(community)
+              const isExpanded = expandedCommunity === community.id
+              return (
+                <motion.div
+                  key={community.id}
+                  {...stagger}
+                  transition={{ duration: 0.5, delay: idx * 0.08 }}
+                  className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 group"
+                >
+                  <div className="h-48 overflow-hidden relative">
+                    {img ? (
+                      <img
+                        src={img}
+                        alt={community.name}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-green-100 flex items-center justify-center">
+                        <Users className="w-10 h-10 text-green-300" />
+                      </div>
+                    )}
+                    <div className="absolute top-3 left-3">
+                      <span className="bg-white/90 backdrop-blur-sm text-green-700 text-xs font-semibold px-2.5 py-1 rounded-full">
+                        {community.region}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="p-5">
+                    <h4 className="font-bold text-gray-900 text-lg">{community.name}</h4>
+                    <p className="mt-2 text-sm text-gray-600 leading-relaxed">{community.description}</p>
+                    {gallery.length > 0 && (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setExpandedCommunity(isExpanded ? null : community.id) }}
+                        className="mt-3 inline-flex items-center gap-1 text-xs text-green-600 hover:text-green-800 transition-colors font-medium"
+                      >
+                        <ChevronDown className={`w-3 h-3 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                        {gallery.length} photo{gallery.length > 1 ? 's' : ''}
+                      </button>
+                    )}
+                  </div>
+                  {isExpanded && gallery.length > 0 && (
+                    <div className="px-5 pb-5">
+                      <div className="grid grid-cols-3 gap-2">
+                        {gallery.map((src, gi) => (
+                          <div key={gi} className="rounded-lg overflow-hidden">
+                            <img src={src} alt={`${community.name} ${gi + 1}`} className="w-full h-20 object-cover" />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </motion.div>
+              )
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* ===================== 5. REGIONS ===================== */}
+      <div className="py-16 sm:py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div {...fadeInUp} className="text-center mb-6">
+            <span className="inline-flex items-center gap-2 text-green-700 font-semibold tracking-wider uppercase text-sm mb-3">
+              <MapPin className="w-4 h-4" /> The Heartland
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">
+              From Mount Kenya to the Indian Ocean
+            </h2>
+          </motion.div>
+          <motion.div {...fadeInUp} className="text-center mb-14">
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Every landscape shapes the people who live on it. The highlands, the lake, the coast, the savannah — 
+              each has forged a distinct way of life.
+            </p>
+          </motion.div>
+
           <div className="grid md:grid-cols-2 gap-6">
             {regions.map((region, idx) => {
               const img = getImage(region)
@@ -293,111 +510,126 @@ const KenyaUnified = () => {
               )
             })}
           </div>
-
-          {/* Ethnic Mosaic */}
-          <motion.div {...fadeInUp} className="mt-14 text-center">
-            <p className="text-gray-500 italic text-sm">
-              A tapestry of over 40 ethnic communities, each bringing unique richness to one nation.
-            </p>
-          </motion.div>
         </div>
       </div>
 
-      {/* ===================== SWAHILI PHRASES ===================== */}
-      <div className="py-14 sm:py-16 bg-white">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div {...fadeInUp} className="text-center mb-10">
-            <span className="inline-flex items-center gap-2 text-green-700 font-semibold tracking-wider uppercase text-sm mb-3">
-              <Volume2 className="w-4 h-4" /> Languages of Unity
+      {/* ===================== 6. THE ARC: FROM SOIL TO STAGE ===================== */}
+      <div className="py-16 sm:py-20 bg-green-900 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-black/30 rounded-full blur-3xl" />
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <motion.div {...fadeInUp} className="text-center mb-12">
+            <span className="inline-flex items-center gap-2 text-green-400 font-semibold tracking-wider uppercase text-sm mb-3">
+              <Sparkles className="w-4 h-4" /> The Mission Connection
             </span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              Speak Kenyan
+            <h2 className="text-3xl sm:text-4xl font-bold text-white">
+              From Soil to Stage
             </h2>
-            <p className="text-gray-600 max-w-xl mx-auto">
-              Over 60 indigenous languages, one unifying tongue — Kiswahili.
+            <p className="text-green-100 max-w-2xl mx-auto mt-4">
+              How does a nation&apos;s heritage become a global platform for change? Here is the arc.
             </p>
           </motion.div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-            {SWAHILI_PHRASES.map((item, idx) => (
+
+          <div className="space-y-8">
+            {[
+              {
+                step: '01',
+                title: 'The Land',
+                desc: 'Kenya\'s geography — from Rift Valley to Swahili Coast — has shaped 44 distinct cultures, each with languages, art forms, and wisdom systems evolved over millennia.',
+                icon: MapPin,
+              },
+              {
+                step: '02',
+                title: 'The People',
+                desc: 'These communities are not museums. They are living, adapting, creating. The beadwork, the music, the running, the tech innovation — all emerge from this cultural soil.',
+                icon: Users,
+              },
+              {
+                step: '03',
+                title: 'The Heritage',
+                desc: 'UNESCO sites, oral traditions, ceremonies, and craftsmanship form an intangible wealth that the world barely knows. This is not folklore — it is living intellectual property.',
+                icon: Landmark,
+              },
+              {
+                step: '04',
+                title: 'The Platform',
+                desc: 'Miss Culture Global Kenya exists to carry this heritage onto a world stage. Not as entertainment, but as a serious cultural diplomacy mission — showing the world what Kenya truly is.',
+                icon: Globe,
+              },
+              {
+                step: '05',
+                title: 'The Ambassador',
+                desc: "Susan Abong'o represents more than a pageant title. She represents the bridge between these 44 communities and the global community — a living testament that culture is power.",
+                icon: Heart,
+              },
+            ].map((item, idx) => (
               <motion.div
-                key={item.phrase}
+                key={item.step}
                 {...stagger}
-                transition={{ duration: 0.4, delay: idx * 0.06 }}
-                className="bg-white p-5 rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 text-center border border-gray-100 group cursor-pointer"
+                transition={{ duration: 0.5, delay: idx * 0.1 }}
+                className="flex gap-5 sm:gap-6 items-start"
               >
-                <div className="text-2xl sm:text-3xl font-bold text-green-700 mb-2">
-                  {item.phrase}
+                <div className="flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/20">
+                  <span className="text-yellow-400 font-bold text-sm sm:text-base">{item.step}</span>
                 </div>
-                <div className="text-gray-600 text-sm font-medium">{item.meaning}</div>
+                <div className="flex-1">
+                  <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">{item.title}</h3>
+                  <p className="text-green-100 leading-relaxed text-sm sm:text-base">{item.desc}</p>
+                </div>
               </motion.div>
             ))}
           </div>
         </div>
       </div>
 
-      {/* ===================== OUR CULTURE ===================== */}
+      {/* ===================== 7. HERITAGE & CEREMONIES ===================== */}
       <div className="py-16 sm:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div {...fadeInUp} className="text-center mb-6">
             <span className="inline-flex items-center gap-2 text-yellow-700 font-semibold tracking-wider uppercase text-sm mb-3">
-              <Landmark className="w-4 h-4" /> Our Culture
+              <Landmark className="w-4 h-4" /> Living Traditions
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">
-              The Soul
+              Heritage & Ceremonies
             </h2>
           </motion.div>
           <motion.div {...fadeInUp} className="text-center mb-14">
             <p className="text-gray-600 max-w-2xl mx-auto">
-              Vibrant traditions, artistic expressions, and sacred ceremonies — this is the soul of Kenya.
+              These are not tourist attractions. They are sacred practices that hold communities together across generations.
             </p>
           </motion.div>
 
-          {/* Communities — photo + info cards */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-14">
-            {communities.map((community, idx) => {
-              const img = getImage(community)
-              const gallery = getGalleryImages(community)
-              const isExpanded = expandedCommunity === community.id
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {heritage.map((item, idx) => {
+              const img = getImage(item)
+              const gallery = getGalleryImages(item)
               return (
                 <motion.div
-                  key={community.id}
+                  key={item.id}
                   {...stagger}
-                  transition={{ duration: 0.5, delay: idx * 0.08 }}
-                  className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 group"
+                  transition={{ duration: 0.4, delay: idx * 0.06 }}
+                  className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden group hover:shadow-md transition-shadow duration-300"
                 >
-                  <div className="h-44 overflow-hidden relative">
-                    {img && (
-                      <img
-                        src={img}
-                        alt={community.name}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                      />
-                    )}
-                    <div className="absolute top-3 left-3">
-                      <span className="bg-white/90 backdrop-blur-sm text-green-700 text-xs font-semibold px-2.5 py-1 rounded-full">
-                        {community.region}
-                      </span>
+                  {img ? (
+                    <div className="h-48 overflow-hidden">
+                      <img src={img} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                     </div>
-                  </div>
+                  ) : (
+                    <div className="h-48 bg-yellow-100 flex items-center justify-center">
+                      <Landmark className="w-10 h-10 text-yellow-400" />
+                    </div>
+                  )}
                   <div className="p-5">
-                    <h4 className="font-bold text-gray-900 text-lg">{community.name}</h4>
-                    <p className="mt-2 text-sm text-gray-600 line-clamp-3">{community.description}</p>
-                    {gallery.length > 0 && (
-                      <button
-                        onClick={(e) => { e.stopPropagation(); setExpandedCommunity(isExpanded ? null : community.id) }}
-                        className="mt-3 inline-flex items-center gap-1 text-xs text-green-600 hover:text-green-800 transition-colors font-medium"
-                      >
-                        <ChevronDown className={`w-3 h-3 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
-                        {gallery.length} photo{gallery.length > 1 ? 's' : ''}
-                      </button>
-                    )}
+                    <p className="text-xs uppercase tracking-wide text-yellow-600 font-semibold">{item.heritage_type}</p>
+                    <h4 className="mt-1 font-bold text-gray-900 text-lg">{item.title}</h4>
+                    <p className="mt-2 text-sm text-gray-600 leading-relaxed">{item.description}</p>
                   </div>
-                  {isExpanded && gallery.length > 0 && (
+                  {gallery.length > 0 && (
                     <div className="px-5 pb-5">
-                      <div className="grid grid-cols-3 gap-2">
-                        {gallery.map((src, gi) => (
-                          <div key={gi} className="rounded-lg overflow-hidden">
-                            <img src={src} alt={`${community.name} ${gi + 1}`} className="w-full h-20 object-cover" />
+                      <div className="grid grid-cols-3 gap-1.5">
+                        {gallery.slice(0, 3).map((src, gi) => (
+                          <div key={gi} className="rounded-md overflow-hidden">
+                            <img src={src} alt={`${item.title} ${gi + 1}`} className="w-full h-16 object-cover" />
                           </div>
                         ))}
                       </div>
@@ -408,8 +640,8 @@ const KenyaUnified = () => {
             })}
           </div>
 
-          {/* Cultural adornment feature cards */}
-          <motion.div {...fadeInUp} className="mb-14">
+          {/* Cultural Expression Cards */}
+          <motion.div {...fadeInUp} className="mt-14">
             <h3 className="text-2xl font-bold text-gray-900 mb-8 text-center flex items-center justify-center gap-2">
               <Palette className="w-5 h-5 text-yellow-600" /> Adornment & Expression
             </h3>
@@ -434,254 +666,107 @@ const KenyaUnified = () => {
               ))}
             </div>
           </motion.div>
-
-          {/* Heritage items — compact photo cards */}
-          {heritage.length > 0 && (
-            <motion.div {...fadeInUp}>
-              <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                <Landmark className="w-5 h-5 text-yellow-600" /> Heritage & Ceremonies
-              </h3>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                {heritage.map((item, idx) => {
-                  const img = getImage(item)
-                  const gallery = getGalleryImages(item)
-                  return (
-                    <motion.div
-                      key={item.id}
-                      {...stagger}
-                      transition={{ duration: 0.4, delay: idx * 0.06 }}
-                      className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden group hover:shadow-md transition-shadow duration-300"
-                    >
-                      {img ? (
-                        <div className="h-36 overflow-hidden">
-                          <img src={img} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                        </div>
-                      ) : (
-                        <div className="h-36 bg-yellow-100 flex items-center justify-center">
-                          <Music className="w-8 h-8 text-yellow-400" />
-                        </div>
-                      )}
-                      <div className="p-4">
-                        <p className="text-xs uppercase tracking-wide text-yellow-600 font-semibold">{item.heritage_type}</p>
-                        <h4 className="mt-1 font-semibold text-gray-900">{item.title}</h4>
-                        <p className="mt-1 text-sm text-gray-500 line-clamp-2">{item.description}</p>
-                      </div>
-                      {gallery.length > 0 && (
-                        <div className="px-4 pb-4">
-                          <div className="grid grid-cols-3 gap-1.5">
-                            {gallery.slice(0, 3).map((src, gi) => (
-                              <div key={gi} className="rounded-md overflow-hidden">
-                                <img src={src} alt={`${item.title} ${gi + 1}`} className="w-full h-14 object-cover" />
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </motion.div>
-                  )
-                })}
-              </div>
-            </motion.div>
-          )}
-
-          {/* Artisan Showcase */}
-          <motion.div {...fadeInUp} className="mt-14">
-            <h3 className="text-2xl font-bold text-gray-900 mb-8 text-center flex items-center justify-center gap-2">
-              <Sparkles className="w-5 h-5 text-yellow-600" /> Artisan Showcase
-            </h3>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {ARTISAN_SHOWCASE.map((artisan, idx) => (
-                <motion.div
-                  key={artisan.title}
-                  {...stagger}
-                  transition={{ duration: 0.5, delay: idx * 0.08 }}
-                  className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 group cursor-pointer"
-                >
-                  <div className="overflow-hidden h-48">
-                    <img
-                      src={artisan.image}
-                      alt={artisan.title}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                  </div>
-                  <div className="p-5">
-                    <h4 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-yellow-600 transition-colors duration-300">{artisan.title}</h4>
-                    <p className="text-gray-600 text-sm leading-relaxed">{artisan.description}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
         </div>
       </div>
 
-      {/* ===================== GUARDIANS OF THE WILD ===================== */}
-      <div className="py-16 sm:py-20 bg-green-50/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div {...fadeInUp} className="text-center mb-6">
+      {/* ===================== 8. SWAHILI PHRASES ===================== */}
+      <div className="py-14 sm:py-16 bg-green-50/30">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div {...fadeInUp} className="text-center mb-10">
             <span className="inline-flex items-center gap-2 text-green-700 font-semibold tracking-wider uppercase text-sm mb-3">
-              <Camera className="w-4 h-4" /> Nature's Sanctuary
+              <Volume2 className="w-4 h-4" /> Languages of Unity
             </span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">
-              Guardians of the Wild
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+              Speak Kenyan
             </h2>
-          </motion.div>
-          <motion.div {...fadeInUp} className="text-center mb-14">
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              From the pioneering rhino sanctuaries to the world-renowned elephant orphanages — we are the stewards of Africa's greatest treasures.
+            <p className="text-gray-600 max-w-xl mx-auto">
+              Over 60 indigenous languages, one unifying tongue — Kiswahili.
             </p>
           </motion.div>
-
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
             {[
-              {
-                title: 'Rhino Conservation',
-                desc: 'Leading the way in protecting the critically endangered Black and White Rhinos through community-led sanctuaries.',
-                icon: ShieldCheck,
-                stat: '80% of world population'
-              },
-              {
-                title: 'Elephant Guardians',
-                desc: 'Home to some of the world\'s most successful rehabilitation programs, ensuring a future for these gentle giants.',
-                icon: Heart,
-                stat: 'Growing populations'
-              },
-              {
-                title: 'Marine Protection',
-                desc: 'Pristine coral reefs and marine parks along the Swahili coast, protected for generations to come.',
-                icon: Waves,
-                stat: '6 Marine Parks'
-              }
+              { phrase: 'Jambo', meaning: 'Hello' },
+              { phrase: 'Asante', meaning: 'Thank you' },
+              { phrase: 'Karibu', meaning: 'Welcome' },
+              { phrase: 'Hakuna Matata', meaning: 'No worries' },
+              { phrase: 'Uhuru', meaning: 'Freedom' },
+              { phrase: 'Harambee', meaning: 'Pull together' },
             ].map((item, idx) => (
               <motion.div
-                key={item.title}
+                key={item.phrase}
                 {...stagger}
-                transition={{ duration: 0.5, delay: idx * 0.1 }}
-                className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 border border-green-100 flex flex-col items-center text-center group"
+                transition={{ duration: 0.4, delay: idx * 0.06 }}
+                className="bg-white p-5 rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 text-center border border-gray-100 group cursor-pointer"
               >
-                <div className="w-14 h-14 bg-green-100 rounded-xl flex items-center justify-center mb-6 group-hover:bg-green-600 transition-colors duration-300">
-                  <item.icon className="w-7 h-7 text-green-700 group-hover:text-white transition-colors duration-300" />
+                <div className="text-2xl sm:text-3xl font-bold text-green-700 mb-2">
+                  {item.phrase}
                 </div>
-                <h4 className="text-xl font-bold text-gray-900 mb-3">{item.title}</h4>
-                <p className="text-gray-600 text-sm mb-4 leading-relaxed">{item.desc}</p>
-                <span className="text-xs font-bold text-green-700 uppercase tracking-widest">{item.stat}</span>
+                <div className="text-gray-600 text-sm font-medium">{item.meaning}</div>
               </motion.div>
             ))}
           </div>
         </div>
       </div>
 
-          {/* Natural & Culinary Heritage Section - Replaced Global Impact with evocative Kenyan experiences */}
-          <motion.div
-            {...fadeInUp}
-            className="mt-14 bg-green-900 rounded-3xl p-10 sm:p-14 text-white relative overflow-hidden shadow-2xl"
-          >
-            <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
-            <div className="absolute bottom-0 left-0 w-96 h-96 bg-black/30 rounded-full blur-3xl" />
-            
-            <div className="relative z-10 text-center mb-12">
-              <span className="inline-flex items-center gap-2 text-green-400 font-semibold tracking-wider uppercase text-sm mb-3">
-                <Sparkles className="w-4 h-4" /> The Kenyan Experience
-              </span>
-              <h3 className="text-3xl sm:text-4xl font-bold">Beyond the Horizon</h3>
-            </div>
-
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-10 relative z-10">
-              {[
-                { 
-                  title: 'The Great Migration', 
-                  desc: 'The Eighth Wonder of the World — a rhythmic journey of millions across the golden savannah.',
-                  icon: Plane 
-                },
-                { 
-                  title: 'Culinary Soul', 
-                  desc: 'From the spice-scented Coast to the hearty Nyama Choma — a journey of flavors and hospitality.',
-                  icon: Utensils 
-                },
-                { 
-                  title: 'Majestic Peaks', 
-                  desc: 'Snow-capped Mount Kenya, the "Seat of God," standing tall over the Great Rift Valley.',
-                  icon: Mountain 
-                },
-                { 
-                  title: 'Silicon Savannah', 
-                  desc: 'A global hub of innovation where mobile banking was born and tech dreams take flight.',
-                  icon: Lightbulb 
-                },
-              ].map((item, idx) => (
-                <motion.div
-                  key={item.title}
-                  {...stagger}
-                  transition={{ duration: 0.5, delay: idx * 0.1 }}
-                  className="flex flex-col items-center text-center group"
-                >
-                  <div className="w-16 h-16 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center mb-6 border border-white/20 group-hover:bg-white/20 transition-all duration-300 transform group-hover:-translate-y-1">
-                    <item.icon className="w-8 h-8 text-yellow-400" />
-                  </div>
-                  <h4 className="text-xl font-bold mb-3">{item.title}</h4>
-                  <p className="text-green-100 text-sm leading-relaxed">{item.desc}</p>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-
-      {/* ===================== PHOTO MOSAIC ===================== */}
-      {allPhotos.length > 0 && (
-        <div className="py-16 sm:py-20 bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <motion.div {...fadeInUp} className="text-center mb-10">
-              <span className="inline-flex items-center gap-2 text-gray-500 font-semibold tracking-wider uppercase text-sm mb-3">
-                <Camera className="w-4 h-4" /> Kenya in Frames
-              </span>
-              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">Photo Highlights</h2>
-            </motion.div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-              {allPhotos.map((photo, idx) => (
-                <motion.div
-                  key={`${photo.src}-${idx}`}
-                  {...stagger}
-                  transition={{ duration: 0.4, delay: idx * 0.04 }}
-                  className={`relative overflow-hidden rounded-xl group cursor-pointer ${
-                    idx === 0 ? 'sm:col-span-2 sm:row-span-2' : ''
-                  }`}
-                >
-                  <img
-                    src={photo.src}
-                    alt={photo.alt}
-                    className={`w-full object-cover group-hover:scale-110 transition-transform duration-500 ${
-                      idx === 0 ? 'h-64 sm:h-full' : 'h-40 sm:h-44'
-                    }`}
-                  />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
-                  <div className="absolute bottom-0 left-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <p className="text-white text-sm font-medium drop-shadow-lg">{photo.alt}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ===================== CALL TO ACTION ===================== */}
+      {/* ===================== 9. BRIDGE CTAS ===================== */}
       <div className="py-16 sm:py-20 bg-white">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            {...fadeInUp}
-            className="bg-green-800 rounded-3xl p-10 sm:p-16 text-white text-center relative overflow-hidden shadow-2xl"
-          >
-            <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl" />
-            <div className="absolute bottom-0 left-0 w-64 h-64 bg-black/20 rounded-full blur-3xl" />
-            <div className="relative z-10">
-              <div className="w-16 h-16 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-6 border border-white/20">
-                <Mountain className="w-8 h-8 text-yellow-400" />
-              </div>
-              <h3 className="text-3xl sm:text-4xl font-bold mb-4">Faith &amp; Unity</h3>
-              <p className="text-green-50 max-w-xl mx-auto leading-relaxed font-light">
-                Strength in diversity — harmony between faiths, traditions, and communities.
-              </p>
-            </div>
+          <motion.div {...fadeInUp} className="text-center mb-10">
+            <span className="inline-block px-4 py-1.5 rounded-full border border-red-200 bg-red-50 text-red-600 text-xs sm:text-sm font-bold tracking-widest uppercase mb-6">
+              Where Do I Go Next
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">
+              Be Part of the Story
+            </h2>
           </motion.div>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            <Link href="/ambassador">
+              <motion.div
+                {...stagger}
+                transition={{ duration: 0.5, delay: 0 }}
+                className="group bg-green-900 rounded-2xl p-8 sm:p-10 text-white relative overflow-hidden hover:shadow-2xl transition-all duration-300 cursor-pointer h-full"
+              >
+                <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl" />
+                <div className="relative z-10">
+                  <div className="w-14 h-14 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center mb-6 border border-white/20 group-hover:bg-white/20 transition-colors">
+                    <Heart className="w-7 h-7 text-yellow-400" />
+                  </div>
+                  <h3 className="text-2xl sm:text-3xl font-bold mb-3">Meet Our Ambassador</h3>
+                  <p className="text-green-100 leading-relaxed mb-6">
+                    Susan Abong&apos;o carries the voice of 44 communities onto the global stage.
+                    Discover her story and her mission to put Kenyan heritage at the centre of world culture.
+                  </p>
+                  <span className="inline-flex items-center gap-2 text-yellow-400 font-semibold group-hover:gap-3 transition-all">
+                    Meet Susan <ArrowRight className="w-5 h-5" />
+                  </span>
+                </div>
+              </motion.div>
+            </Link>
+
+            <Link href="/events">
+              <motion.div
+                {...stagger}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                className="group bg-red-600 rounded-2xl p-8 sm:p-10 text-white relative overflow-hidden hover:shadow-2xl transition-all duration-300 cursor-pointer h-full"
+              >
+                <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
+                <div className="relative z-10">
+                  <div className="w-14 h-14 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center mb-6 border border-white/20 group-hover:bg-white/20 transition-colors">
+                    <Calendar className="w-7 h-7 text-yellow-300" />
+                  </div>
+                  <h3 className="text-2xl sm:text-3xl font-bold mb-3">Join Our Events</h3>
+                  <p className="text-red-100 leading-relaxed mb-6">
+                    From cultural showcases to community outreach, our events bring Kenyan heritage to life. 
+                    Find out where we will be next and how you can participate.
+                  </p>
+                  <span className="inline-flex items-center gap-2 text-yellow-300 font-semibold group-hover:gap-3 transition-all">
+                    See Events <ArrowRight className="w-5 h-5" />
+                  </span>
+                </div>
+              </motion.div>
+            </Link>
+          </div>
         </div>
       </div>
     </section>

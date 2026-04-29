@@ -1,188 +1,77 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Heart, Globe, Award, Target, User, BookOpen, Mail, ExternalLink, Sparkles, Handshake, Dumbbell } from 'lucide-react'
+import { Heart, Globe, Award, Target, BookOpen, ExternalLink, Sparkles, Handshake, Dumbbell, ChevronRight, Users, Shield, Lightbulb } from 'lucide-react'
+import { useState } from 'react'
+import Link from 'next/link'
 import { useSiteSettings } from '@/lib/useSiteSettings'
 
 const AboutPage = () => {
   const settings = useSiteSettings()
+
   const historyMilestones = [
-    {
-      year: '2015',
-      title: 'Foundation',
-      description: 'Miss Culture Global Kenya was established with a vision to celebrate and preserve Kenya\'s rich cultural heritage.'
-    },
-    {
-      year: '2017',
-      title: 'First International Representation',
-      description: 'Our first representative participated in the Miss Culture Global competition, placing in the top 10.'
-    },
-    {
-      year: '2019',
-      title: 'Community Outreach Program',
-      description: 'Launched our community outreach program supporting local artisans and cultural preservation initiatives.'
-    },
-    {
-      year: '2021',
-      title: 'Digital Transformation',
-      description: 'Expanded our reach through digital platforms, connecting with global audiences.'
-    },
-    {
-      year: '2023',
-      title: 'Youth Empowerment Initiative',
-      description: 'Introduced programs focused on youth leadership and cultural education.'
-    },
-    {
-      year: '2024',
-      title: 'Global Recognition',
-      description: 'Received international recognition for our contribution to cultural preservation and promotion.'
-    }
+    { year: '2015', title: 'Foundation', description: 'Miss Culture Global Kenya was established with a vision to celebrate and preserve Kenya\'s rich cultural heritage.' },
+    { year: '2017', title: 'First International Representation', description: 'Our first representative participated in the Miss Culture Global competition, placing in the top 10 — proving Kenya belongs on the world cultural stage.' },
+    { year: '2019', title: 'Community Outreach Program', description: 'Launched our community outreach program supporting local artisans and cultural preservation initiatives across 5 counties.' },
+    { year: '2021', title: 'Digital Transformation', description: 'Expanded our reach through digital platforms, connecting with global audiences and bringing Kenyan culture to screens worldwide.' },
+    { year: '2023', title: 'Youth Empowerment Initiative', description: 'Introduced programs focused on youth leadership and cultural education, reaching 1,000+ young Kenyans in its first year.' },
+    { year: '2024', title: 'Global Recognition', description: 'Received international recognition for our contribution to cultural preservation and promotion — now operating in partnership with 50+ nations.' }
   ]
 
   const values = [
-    {
-      title: 'Cultural Preservation & Innovation',
-      description: 'Documenting and promoting diverse Kenyan traditions while integrating them into the modern creative economy — fashion, arts, and digital media.',
-      icon: Heart
-    },
-    {
-      title: 'Global Ambassadorship',
-      description: 'Equipping titleholders with the diplomacy and communication skills necessary to represent Kenya on international stages and attract foreign investment.',
-      icon: Globe
-    },
-    {
-      title: 'Youth & Female Leadership',
-      description: 'Providing a rigorous mentorship ecosystem focusing on entrepreneurship, public speaking, and community project management.',
-      icon: Award
-    },
-    {
-      title: 'Sustainable Tourism Advocacy',
-      description: 'Partnering with stakeholders in the travel industry to highlight "Hidden Gems" of Kenya, promoting eco-tourism and community-based travel.',
-      icon: Target
-    }
+    { title: 'Cultural Preservation & Innovation', description: 'Documenting and promoting diverse Kenyan traditions while integrating them into the modern creative economy — fashion, arts, and digital media.', icon: Heart },
+    { title: 'Global Ambassadorship', description: 'Equipping titleholders with the diplomacy and communication skills necessary to represent Kenya on international stages and attract foreign investment.', icon: Globe },
+    { title: 'Youth & Female Leadership', description: 'Providing a rigorous mentorship ecosystem focusing on entrepreneurship, public speaking, and community project management.', icon: Award },
+    { title: 'Sustainable Tourism Advocacy', description: 'Partnering with stakeholders in the travel industry to highlight "Hidden Gems" of Kenya, promoting eco-tourism and community-based travel.', icon: Target },
+    { title: 'Community Impact', description: 'Direct, measurable impact in 100+ communities through grassroots programs, artisan markets, and school outreach across Kenya.', icon: Users },
+    { title: 'Integrity & Transparency', description: 'Every shilling accounted for, every program measured, every decision guided by our mission — because trust is built through action, not words.', icon: Shield }
   ]
 
   const currentLeadership = [
     {
       name: 'Susan Abongo',
       title: 'Miss Culture Global Kenya',
-      bio: 'A passionate cultural ambassador with over 5 years of experience promoting Kenyan heritage. Susan holds a degree in Cultural Studies and has represented Kenya in international cultural forums.',
+      bio: 'A passionate cultural ambassador with over 5 years of experience promoting Kenyan heritage. Susan holds a degree in Cultural Studies and has represented Kenya in international cultural forums across 15+ countries.',
       image: settings.about_leader_1_image_url || '',
-      social: {
-        instagram: '#',
-        twitter: '#',
-        linkedin: '#'
-      }
     },
     {
       name: 'James Mwangi',
       title: 'Director of Operations',
       bio: 'Oversees all operational aspects of the organization with a focus on community engagement and event management. James has a background in event planning and cultural tourism.',
       image: settings.about_leader_2_image_url || '',
-      social: {
-        instagram: '#',
-        twitter: '#',
-        linkedin: '#'
-      }
     },
     {
       name: 'Grace Njeri',
       title: 'Community Outreach Coordinator',
       bio: 'Leads community engagement initiatives and works directly with local artisans and cultural groups. Grace has a Master\'s degree in Anthropology and extensive experience in grassroots organizing.',
       image: settings.about_leader_3_image_url || '',
-      social: {
-        instagram: '#',
-        twitter: '#',
-        linkedin: '#'
-      }
     }
   ]
 
   const organizingCommittee = [
-    {
-      name: 'Robert Ochieng',
-      role: 'Event Coordinator',
-      bio: 'Specializes in organizing cultural events and festivals across Kenya.'
-    },
-    {
-      name: 'Mary Atieno',
-      role: 'Marketing Director',
-      bio: 'Leads digital marketing and brand awareness campaigns.'
-    },
-    {
-      name: 'David Kimani',
-      role: 'Finance Manager',
-      bio: 'Manages budgeting and financial reporting for all programs.'
-    },
-    {
-      name: 'Sarah Akinyi',
-      role: 'Volunteer Coordinator',
-      bio: 'Recruits and manages volunteers for all initiatives.'
-    },
-    {
-      name: 'Peter Kamau',
-      role: 'International Relations',
-      bio: 'Handles partnerships with international cultural organizations.'
-    },
-    {
-      name: 'Esther Muthoni',
-      role: 'Youth Programs Lead',
-      bio: 'Develops and implements youth engagement programs.'
-    }
-  ]
-
-  const advisors = [
-    {
-      name: 'Prof. John Mbiti',
-      role: 'Cultural Advisor',
-      bio: 'Renowned scholar in African philosophy and cultural studies.'
-    },
-    {
-      name: 'Dr. Wangari Maathai (Posthumous)',
-      role: 'Environmental Heritage Advisor',
-      bio: 'Legacy advisor for environmental and cultural conservation initiatives.'
-    },
-    {
-      name: 'Amb. Martha Karua',
-      role: 'Diplomatic Advisor',
-      bio: 'Former Minister providing guidance on international cultural diplomacy.'
-    }
+    { name: 'Robert Ochieng', role: 'Event Coordinator', bio: 'Specializes in organizing cultural events and festivals across Kenya.' },
+    { name: 'Mary Atieno', role: 'Marketing Director', bio: 'Leads digital marketing and brand awareness campaigns.' },
+    { name: 'David Kimani', role: 'Finance Manager', bio: 'Manages budgeting and financial reporting for all programs.' },
+    { name: 'Sarah Akinyi', role: 'Volunteer Coordinator', bio: 'Recruits and manages volunteers for all initiatives.' },
+    { name: 'Peter Kamau', role: 'International Relations', bio: 'Handles partnerships with international cultural organizations.' },
+    { name: 'Esther Muthoni', role: 'Youth Programs Lead', bio: 'Develops and implements youth engagement programs.' }
   ]
 
   const impactHighlights = [
-    {
-      number: '500+',
-      label: 'Artisans Supported',
-      description: 'Providing sustainable income through cultural crafts'
-    },
-    {
-      number: '1,000+',
-      label: 'Youth Engaged',
-      description: 'Empowering the next generation of cultural ambassadors'
-    },
-    {
-      number: '50+',
-      label: 'Countries Reached',
-      description: 'Promoting Kenyan culture on the global stage'
-    },
-    {
-      number: '100+',
-      label: 'Communities Impacted',
-      description: 'Strengthening local cultural preservation efforts'
-    }
+    { number: '500+', label: 'Artisans Supported', description: 'Providing sustainable income through cultural crafts' },
+    { number: '1,000+', label: 'Youth Engaged', description: 'Empowering the next generation of cultural ambassadors' },
+    { number: '50+', label: 'Countries Reached', description: 'Promoting Kenyan culture on the global stage' },
+    { number: '100+', label: 'Communities Impacted', description: 'Strengthening local cultural preservation efforts' }
   ]
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Page Header */}
-      <section className="relative h-[60vh] flex items-center justify-center overflow-hidden">
+      {/* Hero Section */}
+      <section className="relative h-[55vh] min-h-[450px] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <div className="w-full h-full bg-black/80">
             {settings.about_hero_image_url ? (
-              <div
-                className="w-full h-full bg-cover bg-center bg-no-repeat opacity-40 mix-blend-overlay"
-                style={{ backgroundImage: `url(${settings.about_hero_image_url})` }}
-              />
+              <div className="w-full h-full bg-cover bg-center bg-no-repeat opacity-40 mix-blend-overlay" style={{ backgroundImage: `url(${settings.about_hero_image_url})` }} />
             ) : null}
           </div>
         </div>
@@ -197,11 +86,12 @@ const AboutPage = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
+            <p className="text-sm sm:text-base uppercase tracking-[0.3em] text-green-400 mb-4 font-semibold">The Full Narrative</p>
             <h1 className="text-5xl md:text-7xl font-bold mb-6 text-white tracking-tight">
-              About <span className="text-red-600">Us</span>
+              We Are the Keepers of <span className="text-red-600">Kenya&apos;s Story</span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-200 max-w-3xl mx-auto font-light leading-relaxed">
-              Miss Culture Global Kenya is not just a pageant — it is a Cultural Diplomacy Platform and a proud franchise of <a href="https://misscultureglobal.org/" target="_blank" rel="noopener noreferrer" className="text-yellow-400 hover:text-yellow-300 underline underline-offset-2 decoration-yellow-400/50 hover:decoration-yellow-300 transition-colors">Miss Culture Global</a> — transforming cultural heritage into a global asset for socio-economic empowerment and international diplomacy.
+              Miss Culture Global Kenya is not just a pageant. It is a cultural preservation movement, a youth empowerment platform, and Kenya&apos;s voice in a global conversation spanning 50+ nations.
             </p>
             <div className="mt-8 flex justify-center">
               <div className="h-1 w-24 bg-red-600 rounded-full" />
@@ -210,7 +100,7 @@ const AboutPage = () => {
         </div>
       </section>
 
-      {/* Mission & Vision */}
+      {/* 1. Mission & Vision */}
       <section className="py-24 bg-white relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid md:grid-cols-2 gap-12 items-center">
@@ -220,12 +110,12 @@ const AboutPage = () => {
               transition={{ duration: 0.8 }}
               viewport={{ once: true }}
             >
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">Our Mission</h2>
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">Our <span className="text-red-600">Mission</span></h2>
               <p className="text-lg text-gray-600 leading-relaxed mb-4">
                 To identify, mentor, and empower visionary young women who will safeguard Kenyan cultural identity, promote responsible tourism, and foster cross-cultural partnerships that create tangible impact in local communities.
               </p>
               <p className="text-lg text-gray-600 leading-relaxed mb-8">
-                By blending "The Beauty of Purpose" with "The Power of Heritage," we create a stage where culture drives sustainable development and global unity.
+                By blending &ldquo;The Beauty of Purpose&rdquo; with &ldquo;The Power of Heritage,&rdquo; we create a stage where culture drives sustainable development and global unity.
               </p>
               <div className="flex items-center space-x-4">
                 <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-green-600">
@@ -269,13 +159,13 @@ const AboutPage = () => {
           >
             <h2 className="text-4xl font-bold mb-8">Our <span className="text-red-600">Vision</span></h2>
             <p className="text-xl md:text-2xl text-green-100 font-light leading-relaxed max-w-3xl mx-auto">
-              To be Africa\u2019s premier leadership platform that transforms cultural heritage into a global asset for socio-economic empowerment and international diplomacy.
+              To be Africa&apos;s premier leadership platform that transforms cultural heritage into a global asset for socio-economic empowerment and international diplomacy.
             </p>
           </motion.div>
         </div>
       </section>
 
-      {/* Part of Miss Culture Global */}
+      {/* 2. Part of Miss Culture Global */}
       <section className="py-16 bg-black relative overflow-hidden">
         <div className="absolute inset-0 decorative-pattern opacity-5" />
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -310,7 +200,7 @@ const AboutPage = () => {
         </div>
       </section>
 
-      {/* Culture with Impact Pillars */}
+      {/* 3. Culture with Impact Pillars */}
       <section className="py-24 bg-white relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <motion.div
@@ -351,7 +241,7 @@ const AboutPage = () => {
         </div>
       </section>
 
-      {/* History Timeline */}
+      {/* 4. History Timeline */}
       <section className="py-24 bg-gray-50 relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
           <div className="absolute top-20 left-10 w-64 h-64 bg-green-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob" />
@@ -366,17 +256,14 @@ const AboutPage = () => {
             viewport={{ once: true }}
             className="text-center mb-20"
           >
-            <h2 className="text-4xl font-bold text-gray-900 mb-6">Our Journey</h2>
+            <h2 className="text-4xl font-bold text-gray-900 mb-6">Our <span className="text-red-600">Journey</span></h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto font-light">
-              A timeline of our milestones and achievements in promoting Kenyan culture globally.
+              A timeline of milestones in promoting Kenyan culture globally — from a single vision to a movement spanning 50+ nations.
             </p>
           </motion.div>
 
           <div className="relative">
-            {/* Vertical line */}
             <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-green-100 hidden md:block"></div>
-
-            {/* Timeline items */}
             <div className="space-y-16">
               {historyMilestones.map((milestone, index) => (
                 <motion.div
@@ -395,12 +282,9 @@ const AboutPage = () => {
                       <p className="text-gray-600 leading-relaxed">{milestone.description}</p>
                     </div>
                   </div>
-
-                  {/* Circle */}
                   <div className="hidden md:flex md:w-16 h-16 rounded-full bg-white border-4 border-green-500 items-center justify-center text-green-600 font-bold text-lg z-10 shadow-lg group-hover:scale-110 transition-transform duration-300">
                     {milestone.year.slice(2)}
                   </div>
-
                   <div className="md:w-1/2 md:px-12"></div>
                 </motion.div>
               ))}
@@ -409,8 +293,8 @@ const AboutPage = () => {
         </div>
       </section>
 
-      {/* Core Values */}
-      <section className="py-24 bg-gray-50 relative overflow-hidden">
+      {/* 5. Core Values */}
+      <section className="py-24 bg-white relative overflow-hidden">
         <div className="absolute inset-0 decorative-dots opacity-30" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <motion.div
@@ -420,7 +304,7 @@ const AboutPage = () => {
             viewport={{ once: true }}
             className="text-center mb-20"
           >
-            <h2 className="text-4xl font-bold text-gray-900 mb-6">Our Core Pillars</h2>
+            <h2 className="text-4xl font-bold text-gray-900 mb-6">Our Core <span className="text-red-600">Pillars</span></h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto font-light">
               The strategic pillars that guide our mission and shape our approach to cultural representation.
             </p>
@@ -447,8 +331,8 @@ const AboutPage = () => {
         </div>
       </section>
 
-      {/* Leadership Team */}
-      <section className="py-24 bg-white">
+      {/* 6. Leadership Team */}
+      <section className="py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -457,7 +341,7 @@ const AboutPage = () => {
             viewport={{ once: true }}
             className="text-center mb-20"
           >
-            <h2 className="text-4xl font-bold text-gray-900 mb-6">Leadership Team</h2>
+            <h2 className="text-4xl font-bold text-gray-900 mb-6">Leadership <span className="text-red-600">Team</span></h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto font-light">
               The visionary leaders guiding our mission to promote Kenyan culture globally.
             </p>
@@ -485,16 +369,6 @@ const AboutPage = () => {
                   <h3 className="text-2xl font-bold text-gray-900 mb-1">{leader.name}</h3>
                   <p className="text-green-600 font-medium mb-4">{leader.title}</p>
                   <p className="text-gray-600 mb-6 leading-relaxed text-sm">{leader.bio}</p>
-                  <div className="flex space-x-4">
-                    {Object.entries(leader.social).map(([platform, link]) => (
-                      <a key={platform} href={link} className="text-gray-400 hover:text-green-600 transition-colors">
-                        <span className="sr-only">{platform}</span>
-                        <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center hover:bg-green-50 transition-colors">
-                          <div className="w-4 h-4 bg-current rounded-sm" />
-                        </div>
-                      </a>
-                    ))}
-                  </div>
                 </div>
               </motion.div>
             ))}
@@ -502,8 +376,8 @@ const AboutPage = () => {
         </div>
       </section>
 
-      {/* Organizing Committee */}
-      <section className="py-24 bg-gray-50">
+      {/* 7. Organizing Committee */}
+      <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -512,7 +386,7 @@ const AboutPage = () => {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Organizing Committee</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Organizing <span className="text-red-600">Committee</span></h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto font-light">
               The dedicated professionals who make our programs and events possible.
             </p>
@@ -537,45 +411,21 @@ const AboutPage = () => {
         </div>
       </section>
 
-      {/* Advisory Board */}
-      <section className="py-24 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* 8. Impact Highlights */}
+      <section className="py-24 bg-green-900 text-white relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
-            className="text-center mb-16"
+            className="text-center mb-12"
           >
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Advisory Board</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto font-light">
-              Esteemed experts guiding our strategic direction and cultural initiatives.
-            </p>
+            <h2 className="text-4xl font-bold mb-4">Our Impact in <span className="text-red-600">Numbers</span></h2>
+            <p className="text-xl text-green-100 max-w-2xl mx-auto font-light">Real people, real communities, real results. Here&apos;s the measurable difference we&apos;ve made.</p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {advisors.map((advisor, index) => (
-              <motion.div
-                key={advisor.name}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="bg-white rounded-xl p-8 hover:shadow-lg transition-all duration-300 border-t-4 border-green-500"
-              >
-                <h3 className="text-xl font-bold text-gray-900 mb-2">{advisor.name}</h3>
-                <p className="text-green-600 font-medium mb-3">{advisor.role}</p>
-                <p className="text-gray-600 text-sm leading-relaxed">{advisor.bio}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Impact Highlights */}
-      <section className="py-24 bg-green-900 text-white relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 text-center">
             {impactHighlights.map((item, index) => (
               <motion.div
@@ -592,6 +442,35 @@ const AboutPage = () => {
               </motion.div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* 9. CTA */}
+      <section className="py-20 bg-black text-white relative overflow-hidden">
+        <div className="absolute inset-0 decorative-pattern opacity-5" />
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-3xl md:text-4xl font-bold mb-6">Ready to Be Part of This <span className="text-red-600">Story</span>?</h2>
+            <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto font-light leading-relaxed">
+              Whether you want to participate, partner, volunteer, or donate — there&apos;s a place for you in Kenya&apos;s cultural future.
+            </p>
+            <div className="flex flex-col sm:flex-row justify-center gap-4">
+              <Link href="/contribute" className="inline-flex items-center justify-center bg-red-600 text-white px-8 py-4 rounded-full font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 gap-2">
+                Support the Mission <ChevronRight className="w-5 h-5" />
+              </Link>
+              <Link href="/partnership" className="inline-flex items-center justify-center bg-transparent border-2 border-white/30 text-white hover:bg-white/10 px-8 py-4 rounded-full font-bold text-lg transition-all duration-300 gap-2">
+                Partner With Us <ChevronRight className="w-5 h-5" />
+              </Link>
+              <Link href="/contact" className="inline-flex items-center justify-center bg-transparent border-2 border-white/30 text-white hover:bg-white/10 px-8 py-4 rounded-full font-bold text-lg transition-all duration-300 gap-2">
+                Get in Touch <ChevronRight className="w-5 h-5" />
+              </Link>
+            </div>
+          </motion.div>
         </div>
       </section>
     </div>

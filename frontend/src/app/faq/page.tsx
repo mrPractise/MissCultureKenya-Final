@@ -1,99 +1,145 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronDown, Mail, Phone, Users, Calendar, Heart } from 'lucide-react'
+import { ChevronDown, Mail, Phone, Heart, Calendar, Users, Globe, ArrowRight, HelpCircle } from 'lucide-react'
 import { useState } from 'react'
+import Link from 'next/link'
 import { useSiteSettings } from '@/lib/useSiteSettings'
+
+const faqCategories = [
+  {
+    title: 'General Information',
+    subtitle: 'Foundational questions about legitimacy & structure',
+    icon: Heart,
+    color: 'bg-green-50 text-green-600 border-green-100',
+    faqs: [
+      {
+        question: 'What is Miss Culture Global Kenya?',
+        answer: 'Miss Culture Global Kenya is a cultural preservation movement, a youth empowerment platform, and Kenya\'s voice in a global conversation spanning 50+ nations. It is not just a pageant — it is a cultural diplomacy platform that transforms heritage into a global asset for socio-economic empowerment.',
+        nextStep: { text: 'Learn more about us', link: '/about' }
+      },
+      {
+        question: 'How are you connected to Miss Culture Global?',
+        answer: 'Miss Culture Global Kenya operates as the Kenyan franchise of Miss Culture Global, the international cultural diplomacy platform. We share a unified mission: to transform cultural heritage into a global asset for socio-economic empowerment and international diplomacy.',
+        nextStep: { text: 'Visit Miss Culture Global', link: 'https://misscultureglobal.org/' }
+      },
+      {
+        question: 'When was this started?',
+        answer: 'Miss Culture Global Kenya was established in 2015 with the vision to celebrate and preserve Kenya\'s rich cultural heritage while promoting it globally. Since then, we\'ve grown to impact 100+ communities across Kenya.',
+        nextStep: { text: 'See our journey', link: '/about' }
+      },
+      {
+        question: 'Is this a nonprofit?',
+        answer: 'Yes, Miss Culture Global Kenya is a registered non-profit organization. All funds raised go directly toward our cultural preservation, youth empowerment, and community development programs.',
+        nextStep: { text: 'Support our mission', link: '/contribute' }
+      }
+    ]
+  },
+  {
+    title: 'Participation & Events',
+    subtitle: 'Action-oriented questions from participants',
+    icon: Calendar,
+    color: 'bg-red-50 text-red-600 border-red-100',
+    faqs: [
+      {
+        question: 'How do I enter the pageant?',
+        answer: 'Applications open in March each year. You must be a Kenyan citizen aged 18-28 with a passion for cultural preservation and demonstrated leadership qualities. Complete at least secondary education.',
+        nextStep: { text: 'Sign up for notifications', link: '/contact' }
+      },
+      {
+        question: 'What are the age requirements?',
+        answer: 'The main pageant is for adults aged 18-28. Our Junior Cultural Ambassador program is for teens aged 13-17. We also have programs for children under 13 focused on cultural education rather than competition.',
+        nextStep: { text: 'View events', link: '/events' }
+      },
+      {
+        question: 'What do events cost?',
+        answer: 'Event costs vary. Many of our community events are free to attend. Our major pageant events have ticket categories ranging from General Admission (free or low-cost) to VIP Experience (KSh 2,000+). Check individual event pages for details.',
+        nextStep: { text: 'Browse events', link: '/events' }
+      },
+      {
+        question: 'Can I attend virtually?',
+        answer: 'Select events offer live-streaming options. Follow our social media channels for virtual event announcements. We\'re working toward making all major events accessible online.',
+        nextStep: { text: 'Follow us for updates', link: '/contact' }
+      },
+      {
+        question: 'How is voting done?',
+        answer: 'Voting is done through our website. You can vote once per category per event. Voting is free and transparent — live vote counts are displayed so you can see real-time results.',
+        nextStep: { text: 'Go to Voting page', link: '/voting' }
+      }
+    ]
+  },
+  {
+    title: 'Community Involvement',
+    subtitle: 'Questions from non-financial supporters',
+    icon: Users,
+    color: 'bg-blue-50 text-blue-600 border-blue-100',
+    faqs: [
+      {
+        question: 'How can I volunteer?',
+        answer: 'We welcome volunteers for events, community programs, and administrative support. Volunteer roles range from event coordination to cultural research to social media management.',
+        nextStep: { text: 'Contact us about volunteering', link: '/contact' }
+      },
+      {
+        question: 'Do you have student programs?',
+        answer: 'Yes! We offer cultural education programs for schools and universities, including workshops, mentorship sessions, and scholarship opportunities for students interested in cultural studies.',
+        nextStep: { text: 'Get in touch', link: '/contact' }
+      },
+      {
+        question: 'Can schools partner with you?',
+        answer: 'Absolutely. We actively collaborate with educational institutions to promote cultural education among youth. We offer tailored school programs, workshops, and cultural exchange opportunities.',
+        nextStep: { text: 'Reach out for school partnerships', link: '/contact' }
+      },
+      {
+        question: 'How do I nominate someone?',
+        answer: 'You can nominate potential contestants, volunteers, or community leaders through our contact form. Select "General Inquiry" and include the nominee\'s name, background, and why they would be a great fit.',
+        nextStep: { text: 'Submit a nomination', link: '/contact' }
+      }
+    ]
+  },
+  {
+    title: 'Support & Partnerships',
+    subtitle: 'Financial & business questions',
+    icon: Globe,
+    color: 'bg-yellow-50 text-yellow-600 border-yellow-100',
+    faqs: [
+      {
+        question: 'How do I become a sponsor?',
+        answer: 'We offer three partnership tiers: Event Sponsorship (KES 50K-500K), Program Support (KES 500K-2M annually), and Global Outreach Partnership (KES 2M+). Each tier offers different levels of visibility, impact, and engagement.',
+        nextStep: { text: 'Explore partnership tiers', link: '/partnership' }
+      },
+      {
+        question: 'Are donations tax-deductible?',
+        answer: 'Yes. We\'re registered as a nonprofit organization in Kenya, so contributions are tax-deductible under Kenyan law. Contact us for an official receipt for your tax records.',
+        nextStep: { text: 'Make a donation', link: '/contribute' }
+      },
+      {
+        question: 'Can individuals donate?',
+        answer: 'Absolutely. Individual donations of any amount are welcome. You can contribute via M-Pesa (for local donors) or Visa/Mastercard (for international donors). Suggested amounts start at KES 500.',
+        nextStep: { text: 'Contribute now', link: '/contribute' }
+      },
+      {
+        question: 'What are the partnership requirements?',
+        answer: 'We partner with organizations that share our values of cultural preservation, youth empowerment, and community development. No specific requirements beyond alignment with our mission and a commitment to making a positive impact.',
+        nextStep: { text: 'Start a conversation', link: '/contact' }
+      }
+    ]
+  }
+]
 
 const FAQPage = () => {
   const settings = useSiteSettings()
-  const [openIndex, setOpenIndex] = useState<number | null>(null)
+  const [openIndex, setOpenIndex] = useState<string | null>(null)
 
-  const toggleAccordion = (index: number) => {
-    setOpenIndex(openIndex === index ? null : index)
+  const toggleAccordion = (key: string) => {
+    setOpenIndex(openIndex === key ? null : key)
   }
-
-  const faqCategories = [
-    {
-      title: 'General Information',
-      icon: <Heart className="w-5 h-5" />,
-      faqs: [
-        {
-          question: 'What is Miss Culture Global Kenya?',
-          answer: 'Miss Culture Global Kenya is a cultural organization dedicated to preserving, promoting, and celebrating Kenya\'s diverse cultural heritage. We work to empower communities, engage youth, and represent Kenya\'s cultural excellence on the global stage.'
-        },
-        {
-          question: 'When was Miss Culture Global Kenya established?',
-          answer: 'Miss Culture Global Kenya was established in 2015 with the mission to celebrate and preserve Kenya\'s rich cultural heritage while promoting it globally.'
-        },
-        {
-          question: 'How is Miss Culture Global Kenya different from other pageants?',
-          answer: 'Unlike traditional beauty pageants, Miss Culture Global Kenya focuses exclusively on cultural representation, heritage preservation, and community empowerment. Our titleholders are cultural ambassadors who work year-round on meaningful initiatives.'
-        }
-      ]
-    },
-    {
-      title: 'Participation & Events',
-      icon: <Calendar className="w-5 h-5" />,
-      faqs: [
-        {
-          question: 'How can I participate in Miss Culture Global Kenya events?',
-          answer: 'We welcome participation from all Kenyans who are passionate about cultural preservation. You can participate by attending our events, volunteering, or applying to represent your community. Check our Events page for upcoming opportunities.'
-        },
-        {
-          question: 'What are the requirements to become Miss Culture Global Kenya?',
-          answer: 'Candidates must be Kenyan citizens aged 18-28, have a passion for cultural preservation, and demonstrate leadership qualities. They should also have completed at least secondary education. Detailed requirements are available in our application guidelines.'
-        },
-        {
-          question: 'Do you have events outside Nairobi?',
-          answer: 'Yes, we organize events across Kenya to ensure all communities can participate. Our Cultural Heritage Festival travels to different regions annually, and we have community outreach programs in major counties.'
-        }
-      ]
-    },
-    {
-      title: 'Community Involvement',
-      icon: <Users className="w-5 h-5" />,
-      faqs: [
-        {
-          question: 'How can my community get involved with Miss Culture Global Kenya?',
-          answer: 'Communities can get involved by hosting local cultural events, participating in our outreach programs, or nominating cultural ambassadors. We also welcome partnerships with local leaders and organizations.'
-        },
-        {
-          question: 'Do you work with local artisans and craftspeople?',
-          answer: 'Absolutely! Supporting local artisans is a core part of our mission. We provide platforms for artisans to showcase their work, help with marketing, and create sustainable income opportunities through cultural preservation.'
-        },
-        {
-          question: 'Can schools and educational institutions partner with you?',
-          answer: 'Yes, we actively collaborate with educational institutions to promote cultural education among youth. We offer school programs, workshops, and scholarship opportunities for students interested in cultural studies.'
-        }
-      ]
-    },
-    {
-      title: 'Support & Volunteering',
-      icon: <Heart className="w-5 h-5" />,
-      faqs: [
-        {
-          question: 'How can I volunteer with Miss Culture Global Kenya?',
-          answer: 'We welcome volunteers for our events, community programs, and administrative support. Visit our Volunteer page to learn about current opportunities and how to apply. Volunteers play a crucial role in our success.'
-        },
-        {
-          question: 'What are the different ways to support your mission?',
-          answer: 'You can support us through financial contributions, volunteering your time and skills, sponsoring our events, or simply spreading awareness about our work. Every contribution, big or small, makes a difference.'
-        },
-        {
-          question: 'Are donations to Miss Culture Global Kenya tax-deductible?',
-          answer: 'Yes, donations to Miss Culture Global Kenya are tax-deductible. We are a registered non-profit organization. Please consult with your tax advisor for specific deductions applicable to your situation.'
-        }
-      ]
-    }
-  ]
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Page Header */}
-      <section className="relative h-[60vh] flex items-center justify-center overflow-hidden">
+      {/* Hero Section */}
+      <section className="relative h-[55vh] min-h-[450px] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-black/80 z-10" />
+          <div className="absolute inset-0 bg-black/70 z-10" />
           <motion.div
             initial={{ scale: 1.1 }}
             animate={{ scale: 1 }}
@@ -113,11 +159,12 @@ const FAQPage = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
+            <p className="text-sm sm:text-base uppercase tracking-[0.3em] text-green-400 mb-4 font-semibold">Self-Service Support</p>
             <h1 className="text-5xl md:text-7xl font-bold mb-6 text-white tracking-tight">
               Frequently Asked <span className="text-red-600">Questions</span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-200 max-w-3xl mx-auto font-light leading-relaxed">
-              Find answers to common questions about Miss Culture Kenya and how you can get involved.
+              Everything you need to know about Miss Culture Global Kenya — how to participate, partner, support, and stay involved.
             </p>
             <div className="mt-8 flex justify-center">
               <div className="h-1 w-24 bg-red-600 rounded-full" />
@@ -127,27 +174,14 @@ const FAQPage = () => {
       </section>
 
       {/* FAQ Content */}
-      <section className="py-24 bg-gray-50 relative overflow-hidden">
+      <section className="py-20 bg-gray-50 relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
           <div className="absolute top-20 left-10 w-64 h-64 bg-green-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob" />
           <div className="absolute top-20 right-10 w-64 h-64 bg-yellow-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000" />
         </div>
 
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Have Questions?</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto font-light">
-              We've compiled answers to the most common questions we receive. If you can't find what you're looking for, please contact us.
-            </p>
-          </motion.div>
-
-          <div className="space-y-8">
+          <div className="space-y-10">
             {faqCategories.map((category, categoryIndex) => (
               <motion.div
                 key={category.title}
@@ -157,25 +191,32 @@ const FAQPage = () => {
                 viewport={{ once: true }}
                 className="bg-white rounded-2xl shadow-elegant overflow-hidden border border-gray-100 hover:shadow-elegant-lg transition-shadow duration-300"
               >
-                <div className="bg-green-50 px-8 py-6 border-b border-green-100">
-                  <h3 className="text-xl font-bold text-gray-900 flex items-center">
-                    <span className="mr-4 p-2 bg-white rounded-lg shadow-sm text-green-600">{category.icon}</span>
-                    {category.title}
-                  </h3>
+                {/* Category Header */}
+                <div className={`px-8 py-6 border-b ${category.color.split(' ').slice(1).join(' ')} ${category.color.split(' ')[0]}`}>
+                  <div className="flex items-center gap-4">
+                    <div className={`w-10 h-10 rounded-xl ${category.color.split(' ')[0]} flex items-center justify-center`}>
+                      <category.icon className={`w-5 h-5 ${category.color.split(' ')[1]}`} />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold text-gray-900">{category.title}</h3>
+                      <p className="text-sm text-gray-500">{category.subtitle}</p>
+                    </div>
+                  </div>
                 </div>
 
+                {/* FAQ Items */}
                 <div className="divide-y divide-gray-100">
-                  {category.faqs.map((faq, index) => {
-                    const globalIndex = categoryIndex * 10 + index
-                    const isOpen = openIndex === globalIndex
+                  {category.faqs.map((faq, faqIndex) => {
+                    const key = `${categoryIndex}-${faqIndex}`
+                    const isOpen = openIndex === key
 
                     return (
-                      <div key={index} className="px-8 bg-white transition-colors duration-300 hover:bg-gray-50/50">
+                      <div key={faqIndex} className="px-8 bg-white transition-colors duration-300 hover:bg-gray-50/50">
                         <button
                           className="w-full py-6 text-left flex justify-between items-center focus:outline-none group"
-                          onClick={() => toggleAccordion(globalIndex)}
+                          onClick={() => toggleAccordion(key)}
                         >
-                          <span className={`text-lg font-medium transition-colors duration-300 ${isOpen ? 'text-green-700' : 'text-gray-900 group-hover:text-green-700'}`}>
+                          <span className={`text-base font-medium transition-colors duration-300 pr-4 ${isOpen ? 'text-green-700' : 'text-gray-900 group-hover:text-green-700'}`}>
                             {faq.question}
                           </span>
                           <div className={`ml-4 flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${isOpen ? 'bg-green-100 text-green-600 rotate-180' : 'bg-gray-100 text-gray-500 group-hover:bg-green-50 group-hover:text-green-600'}`}>
@@ -192,8 +233,18 @@ const FAQPage = () => {
                               transition={{ duration: 0.3, ease: "easeInOut" }}
                               className="overflow-hidden"
                             >
-                              <div className="pb-8 pt-2 text-gray-600 leading-relaxed border-t border-dashed border-gray-100">
-                                {faq.answer}
+                              <div className="pb-6 pt-2 text-gray-600 leading-relaxed border-t border-dashed border-gray-100">
+                                <p className="mb-4">{faq.answer}</p>
+                                {faq.nextStep && (
+                                  <Link
+                                    href={faq.nextStep.link}
+                                    target={faq.nextStep.link.startsWith('http') ? '_blank' : undefined}
+                                    rel={faq.nextStep.link.startsWith('http') ? 'noopener noreferrer' : undefined}
+                                    className="inline-flex items-center gap-1.5 text-green-600 font-semibold text-sm hover:gap-2.5 transition-all duration-200"
+                                  >
+                                    {faq.nextStep.text} <ArrowRight className="w-4 h-4" />
+                                  </Link>
+                                )}
                               </div>
                             </motion.div>
                           )}
@@ -206,7 +257,7 @@ const FAQPage = () => {
             ))}
           </div>
 
-          {/* Contact CTA */}
+          {/* Still Have Questions CTA */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -220,22 +271,22 @@ const FAQPage = () => {
             <div className="relative z-10">
               <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Still Have Questions?</h2>
               <p className="text-xl text-green-50 mb-10 max-w-2xl mx-auto font-light">
-                Our team is here to help. Reach out to us and we'll get back to you as soon as possible.
+                Our team is here to help. Reach out and we&apos;ll get back to you within 24-48 hours on business days.
               </p>
 
-              <div className="flex flex-col sm:flex-row justify-center gap-6">
-                <a
-                  href="mailto:info@misscultureglobalkenya.com"
-                  className="flex items-center justify-center bg-white text-green-700 hover:bg-gray-50 font-bold py-4 px-8 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+              <div className="flex flex-col sm:flex-row justify-center gap-4">
+                <Link
+                  href="/contact"
+                  className="inline-flex items-center justify-center bg-white text-green-700 hover:bg-gray-50 font-bold py-4 px-8 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 gap-2"
                 >
-                  <Mail className="w-5 h-5 mr-2" />
-                  Email Us
-                </a>
+                  <Mail className="w-5 h-5" />
+                  Contact Us
+                </Link>
                 <a
                   href="tel:+254721706983"
-                  className="flex items-center justify-center bg-transparent border-2 border-white/30 text-white hover:bg-white/10 hover:border-white font-bold py-4 px-8 rounded-xl transition-all duration-300 backdrop-blur-sm"
+                  className="inline-flex items-center justify-center bg-transparent border-2 border-white/30 text-white hover:bg-white/10 hover:border-white font-bold py-4 px-8 rounded-xl transition-all duration-300 backdrop-blur-sm gap-2"
                 >
-                  <Phone className="w-5 h-5 mr-2" />
+                  <Phone className="w-5 h-5" />
                   Call Us
                 </a>
               </div>
