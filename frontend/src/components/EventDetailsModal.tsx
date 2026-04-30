@@ -89,18 +89,17 @@ const EventDetailsModal = ({ isOpen, onClose, event }: EventDetailsModalProps) =
       >
         {/* Left Panel – Image (desktop) / Header (mobile) */}
         <div className="relative flex-shrink-0 lg:w-[45%] lg:max-h-full">
-          {/* Close Button */}
-          <button
-            onClick={onClose}
-            className="absolute top-3 right-3 z-10 p-2 bg-white/90 hover:bg-white rounded-full shadow-lg transition-colors duration-200"
-          >
-            <X className="w-5 h-5 text-gray-600" />
-          </button>
-          <img
-            src={event.image}
-            alt={event.title}
-            className="w-full h-40 sm:h-48 lg:h-full object-cover"
-          />
+          {event.image ? (
+            <img
+              src={event.image}
+              alt={event.title}
+              className="w-full h-40 sm:h-48 lg:h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-40 sm:h-48 lg:h-full bg-gradient-to-br from-green-800 to-green-900 flex items-center justify-center">
+              <Calendar className="w-16 h-16 text-green-400/40" />
+            </div>
+          )}
           <div className="absolute inset-0 bg-black/40" />
           <div className="absolute top-3 left-3">
             <span className="bg-green-600 text-white px-2.5 py-0.5 rounded-full text-xs font-semibold">
@@ -120,8 +119,8 @@ const EventDetailsModal = ({ isOpen, onClose, event }: EventDetailsModalProps) =
 
         {/* Right Panel – Details & Tickets */}
         <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
-          {/* Close Button on Desktop (right panel) */}
-          <div className="hidden lg:flex items-center justify-between px-6 pt-5 pb-2 border-b border-gray-100">
+          {/* Close Button */}
+          <div className="flex items-center justify-between px-6 pt-5 pb-2 border-b border-gray-100">
             <h3 className="text-lg font-bold text-gray-900">Event Details</h3>
             <button
               onClick={onClose}

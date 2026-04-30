@@ -117,11 +117,9 @@ const VideoModal = ({ isOpen, onClose, video }: VideoModalProps) => {
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Related Videos</h3>
               <div className="space-y-4">
                 <div className="flex space-x-3 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors duration-200">
-                  <img
-                    src=""
-                    alt="Related video"
-                    className="w-20 h-12 object-cover rounded"
-                  />
+                  <div className="w-20 h-12 bg-gray-200 rounded flex items-center justify-center flex-shrink-0">
+                    <Play className="w-4 h-4 text-gray-400" />
+                  </div>
                   <div className="flex-1 min-w-0">
                     <h4 className="text-sm font-medium text-gray-900 line-clamp-2">
                       Cultural Heritage Documentary
@@ -131,11 +129,9 @@ const VideoModal = ({ isOpen, onClose, video }: VideoModalProps) => {
                 </div>
                 
                 <div className="flex space-x-3 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors duration-200">
-                  <img
-                    src=""
-                    alt="Related video"
-                    className="w-20 h-12 object-cover rounded"
-                  />
+                  <div className="w-20 h-12 bg-gray-200 rounded flex items-center justify-center flex-shrink-0">
+                    <Play className="w-4 h-4 text-gray-400" />
+                  </div>
                   <div className="flex-1 min-w-0">
                     <h4 className="text-sm font-medium text-gray-900 line-clamp-2">
                       Traditional Dance Performance

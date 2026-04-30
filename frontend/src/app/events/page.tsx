@@ -88,101 +88,6 @@ const EventsPage = () => {
     fetchEvents()
   }, [])
 
-  const defaultUpcomingEvents = [
-    {
-      id: 1,
-      title: 'Cultural Heritage Gala — Nairobi',
-      date: '2025-06-14',
-      time: '7:00 PM',
-      venue: 'Kenyatta International Centre',
-      location: 'Nairobi, Kenya',
-      description: 'An evening of traditional performances, artisan showcases, and cultural exhibitions celebrating Kenya\'s diverse heritage. The flagship event of the year.',
-      image: '',
-      category: 'Pageant',
-      capacity: 500,
-      price: 'From KES 2,500',
-      organizer: 'Miss Culture Global Kenya',
-      contactEmail: 'info@misscultureglobalkenya.com',
-      contactPhone: '+254 721 706983',
-      ticketCategories: [
-        { name: 'General Admission', price: 'KSh 2,500', description: 'Access to all performances and exhibitions', available: 350, total: 400 },
-        { name: 'VIP Experience', price: 'KSh 5,000', description: 'Premium seating, meet & greet, and exclusive access', available: 47, total: 100 },
-      ],
-      audience: 'General Public',
-      votingEnabled: false,
-      currentVotes: 0,
-    },
-    {
-      id: 2,
-      title: 'Traditional Dance & Craft Workshop',
-      date: '2025-07-22',
-      time: '2:00 PM',
-      venue: 'Alliance Fran\u00e7aise',
-      location: 'Nairobi, Kenya',
-      description: 'Hands-on sessions in traditional Kenyan dances, beadwork, and oral storytelling. Not just watching — participating.',
-      image: '',
-      category: 'Workshop',
-      capacity: 50,
-      price: 'KSh 1,500',
-      organizer: 'Miss Culture Global Kenya',
-      contactEmail: 'info@misscultureglobalkenya.com',
-      contactPhone: '+254 721 706983',
-      ticketCategories: [
-        { name: 'Adult', price: 'KSh 1,500', description: 'Full workshop participation with materials', available: 35, total: 40 },
-        { name: 'Student', price: 'KSh 800', description: 'Discounted rate for students with valid ID', available: 10, total: 10 },
-      ],
-      audience: 'Families & Youth',
-      votingEnabled: false,
-      currentVotes: 0,
-    },
-    {
-      id: 3,
-      title: 'Cultural Diplomacy Forum',
-      date: '2025-08-10',
-      time: '9:00 AM',
-      venue: 'KICC Convention Centre',
-      location: 'Nairobi, Kenya',
-      description: 'Where heritage meets policy. A diplomatic forum connecting cultural leaders, business executives, and international exchange programmes.',
-      image: '',
-      category: 'Conference',
-      capacity: 200,
-      price: 'From KSh 5,000',
-      organizer: 'Miss Culture Global Kenya',
-      contactEmail: 'info@misscultureglobalkenya.com',
-      contactPhone: '+254 721 706983',
-      ticketCategories: [
-        { name: 'Professional', price: 'KSh 5,000', description: 'Full conference access, lunch, and networking', available: 120, total: 150 },
-        { name: 'Student', price: 'KSh 2,000', description: 'Student rate with valid ID, access to all sessions', available: 30, total: 50 },
-      ],
-      audience: 'Professionals & Institutions',
-      votingEnabled: false,
-      currentVotes: 0,
-    },
-  ]
-
-  const defaultPastEvents = [
-    {
-      id: 4,
-      title: 'UNESCO Cultural Exchange Programme',
-      date: '2024-01-20',
-      venue: 'UNESCO Headquarters',
-      location: 'Paris, France',
-      description: 'Representing Kenya at the international cultural exchange programme.',
-      image: '',
-      category: 'International',
-    },
-    {
-      id: 5,
-      title: 'Community Outreach — Kibera',
-      date: '2024-01-10',
-      venue: 'Kibera Community Centre',
-      location: 'Nairobi, Kenya',
-      description: 'Engaging with local communities to promote cultural awareness and education.',
-      image: '',
-      category: 'Community',
-    },
-  ]
-
   const transformEvent = (event: any) => {
     if (event.title && event.date && event.venue && !event.start_date) return event
     return {
@@ -207,13 +112,9 @@ const EventsPage = () => {
     }
   }
 
-  const displayUpcomingEvents = upcomingEvents.length > 0
-    ? upcomingEvents.map(transformEvent)
-    : defaultUpcomingEvents
+  const displayUpcomingEvents = upcomingEvents.map(transformEvent)
 
-  const displayPastEvents = pastEvents.length > 0
-    ? pastEvents.map(transformEvent)
-    : defaultPastEvents
+  const displayPastEvents = pastEvents.map(transformEvent)
 
   const filteredEvents = activeCategory === 'All'
     ? displayUpcomingEvents
@@ -459,7 +360,7 @@ const EventsPage = () => {
           </div>
 
           {/* Past Events */}
-          {displayPastEvents.length > 0 && (
+          {displayPastEvents.length > 0 ? (
             <>
               <motion.div {...fadeInUp} className="text-center mb-10">
                 <span className="inline-flex items-center gap-2 text-gray-500 font-semibold tracking-wider uppercase text-sm mb-3">
@@ -505,6 +406,11 @@ const EventsPage = () => {
                 ))}
               </div>
             </>
+          ) : (
+            <div className="text-center py-8">
+              <Camera className="w-10 h-10 text-gray-300 mx-auto mb-3" />
+              <p className="text-gray-500">No past events yet. Check back after our upcoming events.</p>
+            </div>
           )}
 
           {/* No-ticket CTA */}

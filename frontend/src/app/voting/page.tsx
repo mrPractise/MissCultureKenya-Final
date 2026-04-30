@@ -1,8 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Heart, Calendar, MapPin, Users, Clock, Trophy, ChevronRight, AlertCircle, CheckCircle, Star, Music, Palette, PartyPopper } from 'lucide-react'
-import { useState, useEffect } from 'react'
+import { Calendar, Trophy, ChevronRight, Star, Music, Palette, PartyPopper } from 'lucide-react'
 import Link from 'next/link'
 import { useSiteSettings } from '@/lib/useSiteSettings'
 
@@ -65,157 +64,7 @@ const votingCategories = [
 ]
 
 const VotingPage = () => {
-  const [votedParticipants, setVotedParticipants] = useState<Set<string>>(new Set())
-  const [selectedEvent, setSelectedEvent] = useState<number | null>(null)
-  const [selectedCategory, setSelectedCategory] = useState<string>('all')
-  const [timeLeft, setTimeLeft] = useState({ days: 3, hours: 14, minutes: 27, seconds: 0 })
   const settings = useSiteSettings()
-
-  // Countdown timer
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev.seconds > 0) return { ...prev, seconds: prev.seconds - 1 }
-        if (prev.minutes > 0) return { ...prev, minutes: prev.minutes - 1, seconds: 59 }
-        if (prev.hours > 0) return { ...prev, hours: prev.hours - 1, minutes: 59, seconds: 59 }
-        if (prev.days > 0) return { ...prev, days: prev.days - 1, hours: 23, minutes: 59, seconds: 59 }
-        return prev
-      })
-    }, 1000)
-    return () => clearInterval(timer)
-  }, [])
-
-  const events = [
-    {
-      id: 1,
-      title: 'Miss Culture Global Kenya 2024',
-      date: '2024-04-15',
-      time: '7:00 PM',
-      venue: 'KICC Convention Centre',
-      location: 'Nairobi, Kenya',
-      description: 'The ultimate cultural pageant celebrating Kenya\'s diverse heritage and empowering young women to be cultural ambassadors.',
-      image: settings.voting_event_1_image_url || '',
-      category: 'Main Pageant',
-      votingEnabled: true,
-      participants: [
-        {
-          id: '1-1', name: 'Susan Abongo', age: 22, category: 'adult',
-          image: settings.voting_participant_1_image_url || '',
-          ideology: 'Promoting cultural unity through education and community engagement',
-          whyVote: 'Susan believes in using her platform to educate young people about Kenya\'s rich cultural heritage and inspire them to be proud of their roots.',
-          hometown: 'Nairobi', votes: 1247
-        },
-        {
-          id: '1-2', name: 'Aisha Mwangi', age: 23, category: 'adult',
-          image: settings.voting_participant_2_image_url || '',
-          ideology: 'Empowering women through cultural entrepreneurship',
-          whyVote: 'Aisha is passionate about helping women start cultural businesses and preserving traditional crafts for future generations.',
-          hometown: 'Mombasa', votes: 1103
-        },
-        {
-          id: '1-3', name: 'Faith Chebet', age: 19, category: 'adult',
-          image: settings.voting_participant_3_image_url || '',
-          ideology: 'Youth leadership in cultural preservation',
-          whyVote: 'Faith is dedicated to engaging young people in cultural activities and creating innovative ways to keep traditions alive.',
-          hometown: 'Nakuru', votes: 982
-        },
-        {
-          id: '1-4', name: 'Zawadi Makena', age: 17, category: 'teens',
-          image: settings.voting_participant_4_image_url || '',
-          ideology: 'Inspiring the next generation through cultural pride',
-          whyVote: 'Zawadi wants to show other teenagers that being culturally aware and proud is cool and important for our future.',
-          hometown: 'Kisumu', votes: 876
-        },
-        {
-          id: '1-5', name: 'Neema Akinyi', age: 16, category: 'teens',
-          image: settings.voting_participant_5_image_url || '',
-          ideology: 'Cultural diversity as a strength',
-          whyVote: 'Neema believes that Kenya\'s diversity is its greatest strength and wants to promote unity among all communities.',
-          hometown: 'Eldoret', votes: 754
-        },
-        {
-          id: '1-6', name: 'Wanjiku Kamau', age: 18, category: 'teens',
-          image: settings.voting_participant_6_image_url || '',
-          ideology: 'Environmental conservation through cultural practices',
-          whyVote: 'Wanjiku combines traditional environmental knowledge with modern conservation efforts to protect Kenya\'s natural heritage.',
-          hometown: 'Thika', votes: 689
-        }
-      ]
-    },
-    {
-      id: 2,
-      title: 'Cultural Dance Competition 2024',
-      date: '2024-03-20',
-      time: '6:00 PM',
-      venue: 'Alliance Française',
-      location: 'Nairobi, Kenya',
-      description: 'A vibrant showcase of traditional Kenyan dances featuring talented performers from across the country.',
-      image: settings.voting_event_2_image_url || '',
-      category: 'Dance Competition',
-      votingEnabled: true,
-      participants: [
-        { id: '2-1', name: 'Kikuyu Cultural Dancers', age: 25, category: 'group', image: '', ideology: 'Preserving Kikuyu traditional dance heritage', whyVote: 'Our group has been performing traditional Kikuyu dances for over 10 years, keeping the culture alive through authentic performances.', hometown: 'Nyeri', votes: 634 },
-        { id: '2-2', name: 'Luo Warriors Dance Group', age: 28, category: 'group', image: '', ideology: 'Celebrating Luo warrior traditions through dance', whyVote: 'We bring the powerful energy of Luo warrior dances to modern audiences, connecting past and present.', hometown: 'Kisumu', votes: 512 },
-        { id: '2-3', name: 'Maasai Cultural Performers', age: 30, category: 'group', image: '', ideology: 'Sharing Maasai culture with the world', whyVote: 'Our authentic Maasai performances educate people about our rich cultural heritage and traditions.', hometown: 'Kajiado', votes: 489 }
-      ]
-    },
-    {
-      id: 3,
-      title: 'Traditional Music Talent Show',
-      date: '2024-05-10',
-      time: '7:30 PM',
-      venue: 'Carnivore Grounds',
-      location: 'Nairobi, Kenya',
-      description: 'Discovering the next generation of traditional Kenyan musicians and vocalists.',
-      image: settings.voting_event_3_image_url || '',
-      category: 'Music Competition',
-      votingEnabled: true,
-      participants: [
-        { id: '3-1', name: 'Sarah Wanjiku', age: 24, category: 'solo', image: '', ideology: 'Modernizing traditional Kikuyu folk songs', whyVote: 'I blend traditional Kikuyu melodies with contemporary sounds to make our culture accessible to young people.', hometown: 'Nairobi', votes: 423 },
-        { id: '3-2', name: 'Onyango & The Luo Ensemble', age: 26, category: 'group', image: '', ideology: 'Preserving Luo musical traditions', whyVote: 'Our ensemble keeps Luo traditional instruments and songs alive for future generations.', hometown: 'Kisumu', votes: 367 },
-        { id: '3-3', name: 'Mama Akinyi', age: 45, category: 'solo', image: '', ideology: 'Passing down traditional wisdom through song', whyVote: 'I sing the songs my grandmother taught me, keeping our cultural stories and wisdom alive.', hometown: 'Kakamega', votes: 345 }
-      ]
-    },
-    {
-      id: 4,
-      title: 'Cultural Fashion Show',
-      date: '2024-06-15',
-      time: '8:00 PM',
-      venue: 'Sarit Centre',
-      location: 'Nairobi, Kenya',
-      description: 'Showcasing contemporary fashion inspired by Kenya\'s diverse cultural heritage.',
-      image: settings.voting_event_4_image_url || '',
-      category: 'Fashion Showcase',
-      votingEnabled: true,
-      participants: [
-        { id: '4-1', name: 'Designer Grace Muthoni', age: 29, category: 'designer', image: '', ideology: 'Fusing traditional fabrics with modern design', whyVote: 'My designs celebrate Kenya\'s textile heritage while creating contemporary pieces for today\'s fashion-conscious youth.', hometown: 'Nairobi', votes: 289 },
-        { id: '4-2', name: 'Kikoi Couture by Aisha', age: 31, category: 'designer', image: '', ideology: 'Elevating coastal fashion traditions', whyVote: 'I specialize in creating elegant contemporary pieces using traditional coastal fabrics and techniques.', hometown: 'Mombasa', votes: 234 },
-        { id: '4-3', name: 'Maasai Modern by John', age: 27, category: 'designer', image: '', ideology: 'Bringing Maasai aesthetics to urban fashion', whyVote: 'My designs incorporate Maasai beadwork and patterns into modern urban wear, celebrating our heritage.', hometown: 'Kajiado', votes: 198 }
-      ]
-    }
-  ]
-
-  const handleParticipantVote = (participantId: string) => {
-    if (votedParticipants.has(participantId)) {
-      setVotedParticipants(prev => {
-        const newSet = new Set(prev)
-        newSet.delete(participantId)
-        return newSet
-      })
-    } else {
-      setVotedParticipants(prev => new Set(prev).add(participantId))
-    }
-  }
-
-  const getFilteredParticipants = (eventId: number) => {
-    const event = events.find(e => e.id === eventId)
-    if (!event || !event.participants) return []
-    if (selectedCategory === 'all') return event.participants
-    return event.participants.filter(p => p.category === selectedCategory)
-  }
-
-  const totalVotesCast = events.reduce((sum, event) =>
-    sum + event.participants.reduce((pSum, p) => pSum + (p.votes || 0), 0), 0)
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -260,63 +109,6 @@ const VotingPage = () => {
         </div>
       </section>
 
-      {/* Trust Signals Bar */}
-      <section className="bg-white border-b border-gray-100 py-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Countdown */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="flex items-center gap-4 p-4 bg-red-50 rounded-2xl border border-red-100"
-            >
-              <div className="w-12 h-12 bg-red-600 rounded-xl flex items-center justify-center flex-shrink-0">
-                <Clock className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-red-600 uppercase tracking-wide">Voting closes in</p>
-                <p className="text-xl font-bold text-gray-900">
-                  {timeLeft.days}d {timeLeft.hours}h {timeLeft.minutes}m
-                </p>
-              </div>
-            </motion.div>
-
-            {/* Vote Count */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="flex items-center gap-4 p-4 bg-green-50 rounded-2xl border border-green-100"
-            >
-              <div className="w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center flex-shrink-0">
-                <Users className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-green-600 uppercase tracking-wide">Total votes cast</p>
-                <p className="text-xl font-bold text-gray-900">{totalVotesCast.toLocaleString()}</p>
-              </div>
-            </motion.div>
-
-            {/* Voting Rules */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="flex items-center gap-4 p-4 bg-blue-50 rounded-2xl border border-blue-100"
-            >
-              <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center flex-shrink-0">
-                <AlertCircle className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-blue-600 uppercase tracking-wide">Voting rules</p>
-                <p className="text-sm font-medium text-gray-700">One vote per category. Your vote is final.</p>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
       {/* Voting Categories Explainer */}
       <section className="py-16 bg-white relative overflow-hidden">
         <div className="absolute inset-0 decorative-pattern opacity-[0.03]" />
@@ -353,247 +145,44 @@ const VotingPage = () => {
         </div>
       </section>
 
-      {/* Voting Content */}
+      {/* Voting Coming Soon */}
       <section className="py-20 bg-gray-50 relative overflow-hidden">
-        <div className="absolute inset-0 decorative-pattern opacity-[0.03]" />
         <div className="absolute top-20 right-10 w-96 h-96 bg-green-500/5 rounded-full blur-3xl" />
         <div className="absolute bottom-20 left-10 w-96 h-96 bg-yellow-500/5 rounded-full blur-3xl" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          {/* Event Selection */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
-            className="mb-16"
+            className="text-center py-16"
           >
-            <div className="text-center mb-10">
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">Select an Event to Vote</h2>
-              <p className="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                Browse through our cultural events and vote for your favorite participants.
-              </p>
+            <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-8">
+              <Trophy className="w-12 h-12 text-green-600" />
             </div>
-
-            <div className="flex flex-wrap justify-center gap-3 sm:gap-4 mb-10">
-              {events.map((event) => (
-                <button
-                  key={event.id}
-                  onClick={() => { setSelectedEvent(event.id); setSelectedCategory('all') }}
-                  className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 text-sm sm:text-base shadow-md hover:shadow-lg transform hover:-translate-y-1 ${selectedEvent === event.id
-                    ? 'bg-green-600 text-white'
-                    : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-100'
-                  }`}
-                >
-                  {event.title}
-                </button>
-              ))}
-            </div>
-
-            {/* Category Filter */}
-            {selectedEvent && (
-              <div className="flex justify-center">
-                <div className="flex flex-wrap justify-center gap-2 bg-white p-2 rounded-2xl shadow-lg border border-gray-100 max-w-full overflow-x-auto">
-                  <button
-                    onClick={() => setSelectedCategory('all')}
-                    className={`px-4 py-2 rounded-xl font-semibold transition-colors duration-200 text-sm ${selectedCategory === 'all'
-                      ? 'bg-green-600 text-white shadow-md'
-                      : 'text-gray-600 hover:text-green-600 hover:bg-green-50'
-                    }`}
-                  >
-                    All Participants
-                  </button>
-                  {events.find(e => e.id === selectedEvent)?.participants &&
-                    Array.from(new Set(events.find(e => e.id === selectedEvent)?.participants?.map(p => p.category))).map(category => (
-                      <button
-                        key={category}
-                        onClick={() => setSelectedCategory(category)}
-                        className={`px-4 py-2 rounded-xl font-semibold transition-colors duration-200 text-sm ${selectedCategory === category
-                          ? 'bg-green-600 text-white shadow-md'
-                          : 'text-gray-600 hover:text-green-600 hover:bg-green-50'
-                        }`}
-                      >
-                        {category === 'adult' ? 'Adults' : category === 'teens' ? 'Teens' : category === 'group' ? 'Groups' : category === 'solo' ? 'Solo' : category === 'designer' ? 'Designers' : category}
-                      </button>
-                    ))}
-                </div>
-              </div>
-            )}
-          </motion.div>
-
-          {/* Selected Event Participants */}
-          {selectedEvent && (
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              viewport={{ once: true }}
-            >
-              {(() => {
-                const event = events.find(e => e.id === selectedEvent)
-                if (!event) return null
-
-                return (
-                  <div>
-                    {/* Event Header */}
-                    <div className="text-center mb-12">
-                      <h3 className="text-3xl font-bold text-gray-900 mb-4">{event.title}</h3>
-                      <p className="text-lg text-gray-600 max-w-3xl mx-auto mb-6">{event.description}</p>
-                      <div className="flex flex-wrap justify-center gap-4 sm:gap-8 text-sm font-medium text-gray-600">
-                        <div className="flex items-center bg-white px-4 py-2 rounded-full shadow-sm border border-gray-100">
-                          <Calendar className="w-4 h-4 mr-2 text-green-600" />
-                          <span>{new Date(event.date).toLocaleDateString()}</span>
-                        </div>
-                        <div className="flex items-center bg-white px-4 py-2 rounded-full shadow-sm border border-gray-100">
-                          <Clock className="w-4 h-4 mr-2 text-green-600" />
-                          <span>{event.time}</span>
-                        </div>
-                        <div className="flex items-center bg-white px-4 py-2 rounded-full shadow-sm border border-gray-100">
-                          <MapPin className="w-4 h-4 mr-2 text-green-600" />
-                          <span>{event.venue}, {event.location}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Contestant Cards */}
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                      {getFilteredParticipants(selectedEvent).map((participant, index) => (
-                        <motion.div
-                          key={participant.id}
-                          initial={{ opacity: 0, y: 30 }}
-                          whileInView={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.5, delay: index * 0.1 }}
-                          viewport={{ once: true }}
-                          className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group border border-gray-100 flex flex-col h-full"
-                        >
-                          {/* Participant Image */}
-                          <div className="relative h-72 overflow-hidden">
-                            <img
-                              src={participant.image}
-                              alt={participant.name}
-                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                            />
-                            <div className="absolute inset-0 bg-black/40 opacity-80" />
-                            <div className="absolute top-4 left-4">
-                              <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide shadow-sm ${participant.category === 'adult'
-                                  ? 'bg-purple-600 text-white'
-                                  : participant.category === 'teens'
-                                    ? 'bg-pink-600 text-white'
-                                    : participant.category === 'group'
-                                      ? 'bg-blue-600 text-white'
-                                      : participant.category === 'solo'
-                                        ? 'bg-green-600 text-white'
-                                        : participant.category === 'designer'
-                                          ? 'bg-orange-600 text-white'
-                                          : 'bg-gray-600 text-white'
-                                }`}>
-                                {participant.category === 'adult' ? 'Adult' : participant.category === 'teens' ? 'Teens' : participant.category === 'group' ? 'Group' : participant.category === 'solo' ? 'Solo' : participant.category === 'designer' ? 'Designer' : participant.category}
-                              </span>
-                            </div>
-                            {/* Live vote count */}
-                            <div className="absolute top-4 right-4">
-                              <span className="bg-white/90 backdrop-blur-md text-gray-900 px-3 py-1 rounded-full text-xs font-bold shadow-sm flex items-center gap-1">
-                                <Heart className="w-3 h-3 text-red-500 fill-red-500" />
-                                {(participant.votes || 0).toLocaleString()} votes
-                              </span>
-                            </div>
-                            {/* Name overlay */}
-                            <div className="absolute bottom-4 left-4 right-4">
-                              <h4 className="text-2xl font-bold text-white mb-1">{participant.name}</h4>
-                              <p className="text-gray-200 text-sm flex items-center gap-1">
-                                <MapPin className="w-3.5 h-3.5" />
-                                {participant.hometown}
-                              </p>
-                            </div>
-                          </div>
-
-                          {/* Participant Content */}
-                          <div className="p-6 flex-grow flex flex-col">
-                            <div className="mb-6 space-y-3 flex-grow">
-                              <div>
-                                <h5 className="font-bold text-gray-900 mb-1 text-xs uppercase tracking-wide">Their Vision</h5>
-                                <p className="text-sm text-gray-600 leading-relaxed">{participant.ideology}</p>
-                              </div>
-                              <div>
-                                <h5 className="font-bold text-gray-900 mb-1 text-xs uppercase tracking-wide">Why Vote for Them</h5>
-                                <p className="text-sm text-gray-600 leading-relaxed">{participant.whyVote}</p>
-                              </div>
-                            </div>
-
-                            {/* Vote Button */}
-                            <div className="mt-auto">
-                              {votedParticipants.has(participant.id) ? (
-                                <div className="w-full px-6 py-4 rounded-xl bg-green-50 text-green-700 font-bold text-sm flex items-center justify-center gap-2 border border-green-200">
-                                  <CheckCircle className="w-5 h-5" />
-                                  <span>Vote Recorded</span>
-                                </div>
-                              ) : (
-                                <button
-                                  onClick={() => handleParticipantVote(participant.id)}
-                                  className="w-full px-6 py-4 rounded-xl font-bold text-sm uppercase tracking-wider transition-all duration-300 flex items-center justify-center space-x-3 shadow-md hover:shadow-lg transform hover:-translate-y-1 bg-green-600 text-white hover:bg-green-700"
-                                >
-                                  <Heart className="w-5 h-5" />
-                                  <span>Vote for {participant.name.split(' ')[0]}</span>
-                                </button>
-                              )}
-                            </div>
-                          </div>
-                        </motion.div>
-                      ))}
-                    </div>
-                  </div>
-                )
-              })()}
-            </motion.div>
-          )}
-
-          {/* No Event Selected Prompt */}
-          {!selectedEvent && (
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
-              className="text-center py-16"
-            >
-              <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Trophy className="w-10 h-10 text-gray-400" />
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Select an Event Above</h3>
-              <p className="text-gray-600 max-w-lg mx-auto">Choose one of the events to see the contestants and cast your vote.</p>
-            </motion.div>
-          )}
-
-          {/* Voting Summary */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            viewport={{ once: true }}
-            className="mt-20 bg-green-900 rounded-[2.5rem] p-12 text-white text-center shadow-2xl relative overflow-hidden"
-          >
-            <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
-            <div className="absolute bottom-0 left-0 w-96 h-96 bg-black/20 rounded-full blur-3xl" />
-
-            <div className="relative z-10">
-              <h3 className="text-3xl font-bold mb-6">Your Voting Summary</h3>
-              <p className="text-xl text-green-100 mb-10 max-w-2xl mx-auto font-light leading-relaxed">
-                Your votes help determine who represents Kenya&apos;s cultural future. Every vote matters — this is your voice.
-              </p>
-              <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-                <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/10">
-                  <div className="text-5xl font-bold mb-2 text-yellow-400">{votedParticipants.size}</div>
-                  <div className="text-green-100 font-medium uppercase tracking-wide text-sm">Your Votes Cast</div>
-                </div>
-                <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/10">
-                  <div className="text-5xl font-bold mb-2 text-yellow-400">{totalVotesCast.toLocaleString()}</div>
-                  <div className="text-green-100 font-medium uppercase tracking-wide text-sm">Total Community Votes</div>
-                </div>
-                <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/10">
-                  <div className="text-5xl font-bold mb-2 text-yellow-400">{events.length}</div>
-                  <div className="text-green-100 font-medium uppercase tracking-wide text-sm">Events Available</div>
-                </div>
-              </div>
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Voting Coming Soon</h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-8">
+              Voting events and participants will be available here once they are set up by the admin team. 
+              Stay tuned — your voice will shape who represents Kenya&apos;s cultural future on the global stage.
+            </p>
+            <div className="flex flex-wrap justify-center gap-4">
+              <Link
+                href="/events"
+                className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-full font-semibold text-sm transition-colors"
+              >
+                <Calendar className="w-4 h-4" />
+                View Upcoming Events
+              </Link>
+              <a
+                href="https://instagram.com/misscultureglobalkenya"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-3 rounded-full font-semibold text-sm transition-colors"
+              >
+                Follow for Updates
+                <ChevronRight className="w-4 h-4" />
+              </a>
             </div>
           </motion.div>
         </div>

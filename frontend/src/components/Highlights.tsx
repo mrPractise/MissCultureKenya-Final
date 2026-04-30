@@ -61,12 +61,18 @@ const Highlights = () => {
               <Link href={highlight.href}>
                 <div className="relative h-full overflow-hidden rounded-2xl shadow-elegant hover:shadow-elegant-lg transition-all duration-500 bg-white/95 backdrop-blur-sm transform hover:-translate-y-2 border border-gray-100/70 group">
                   <div className="relative h-56">
-                    <img
-                      src={highlight.image}
-                      alt={highlight.title}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                    />
-                    <div className={`absolute inset-0 ${highlight.color} opacity-20 group-hover:opacity-10 transition-opacity duration-500`} />
+                    {highlight.image ? (
+                      <img
+                        src={highlight.image}
+                        alt={highlight.title}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                      />
+                    ) : (
+                      <div className={`w-full h-full ${highlight.color} flex items-center justify-center`}>
+                        <highlight.icon className="w-12 h-12 text-white/50" />
+                      </div>
+                    )}
+                    <div className={`absolute inset-0 ${highlight.color} ${highlight.image ? 'opacity-20 group-hover:opacity-10' : 'opacity-0'} transition-opacity duration-500`} />
                     <div className="absolute inset-0 bg-black/40" />
                     
                     <div className="absolute top-4 left-4">

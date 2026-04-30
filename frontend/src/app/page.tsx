@@ -12,10 +12,8 @@ import SocialFeed from '@/components/SocialFeed'
 import FollowCTA from '@/components/FollowCTA'
 import EventDetailsModal from '@/components/EventDetailsModal'
 import apiClient from '@/lib/api'
-import { useSiteSettings } from '@/lib/useSiteSettings'
 
 export default function Home() {
-  const settings = useSiteSettings()
   const [showEventModal, setShowEventModal] = useState(false)
   const [upcomingEvent, setUpcomingEvent] = useState<any>(null)
 
@@ -27,7 +25,6 @@ export default function Home() {
         const eventsArray = Array.isArray(events) ? events : []
         if (eventsArray.length > 0) {
           const event = eventsArray[0]
-          // Transform API event to component format
           setUpcomingEvent({
             id: event.id,
             title: event.title || event.name,
@@ -36,7 +33,7 @@ export default function Home() {
             venue: event.venue_name || event.venue,
             location: `${event.city || ''}, ${event.country || 'Kenya'}`.trim().replace(/^,\s*/, ''),
             description: event.description,
-            image: event.featured_image_url || event.featured_image || event.image || settings.home_upcoming_event_image_url || '',
+            image: event.featured_image_url || event.featured_image || event.image || '',
             category: event.event_type || event.category || 'Event',
             capacity: event.capacity || 0,
             price: event.price || 'Free',
@@ -47,92 +44,21 @@ export default function Home() {
             votingEnabled: event.voting_enabled || false,
             currentVotes: event.current_votes || 0
           })
-        } else {
-          // Fallback event if no events from API
-          setUpcomingEvent({
-            id: 1,
-            title: 'Cultural Heritage Festival 2024',
-            date: '2024-03-15',
-            time: '10:00 AM',
-            venue: 'Nairobi National Museum',
-            location: 'Nairobi, Kenya',
-            description: 'Join us for a celebration of Kenya\'s diverse cultural heritage featuring traditional performances, artisan showcases, and cultural exhibitions. This is a must-attend event for everyone passionate about Kenyan culture!',
-            image: settings.home_upcoming_event_image_url || '',
-            category: 'Cultural Event',
-    capacity: 500,
-    price: 'Free',
-    organizer: 'Miss Culture Global Kenya',
-    contactEmail: 'info@misscultureglobalkenya.com',
-    contactPhone: '+254 721 706983',
-    ticketCategories: [
-      {
-        name: 'General Admission',
-        price: 'Free',
-        description: 'Access to all festival activities and performances',
-        available: 450,
-        total: 500
-      },
-      {
-        name: 'VIP Experience',
-        price: 'KSh 2,000',
-        description: 'Premium seating, meet & greet, and exclusive access',
-        available: 30,
-        total: 50
-      }
-    ],
-            votingEnabled: true,
-            currentVotes: 127
-          })
         }
       } catch (err) {
         console.error('Error fetching upcoming event:', err)
-        // Use fallback event
-        setUpcomingEvent({
-          id: 1,
-          title: 'Cultural Heritage Festival 2024',
-          date: '2024-03-15',
-          time: '10:00 AM',
-          venue: 'Nairobi National Museum',
-          location: 'Nairobi, Kenya',
-          description: 'Join us for a celebration of Kenya\'s diverse cultural heritage featuring traditional performances, artisan showcases, and cultural exhibitions. This is a must-attend event for everyone passionate about Kenyan culture!',
-        image: settings.home_upcoming_event_image_url || '',
-        category: 'Cultural Event',
-          capacity: 500,
-          price: 'Free',
-          organizer: 'Miss Culture Global Kenya',
-          contactEmail: 'info@misscultureglobalkenya.com',
-          contactPhone: '+254 721 706983',
-          ticketCategories: [
-            {
-              name: 'General Admission',
-              price: 'Free',
-              description: 'Access to all festival activities and performances',
-              available: 450,
-              total: 500
-            },
-            {
-              name: 'VIP Experience',
-              price: 'KSh 2,000',
-              description: 'Premium seating, meet & greet, and exclusive access',
-              available: 30,
-              total: 50
-            }
-          ],
-          votingEnabled: true,
-          currentVotes: 127
-        })
       }
     }
 
     fetchUpcomingEvent()
   }, [])
 
-  // Show event modal after 4.5 seconds on initial page load (only if event exists)
+  // Show event modal after 20 seconds on initial page load (only if event exists)
   useEffect(() => {
     if (upcomingEvent) {
       const timer = setTimeout(() => {
         setShowEventModal(true)
-      }, 4500)
+      }, 20000)
 
       return () => clearTimeout(timer)
     }

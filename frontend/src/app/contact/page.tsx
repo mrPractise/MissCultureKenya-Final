@@ -28,7 +28,7 @@ const contactInfo = [
   {
     icon: MapPin,
     title: 'Physical Location',
-    details: 'Nairobi, Kenya',
+    details: 'Syokimau Country Club, Nairobi, Kenya',
     description: 'Visitors welcome by appointment only.',
     color: 'bg-red-50 text-red-600',
     priority: 'In-person meetings'

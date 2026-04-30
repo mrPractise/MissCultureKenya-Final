@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Heart, CreditCard, Smartphone, Users, Globe, Award, Check, Palette, GraduationCap, Globe2, Home, Shield, ChevronRight } from 'lucide-react'
+import { CreditCard, Smartphone, Check, Palette, GraduationCap, Globe2, Home, Shield } from 'lucide-react'
 import { useState } from 'react'
 import Link from 'next/link'
 import { useSiteSettings } from '@/lib/useSiteSettings'
@@ -11,38 +11,26 @@ const impactAreas = [
     title: 'Cultural Preservation',
     description: 'Funding traditional craftspeople, documenting oral histories, and archiving endangered art forms before they disappear.',
     icon: Palette,
-    impact: '500+ artisans supported',
-    answer: 'What cultural work gets funded?'
+    impact: '500+ artisans supported'
   },
   {
     title: 'Youth Empowerment',
     description: 'Scholarships, leadership training, mentorship programs — preparing the next generation of cultural ambassadors.',
     icon: GraduationCap,
-    impact: '1,000+ youth reached',
-    answer: 'How do you support young people?'
+    impact: '1,000+ youth reached'
   },
   {
     title: 'Global Outreach',
     description: 'Ambassador travel, international conference attendance, cross-border cultural exchange — taking Kenya to the world.',
     icon: Globe2,
-    impact: '50+ countries reached',
-    answer: 'What global work gets funded?'
+    impact: '50+ countries reached'
   },
   {
     title: 'Community Development',
     description: 'Grassroots programs, artisan markets, school outreach — direct impact in local communities across Kenya.',
     icon: Home,
-    impact: '100+ communities impacted',
-    answer: 'Does this help people locally?'
+    impact: '100+ communities impacted'
   }
-]
-
-const impactExamples = [
-  { amount: 'KES 500', impact: 'Covers materials for one artisan workshop session' },
-  { amount: 'KES 1,000', impact: 'Sponsors one youth workshop session' },
-  { amount: 'KES 5,000', impact: 'Funds one artisan\'s materials for a month' },
-  { amount: 'KES 10,000', impact: 'Supports one school outreach visit' },
-  { amount: 'KES 50,000', impact: 'Funds a community cultural event' }
 ]
 
 const ContributePage = () => {
@@ -150,10 +138,9 @@ const ContributePage = () => {
                   </div>
                   <h3 className="text-xl font-bold text-gray-900 mb-3">{area.title}</h3>
                   <p className="text-gray-600 mb-4 leading-relaxed text-sm">{area.description}</p>
-                  <div className="inline-block px-4 py-1 bg-green-50 text-green-700 rounded-full font-semibold text-sm mb-2">
+                  <div className="inline-block px-4 py-1 bg-green-50 text-green-700 rounded-full font-semibold text-sm">
                     {area.impact}
                   </div>
-                  <p className="text-xs text-gray-400 italic">Answers: &ldquo;{area.answer}&rdquo;</p>
                 </motion.div>
               ))}
             </div>
@@ -161,67 +148,18 @@ const ContributePage = () => {
         </div>
       </section>
 
-      {/* Impact Transparency + Payment */}
+      {/* Payment */}
       <section className="py-20 bg-gray-50 relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
           <div className="absolute top-20 left-10 w-64 h-64 bg-green-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob" />
           <div className="absolute top-20 right-10 w-64 h-64 bg-yellow-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000" />
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="grid lg:grid-cols-2 gap-12 items-start">
-            {/* Impact Transparency */}
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
-            >
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">Impact <span className="text-red-600">Transparency</span></h2>
-              <p className="text-gray-600 mb-8 leading-relaxed">Every amount has a concrete outcome. Here&apos;s what your specific donation actually does.</p>
-
-              <div className="space-y-4 mb-8">
-                {impactExamples.map((item, index) => (
-                  <motion.div
-                    key={item.amount}
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.4, delay: index * 0.08 }}
-                    viewport={{ once: true }}
-                    className="flex items-center gap-4 p-4 bg-white rounded-xl shadow-sm border border-gray-100 hover:border-green-100 transition-colors duration-200"
-                  >
-                    <div className="w-24 text-center flex-shrink-0">
-                      <span className="text-lg font-bold text-green-600">{item.amount}</span>
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm text-gray-700 font-medium">{item.impact}</p>
-                    </div>
-                    <button
-                      onClick={() => setAmount(item.amount.replace('KES ', '').replace(/,/g, ''))}
-                      className="text-xs font-semibold text-green-600 hover:text-green-700 bg-green-50 hover:bg-green-100 px-3 py-1.5 rounded-full transition-colors duration-200 flex-shrink-0"
-                    >
-                      Select
-                    </button>
-                  </motion.div>
-                ))}
-              </div>
-
-              {/* Donor Recognition */}
-              <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-6">
-                <div className="flex items-start gap-3">
-                  <Award className="w-6 h-6 text-yellow-600 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <h4 className="font-bold text-yellow-900 mb-1">Donor Recognition</h4>
-                    <p className="text-yellow-800 text-sm leading-relaxed">Major donors (KES 50K+) are acknowledged on our website and annual reports, unless you prefer to remain anonymous.</p>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Payment Form */}
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          {/* Payment Form */}
+          <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
               viewport={{ once: true }}
               className="bg-white rounded-[2.5rem] shadow-2xl p-8 md:p-12 border border-gray-100 relative overflow-hidden"
@@ -338,7 +276,7 @@ const ContributePage = () => {
                     {isProcessing ? (
                       <><svg className="animate-spin h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><span>Processing...</span></>
                     ) : (
-                      <><span>Contribute via M-Pesa</span><Heart className="w-5 h-5 fill-current" /></>
+                      <><span>Contribute via M-Pesa</span></>
                     )}
                   </button>
                 </motion.form>
@@ -401,13 +339,12 @@ const ContributePage = () => {
                     {isProcessing ? (
                       <><svg className="animate-spin h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><span>Processing...</span></>
                     ) : (
-                      <><span>Contribute via Card</span><Heart className="w-5 h-5 fill-current" /></>
+                      <><span>Contribute via Card</span></>
                     )}
                   </button>
                 </motion.form>
               )}
             </motion.div>
-          </div>
         </div>
       </section>
     </div>

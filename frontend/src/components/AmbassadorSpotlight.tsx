@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Award, ArrowRight, Quote } from 'lucide-react'
+import { Award, ArrowRight, Quote, User } from 'lucide-react'
 import Link from 'next/link'
 import { useSiteSettings } from '@/lib/useSiteSettings'
 
@@ -44,11 +44,17 @@ const AmbassadorSpotlight = () => {
           >
             <div className="absolute inset-0 bg-green-600/10 rounded-3xl rotate-2 group-hover:rotate-3 transition-transform duration-500" />
             <div className="relative overflow-hidden rounded-3xl shadow-2xl">
-              <img
-                src={settings.ambassador_profile_image_url || settings.home_ambassador_highlight_image_url || ''}
-                alt="Susan - Miss Culture Global Kenya Ambassador"
-                className="w-full h-[500px] object-cover"
-              />
+              {(settings.ambassador_profile_image_url || settings.home_ambassador_highlight_image_url) ? (
+                <img
+                  src={(settings.ambassador_profile_image_url || settings.home_ambassador_highlight_image_url) as string}
+                  alt="Susan - Miss Culture Global Kenya Ambassador"
+                  className="w-full h-[500px] object-cover"
+                />
+              ) : (
+                <div className="w-full h-[500px] bg-green-100 flex items-center justify-center">
+                  <User className="w-20 h-20 text-green-300" />
+                </div>
+              )}
               <div className="absolute inset-0 bg-black/20" />
               <div className="absolute bottom-6 left-6 right-6">
                 <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20">

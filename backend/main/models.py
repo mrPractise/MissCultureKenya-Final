@@ -158,6 +158,38 @@ class Partner(models.Model):
 
 class SiteSettings(models.Model):
     """Singleton model for site-wide hero images per navbar tab"""
+
+    # ── Leader labels (editable from Django admin) ──
+    leader_1_name = models.CharField(max_length=100, blank=True, default='')
+    leader_1_title = models.CharField(max_length=200, blank=True, default='')
+    leader_1_bio = models.TextField(blank=True, default='')
+    leader_2_name = models.CharField(max_length=100, blank=True, default='')
+    leader_2_title = models.CharField(max_length=200, blank=True, default='')
+    leader_2_bio = models.TextField(blank=True, default='')
+    leader_3_name = models.CharField(max_length=100, blank=True, default='')
+    leader_3_title = models.CharField(max_length=200, blank=True, default='')
+    leader_3_bio = models.TextField(blank=True, default='')
+
+    # ── Committee labels (editable from Django admin) ──
+    committee_1_name = models.CharField(max_length=100, blank=True, default='')
+    committee_1_role = models.CharField(max_length=200, blank=True, default='')
+    committee_1_bio = models.TextField(blank=True, default='')
+    committee_2_name = models.CharField(max_length=100, blank=True, default='')
+    committee_2_role = models.CharField(max_length=200, blank=True, default='')
+    committee_2_bio = models.TextField(blank=True, default='')
+    committee_3_name = models.CharField(max_length=100, blank=True, default='')
+    committee_3_role = models.CharField(max_length=200, blank=True, default='')
+    committee_3_bio = models.TextField(blank=True, default='')
+    committee_4_name = models.CharField(max_length=100, blank=True, default='')
+    committee_4_role = models.CharField(max_length=200, blank=True, default='')
+    committee_4_bio = models.TextField(blank=True, default='')
+    committee_5_name = models.CharField(max_length=100, blank=True, default='')
+    committee_5_role = models.CharField(max_length=200, blank=True, default='')
+    committee_5_bio = models.TextField(blank=True, default='')
+    committee_6_name = models.CharField(max_length=100, blank=True, default='')
+    committee_6_role = models.CharField(max_length=200, blank=True, default='')
+    committee_6_bio = models.TextField(blank=True, default='')
+
     # ── Home tab ──
     home_hero_image = cloudinary.models.CloudinaryField('home_hero', folder='missculture/site/home', blank=True, null=True)
     home_hero_video_url = models.URLField('home_hero_video_url', blank=True, null=True)

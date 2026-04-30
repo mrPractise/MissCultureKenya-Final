@@ -87,72 +87,12 @@ const stagger = {
   viewport: { once: true },
 }
 
-/* ── static fallback data ── */
-const FALLBACK_REGIONS = [
-  { id: 0, name: 'Nairobi', description: 'The vibrant capital city — a melting pot of cultures, innovation, and the beating heart of modern Kenya. From the bustling Maasai Market to the serene Karura Forest, Nairobi bridges tradition and tomorrow.', image_url: '', gallery_photos: [] },
-  { id: 1, name: 'Mombasa', description: 'The coastal gem where Swahili culture meets the Indian Ocean. Centuries of trade have woven Arab, Portuguese, and indigenous influences into a tapestry of spice-scented streets and coral-stone architecture.', image_url: '', gallery_photos: [] },
-  { id: 2, name: 'Nakuru', description: 'Home to the Great Rift Valley and stunning natural beauty. Lake Nakuru paints the shoreline pink with millions of flamingos, while the surrounding highlands produce some of the world\'s finest tea.', image_url: '', gallery_photos: [] },
-  { id: 3, name: 'Kisumu', description: 'The lakeside city on the shores of Lake Victoria — the source of the Nile. Fishing communities, vibrant markets, and sunsets over Africa\'s largest lake define this western Kenyan gem.', image_url: '', gallery_photos: [] },
-]
-
-const FALLBACK_COMMUNITIES = [
-  { id: 0, name: 'Kikuyu', region: 'Central Kenya', description: 'The largest ethnic group, known for their agricultural heritage, entrepreneurial spirit, and deep connection to the slopes of Mount Kenya.', image_url: '', gallery_photos: [] },
-  { id: 1, name: 'Luo', region: 'Western Kenya', description: 'Famous for their fishing traditions along Lake Victoria, vibrant musical heritage, and significant contributions to Kenya\'s intellectual and political life.', image_url: '', gallery_photos: [] },
-  { id: 2, name: 'Kalenjin', region: 'Rift Valley', description: 'World-renowned for their athletic prowess and running traditions. The Rift Valley highlands have produced more Olympic champions per capita than anywhere on Earth.', image_url: '', gallery_photos: [] },
-  { id: 3, name: 'Kamba', region: 'Eastern Kenya', description: 'Known for their exquisite wood carving skills, vibrant musical traditions, and resilience in the semi-arid beauty of Ukambani.', image_url: '', gallery_photos: [] },
-]
-
-const FALLBACK_HERITAGE = [
-  { id: 0, title: 'Lamu Old Town', heritage_type: 'Ceremony', description: 'A living example of Swahili culture and architecture — one of East Africa\'s oldest continuously inhabited towns and a UNESCO World Heritage Site.', image_url: '', gallery_photos: [] },
-  { id: 1, title: 'Fort Jesus', heritage_type: 'Art', description: 'A 16th-century Portuguese fort standing guard over Mombasa\'s Old Town — a testament to Kenya\'s layered colonial history and cultural resilience.', image_url: '', gallery_photos: [] },
-  { id: 2, title: 'Thimlich Ohinga', heritage_type: 'Craft', description: 'Ancient dry-stone wall enclosures in Migori County, showcasing early engineering genius and the communal living traditions of early Kenyan communities.', image_url: '', gallery_photos: [] },
-]
-
-const FALLBACK_ACHIEVEMENTS = [
-  { id: 0, title: 'Athletics Excellence', achievement_type: 'Sports', description: 'Kenya\'s dominance in long-distance running has brought home countless Olympic and World Championship medals, making the Rift Valley the running capital of the world.', year: 2024, image_url: '', gallery_photos: [] },
-  { id: 1, title: 'Magical Kenya', achievement_type: 'Tourism', description: 'From the Maasai Mara\'s Great Migration to Mount Kenya\'s snow-capped peaks, our natural beauty attracts over two million visitors annually.', year: 2024, image_url: '', gallery_photos: [] },
-  { id: 2, title: 'Silicon Savannah', achievement_type: 'Innovation', description: 'M-Pesa revolutionised mobile payments worldwide, and Nairobi\'s tech scene continues to innovate — earning the title "Silicon Savannah" with over 40 million active users.', year: 2024, image_url: '', gallery_photos: [] },
-  { id: 3, title: 'Creative Expression', achievement_type: 'Arts', description: 'From Ngũgĩ wa Thiong\'o\'s literary genius to award-winning films and the vibrant contemporary art scene, Kenyan artists are making their mark on the global cultural landscape.', year: 2024, image_url: '', gallery_photos: [] },
-]
-
+/* ── static data ── */
 const CULTURAL_FACTS = [
   { number: '44+', label: 'Ethnic Communities', description: 'Each with distinct languages, customs, and artistic traditions' },
   { number: '68+', label: 'Living Languages', description: 'A linguistic diversity that echoes ancient migrations and trade routes' },
   { number: '7', label: 'UNESCO Sites', description: 'From Lamu Old Town to the Lake Turkana fossil beds' },
   { number: '2M+', label: 'Annual Visitors', description: 'Drawn by wildlife, culture, and the warmth of Kenyan hospitality' },
-]
-
-const NARRATIVE_PHOTOS = [
-  {
-    src: '',
-    alt: 'Maasai Beadwork',
-    caption: 'Maasai beadwork — a language of colour, status, and identity worn by generations. Every pattern tells a story of age, marital status, and tribal history. This is the kind of living heritage Miss Culture Global Kenya exists to amplify on the world stage.',
-  },
-  {
-    src: '',
-    alt: 'The Great Rift Valley',
-    caption: 'The Great Rift Valley — the cradle of humankind, where our earliest ancestors walked. This land carries the memory of all humanity, and its people carry forward traditions that have endured for millennia.',
-  },
-  {
-    src: '',
-    alt: 'Swahili Coast Architecture',
-    caption: 'Coral-stone architecture of the Swahili Coast — where African, Arab, and Portuguese histories merged into a unique coastal civilization. Lamu Old Town stands as a UNESCO monument to this cultural fusion.',
-  },
-  {
-    src: '',
-    alt: 'Kalenjin Runners',
-    caption: 'The Rift Valley highlands — producing more Olympic champions per capita than anywhere on Earth. This is not just athletic excellence; it is the discipline, community support, and warrior spirit of a people written into motion.',
-  },
-  {
-    src: '',
-    alt: 'Kikuyu Agricultural Heritage',
-    caption: 'Terraced farms on Mount Kenya\'s slopes — where agricultural wisdom passed down generations feeds a nation. The Kikuyu connection to this land is spiritual as much as it is economic.',
-  },
-  {
-    src: '',
-    alt: 'Luo Fishing Traditions',
-    caption: 'Fishing boats on Lake Victoria at dawn — the Luo people have drawn life from these waters for centuries. Their music, their proverbs, their very worldview flow from this relationship with the lake.',
-  },
 ]
 
 /* ── component ── */
@@ -185,11 +125,11 @@ const KenyaUnified = () => {
     fetchData()
   }, [])
 
-  /* Merge API data with fallbacks so the page always has content */
-  const regions = (data?.regions.length ? data.regions : FALLBACK_REGIONS) as Region[]
-  const communities = (data?.communities.length ? data.communities : FALLBACK_COMMUNITIES) as Community[]
-  const heritage = (data?.heritage.length ? data.heritage : FALLBACK_HERITAGE) as Heritage[]
-  const achievements = (data?.achievements.length ? data.achievements : FALLBACK_ACHIEVEMENTS) as Achievement[]
+  /* Use API data directly — show empty states when no data */
+  const regions = (data?.regions || []) as Region[]
+  const communities = (data?.communities || []) as Community[]
+  const heritage = (data?.heritage || []) as Heritage[]
+  const achievements = (data?.achievements || []) as Achievement[]
 
   /* Build photo grid with captions from gallery photos */
   const galleryPhotos = useMemo(() => {
@@ -230,10 +170,7 @@ const KenyaUnified = () => {
       const img = getImage(a)
       if (img) photos.push({ src: img, alt: a.title, caption: a.description })
     })
-    // If no API photos, use narrative fallback photos with rich captions
-    if (photos.length === 0) {
-      return NARRATIVE_PHOTOS.map(p => ({ ...p, src: p.src || '' })).filter(p => p.src)
-    }
+    // No fallback photos — gallery section will be hidden when empty
     return photos.slice(0, 12)
   }, [regions, communities, heritage, achievements])
 
@@ -377,7 +314,8 @@ const KenyaUnified = () => {
           </motion.div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {communities.map((community, idx) => {
+            {communities.length > 0 ? (
+              communities.map((community, idx) => {
               const img = getImage(community)
               const gallery = getGalleryImages(community)
               const isExpanded = expandedCommunity === community.id
@@ -432,7 +370,13 @@ const KenyaUnified = () => {
                   )}
                 </motion.div>
               )
-            })}
+            })
+            ) : (
+              <div className="col-span-full text-center py-12">
+                <Users className="w-10 h-10 text-green-300 mx-auto mb-3" />
+                <p className="text-gray-500">No communities added yet. Add them in Django admin.</p>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -456,7 +400,8 @@ const KenyaUnified = () => {
           </motion.div>
 
           <div className="grid md:grid-cols-2 gap-6">
-            {regions.map((region, idx) => {
+            {regions.length > 0 ? (
+              regions.map((region, idx) => {
               const img = getImage(region)
               const gallery = getGalleryImages(region)
               const isExpanded = expandedRegion === region.id
@@ -508,7 +453,13 @@ const KenyaUnified = () => {
                   )}
                 </motion.div>
               )
-            })}
+            })
+            ) : (
+              <div className="col-span-full text-center py-12">
+                <MapPin className="w-10 h-10 text-green-300 mx-auto mb-3" />
+                <p className="text-gray-500">No regions added yet. Add them in Django admin.</p>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -600,7 +551,8 @@ const KenyaUnified = () => {
           </motion.div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {heritage.map((item, idx) => {
+            {heritage.length > 0 ? (
+              heritage.map((item, idx) => {
               const img = getImage(item)
               const gallery = getGalleryImages(item)
               return (
@@ -637,7 +589,13 @@ const KenyaUnified = () => {
                   )}
                 </motion.div>
               )
-            })}
+            })
+            ) : (
+              <div className="col-span-full text-center py-12">
+                <Landmark className="w-10 h-10 text-yellow-400 mx-auto mb-3" />
+                <p className="text-gray-500">No heritage items added yet. Add them in Django admin.</p>
+              </div>
+            )}
           </div>
 
           {/* Cultural Expression Cards */}

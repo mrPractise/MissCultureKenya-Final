@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Heart, Globe, Award, Target, BookOpen, ExternalLink, Sparkles, Handshake, Dumbbell, ChevronRight, Users, Shield, Lightbulb } from 'lucide-react'
+import { Heart, Globe, Award, Target, BookOpen, ExternalLink, Sparkles, Handshake, Dumbbell, ChevronRight, Users, Shield, Lightbulb, Landmark } from 'lucide-react'
 import { useState } from 'react'
 import Link from 'next/link'
 import { useSiteSettings } from '@/lib/useSiteSettings'
@@ -29,32 +29,32 @@ const AboutPage = () => {
 
   const currentLeadership = [
     {
-      name: 'Susan Abongo',
-      title: 'Miss Culture Global Kenya',
-      bio: 'A passionate cultural ambassador with over 5 years of experience promoting Kenyan heritage. Susan holds a degree in Cultural Studies and has represented Kenya in international cultural forums across 15+ countries.',
+      name: settings.leader_1_name || 'Susan Abongo',
+      title: settings.leader_1_title || 'Miss Culture Global Kenya',
+      bio: settings.leader_1_bio || 'A passionate cultural ambassador with over 5 years of experience promoting Kenyan heritage. Susan holds a degree in Cultural Studies and has represented Kenya in international cultural forums across 15+ countries.',
       image: settings.about_leader_1_image_url || '',
     },
     {
-      name: 'James Mwangi',
-      title: 'Director of Operations',
-      bio: 'Oversees all operational aspects of the organization with a focus on community engagement and event management. James has a background in event planning and cultural tourism.',
+      name: settings.leader_2_name || 'James Mwangi',
+      title: settings.leader_2_title || 'Director of Operations',
+      bio: settings.leader_2_bio || 'Oversees all operational aspects of the organization with a focus on community engagement and event management. James has a background in event planning and cultural tourism.',
       image: settings.about_leader_2_image_url || '',
     },
     {
-      name: 'Grace Njeri',
-      title: 'Community Outreach Coordinator',
-      bio: 'Leads community engagement initiatives and works directly with local artisans and cultural groups. Grace has a Master\'s degree in Anthropology and extensive experience in grassroots organizing.',
+      name: settings.leader_3_name || 'Grace Njeri',
+      title: settings.leader_3_title || 'Community Outreach Coordinator',
+      bio: settings.leader_3_bio || 'Leads community engagement initiatives and works directly with local artisans and cultural groups. Grace has a Master\'s degree in Anthropology and extensive experience in grassroots organizing.',
       image: settings.about_leader_3_image_url || '',
     }
   ]
 
   const organizingCommittee = [
-    { name: 'Robert Ochieng', role: 'Event Coordinator', bio: 'Specializes in organizing cultural events and festivals across Kenya.' },
-    { name: 'Mary Atieno', role: 'Marketing Director', bio: 'Leads digital marketing and brand awareness campaigns.' },
-    { name: 'David Kimani', role: 'Finance Manager', bio: 'Manages budgeting and financial reporting for all programs.' },
-    { name: 'Sarah Akinyi', role: 'Volunteer Coordinator', bio: 'Recruits and manages volunteers for all initiatives.' },
-    { name: 'Peter Kamau', role: 'International Relations', bio: 'Handles partnerships with international cultural organizations.' },
-    { name: 'Esther Muthoni', role: 'Youth Programs Lead', bio: 'Develops and implements youth engagement programs.' }
+    { name: settings.committee_1_name || 'Robert Ochieng', role: settings.committee_1_role || 'Event Coordinator', bio: settings.committee_1_bio || 'Specializes in organizing cultural events and festivals across Kenya.' },
+    { name: settings.committee_2_name || 'Mary Atieno', role: settings.committee_2_role || 'Marketing Director', bio: settings.committee_2_bio || 'Leads digital marketing and brand awareness campaigns.' },
+    { name: settings.committee_3_name || 'David Kimani', role: settings.committee_3_role || 'Finance Manager', bio: settings.committee_3_bio || 'Manages budgeting and financial reporting for all programs.' },
+    { name: settings.committee_4_name || 'Sarah Akinyi', role: settings.committee_4_role || 'Volunteer Coordinator', bio: settings.committee_4_bio || 'Recruits and manages volunteers for all initiatives.' },
+    { name: settings.committee_5_name || 'Peter Kamau', role: settings.committee_5_role || 'International Relations', bio: settings.committee_5_bio || 'Handles partnerships with international cultural organizations.' },
+    { name: settings.committee_6_name || 'Esther Muthoni', role: settings.committee_6_role || 'Youth Programs Lead', bio: settings.committee_6_bio || 'Develops and implements youth engagement programs.' }
   ]
 
   const impactHighlights = [
@@ -135,11 +135,17 @@ const AboutPage = () => {
               className="relative"
             >
               <div className="absolute inset-0 bg-green-600/10 rounded-2xl transform rotate-3" />
-              <img
-                src={settings.about_mission_image_url || ''}
-                alt="Kenyan Culture"
-                className="relative rounded-2xl shadow-2xl transform -rotate-3 hover:rotate-0 transition-transform duration-500"
-              />
+              {settings.about_mission_image_url ? (
+                <img
+                  src={settings.about_mission_image_url}
+                  alt="Kenyan Culture"
+                  className="relative rounded-2xl shadow-2xl transform -rotate-3 hover:rotate-0 transition-transform duration-500"
+                />
+              ) : (
+                <div className="relative rounded-2xl shadow-2xl transform -rotate-3 hover:rotate-0 transition-transform duration-500 bg-green-100 flex items-center justify-center h-64">
+                  <Landmark className="w-16 h-16 text-green-300" />
+                </div>
+              )}
             </motion.div>
           </div>
         </div>
@@ -357,14 +363,20 @@ const AboutPage = () => {
                 viewport={{ once: true }}
                 className="bg-white rounded-2xl shadow-elegant overflow-hidden hover:shadow-elegant-lg transition-all duration-300 group"
               >
-                <div className="h-80 overflow-hidden relative">
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10" />
-                  <img
-                    src={leader.image}
-                    alt={leader.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
+                {leader.image ? (
+                  <div className="h-80 overflow-hidden relative">
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10" />
+                    <img
+                      src={leader.image}
+                      alt={leader.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  </div>
+                ) : (
+                  <div className="h-32 bg-gradient-to-br from-green-600 to-green-800 flex items-center justify-center">
+                    <span className="text-5xl font-bold text-white/80">{leader.name.split(' ').map(n => n[0]).join('')}</span>
+                  </div>
+                )}
                 <div className="p-8">
                   <h3 className="text-2xl font-bold text-gray-900 mb-1">{leader.name}</h3>
                   <p className="text-green-600 font-medium mb-4">{leader.title}</p>

@@ -36,13 +36,10 @@ const Navigation = () => {
 
   return (
     <>
-      <motion.nav
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
+      <nav
         className={`sticky top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          scrolled 
-            ? 'bg-white/95 backdrop-blur-xl shadow-elegant py-1' 
+          scrolled
+            ? 'bg-white/95 backdrop-blur-xl shadow-elegant py-1'
             : 'bg-white border-b border-gray-100 py-2'
         }`}
       >
@@ -101,7 +98,7 @@ const Navigation = () => {
             </div>
           </div>
         </div>
-      </motion.nav>
+      </nav>
 
       {/* Mobile Navigation - Floating Button */}
       <motion.button

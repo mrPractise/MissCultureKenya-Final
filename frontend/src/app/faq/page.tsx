@@ -1,7 +1,7 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronDown, Mail, Phone, Heart, Calendar, Users, Globe, ArrowRight, HelpCircle } from 'lucide-react'
+import { ChevronDown, Mail, Phone, Heart, Calendar, Users, Globe, HelpCircle } from 'lucide-react'
 import { useState } from 'react'
 import Link from 'next/link'
 import { useSiteSettings } from '@/lib/useSiteSettings'
@@ -15,23 +15,19 @@ const faqCategories = [
     faqs: [
       {
         question: 'What is Miss Culture Global Kenya?',
-        answer: 'Miss Culture Global Kenya is a cultural preservation movement, a youth empowerment platform, and Kenya\'s voice in a global conversation spanning 50+ nations. It is not just a pageant — it is a cultural diplomacy platform that transforms heritage into a global asset for socio-economic empowerment.',
-        nextStep: { text: 'Learn more about us', link: '/about' }
+        answer: 'Miss Culture Global Kenya is a cultural preservation movement, a youth empowerment platform, and Kenya\'s voice in a global conversation spanning 50+ nations. It is not just a pageant — it is a cultural diplomacy platform that transforms heritage into a global asset for socio-economic empowerment.'
       },
       {
         question: 'How are you connected to Miss Culture Global?',
-        answer: 'Miss Culture Global Kenya operates as the Kenyan franchise of Miss Culture Global, the international cultural diplomacy platform. We share a unified mission: to transform cultural heritage into a global asset for socio-economic empowerment and international diplomacy.',
-        nextStep: { text: 'Visit Miss Culture Global', link: 'https://misscultureglobal.org/' }
+        answer: 'Miss Culture Global Kenya operates as the Kenyan franchise of Miss Culture Global, the international cultural diplomacy platform. We share a unified mission: to transform cultural heritage into a global asset for socio-economic empowerment and international diplomacy.'
       },
       {
         question: 'When was this started?',
-        answer: 'Miss Culture Global Kenya was established in 2015 with the vision to celebrate and preserve Kenya\'s rich cultural heritage while promoting it globally. Since then, we\'ve grown to impact 100+ communities across Kenya.',
-        nextStep: { text: 'See our journey', link: '/about' }
+        answer: 'Miss Culture Global Kenya was established in 2015 with the vision to celebrate and preserve Kenya\'s rich cultural heritage while promoting it globally. Since then, we\'ve grown to impact 100+ communities across Kenya.'
       },
       {
         question: 'Is this a nonprofit?',
-        answer: 'Yes, Miss Culture Global Kenya is a registered non-profit organization. All funds raised go directly toward our cultural preservation, youth empowerment, and community development programs.',
-        nextStep: { text: 'Support our mission', link: '/contribute' }
+        answer: 'Yes, Miss Culture Global Kenya is a registered non-profit organization. All funds raised go directly toward our cultural preservation, youth empowerment, and community development programs.'
       }
     ]
   },
@@ -43,28 +39,23 @@ const faqCategories = [
     faqs: [
       {
         question: 'How do I enter the pageant?',
-        answer: 'Applications open in March each year. You must be a Kenyan citizen aged 18-28 with a passion for cultural preservation and demonstrated leadership qualities. Complete at least secondary education.',
-        nextStep: { text: 'Sign up for notifications', link: '/contact' }
+        answer: 'Applications open in March each year. You must be a Kenyan citizen aged 18-28 with a passion for cultural preservation and demonstrated leadership qualities. Complete at least secondary education.'
       },
       {
         question: 'What are the age requirements?',
-        answer: 'The main pageant is for adults aged 18-28. Our Junior Cultural Ambassador program is for teens aged 13-17. We also have programs for children under 13 focused on cultural education rather than competition.',
-        nextStep: { text: 'View events', link: '/events' }
+        answer: 'The main pageant is for adults aged 18-28. Our Junior Cultural Ambassador program is for teens aged 13-17. We also have programs for children under 13 focused on cultural education rather than competition.'
       },
       {
         question: 'What do events cost?',
-        answer: 'Event costs vary. Many of our community events are free to attend. Our major pageant events have ticket categories ranging from General Admission (free or low-cost) to VIP Experience (KSh 2,000+). Check individual event pages for details.',
-        nextStep: { text: 'Browse events', link: '/events' }
+        answer: 'Event costs vary. Many of our community events are free to attend. Our major pageant events have ticket categories ranging from General Admission (free or low-cost) to VIP Experience (KSh 2,000+). Check individual event pages for details.'
       },
       {
         question: 'Can I attend virtually?',
-        answer: 'Select events offer live-streaming options. Follow our social media channels for virtual event announcements. We\'re working toward making all major events accessible online.',
-        nextStep: { text: 'Follow us for updates', link: '/contact' }
+        answer: 'Select events offer live-streaming options. Follow our social media channels for virtual event announcements. We\'re working toward making all major events accessible online.'
       },
       {
         question: 'How is voting done?',
-        answer: 'Voting is done through our website. You can vote once per category per event. Voting is free and transparent — live vote counts are displayed so you can see real-time results.',
-        nextStep: { text: 'Go to Voting page', link: '/voting' }
+        answer: 'Voting is done through our website. You can vote once per category per event. Voting is free and transparent — live vote counts are displayed so you can see real-time results.'
       }
     ]
   },
@@ -76,23 +67,19 @@ const faqCategories = [
     faqs: [
       {
         question: 'How can I volunteer?',
-        answer: 'We welcome volunteers for events, community programs, and administrative support. Volunteer roles range from event coordination to cultural research to social media management.',
-        nextStep: { text: 'Contact us about volunteering', link: '/contact' }
+        answer: 'We welcome volunteers for events, community programs, and administrative support. Volunteer roles range from event coordination to cultural research to social media management.'
       },
       {
         question: 'Do you have student programs?',
-        answer: 'Yes! We offer cultural education programs for schools and universities, including workshops, mentorship sessions, and scholarship opportunities for students interested in cultural studies.',
-        nextStep: { text: 'Get in touch', link: '/contact' }
+        answer: 'Yes! We offer cultural education programs for schools and universities, including workshops, mentorship sessions, and scholarship opportunities for students interested in cultural studies.'
       },
       {
         question: 'Can schools partner with you?',
-        answer: 'Absolutely. We actively collaborate with educational institutions to promote cultural education among youth. We offer tailored school programs, workshops, and cultural exchange opportunities.',
-        nextStep: { text: 'Reach out for school partnerships', link: '/contact' }
+        answer: 'Absolutely. We actively collaborate with educational institutions to promote cultural education among youth. We offer tailored school programs, workshops, and cultural exchange opportunities.'
       },
       {
         question: 'How do I nominate someone?',
-        answer: 'You can nominate potential contestants, volunteers, or community leaders through our contact form. Select "General Inquiry" and include the nominee\'s name, background, and why they would be a great fit.',
-        nextStep: { text: 'Submit a nomination', link: '/contact' }
+        answer: 'You can nominate potential contestants, volunteers, or community leaders through our contact form. Select "General Inquiry" and include the nominee\'s name, background, and why they would be a great fit.'
       }
     ]
   },
@@ -104,23 +91,19 @@ const faqCategories = [
     faqs: [
       {
         question: 'How do I become a sponsor?',
-        answer: 'We offer three partnership tiers: Event Sponsorship (KES 50K-500K), Program Support (KES 500K-2M annually), and Global Outreach Partnership (KES 2M+). Each tier offers different levels of visibility, impact, and engagement.',
-        nextStep: { text: 'Explore partnership tiers', link: '/partnership' }
+        answer: 'We offer three partnership tiers: Event Sponsorship (KES 50K-500K), Program Support (KES 500K-2M annually), and Global Outreach Partnership (KES 2M+). Each tier offers different levels of visibility, impact, and engagement.'
       },
       {
         question: 'Are donations tax-deductible?',
-        answer: 'Yes. We\'re registered as a nonprofit organization in Kenya, so contributions are tax-deductible under Kenyan law. Contact us for an official receipt for your tax records.',
-        nextStep: { text: 'Make a donation', link: '/contribute' }
+        answer: 'Yes. We\'re registered as a nonprofit organization in Kenya, so contributions are tax-deductible under Kenyan law. Contact us for an official receipt for your tax records.'
       },
       {
         question: 'Can individuals donate?',
-        answer: 'Absolutely. Individual donations of any amount are welcome. You can contribute via M-Pesa (for local donors) or Visa/Mastercard (for international donors). Suggested amounts start at KES 500.',
-        nextStep: { text: 'Contribute now', link: '/contribute' }
+        answer: 'Absolutely. Individual donations of any amount are welcome. You can contribute via M-Pesa (for local donors) or Visa/Mastercard (for international donors). Suggested amounts start at KES 500.'
       },
       {
         question: 'What are the partnership requirements?',
-        answer: 'We partner with organizations that share our values of cultural preservation, youth empowerment, and community development. No specific requirements beyond alignment with our mission and a commitment to making a positive impact.',
-        nextStep: { text: 'Start a conversation', link: '/contact' }
+        answer: 'We partner with organizations that share our values of cultural preservation, youth empowerment, and community development. No specific requirements beyond alignment with our mission and a commitment to making a positive impact.'
       }
     ]
   }
@@ -234,17 +217,7 @@ const FAQPage = () => {
                               className="overflow-hidden"
                             >
                               <div className="pb-6 pt-2 text-gray-600 leading-relaxed border-t border-dashed border-gray-100">
-                                <p className="mb-4">{faq.answer}</p>
-                                {faq.nextStep && (
-                                  <Link
-                                    href={faq.nextStep.link}
-                                    target={faq.nextStep.link.startsWith('http') ? '_blank' : undefined}
-                                    rel={faq.nextStep.link.startsWith('http') ? 'noopener noreferrer' : undefined}
-                                    className="inline-flex items-center gap-1.5 text-green-600 font-semibold text-sm hover:gap-2.5 transition-all duration-200"
-                                  >
-                                    {faq.nextStep.text} <ArrowRight className="w-4 h-4" />
-                                  </Link>
-                                )}
+                                <p>{faq.answer}</p>
                               </div>
                             </motion.div>
                           )}

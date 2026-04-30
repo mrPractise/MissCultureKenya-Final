@@ -150,6 +150,37 @@ class SiteSettingsSerializer(serializers.ModelSerializer):
     about_leader_1_image_url = serializers.SerializerMethodField()
     about_leader_2_image_url = serializers.SerializerMethodField()
     about_leader_3_image_url = serializers.SerializerMethodField()
+
+    # Leader labels
+    leader_1_name = serializers.CharField(allow_blank=True, required=False)
+    leader_1_title = serializers.CharField(allow_blank=True, required=False)
+    leader_1_bio = serializers.CharField(allow_blank=True, required=False)
+    leader_2_name = serializers.CharField(allow_blank=True, required=False)
+    leader_2_title = serializers.CharField(allow_blank=True, required=False)
+    leader_2_bio = serializers.CharField(allow_blank=True, required=False)
+    leader_3_name = serializers.CharField(allow_blank=True, required=False)
+    leader_3_title = serializers.CharField(allow_blank=True, required=False)
+    leader_3_bio = serializers.CharField(allow_blank=True, required=False)
+
+    # Committee labels
+    committee_1_name = serializers.CharField(allow_blank=True, required=False)
+    committee_1_role = serializers.CharField(allow_blank=True, required=False)
+    committee_1_bio = serializers.CharField(allow_blank=True, required=False)
+    committee_2_name = serializers.CharField(allow_blank=True, required=False)
+    committee_2_role = serializers.CharField(allow_blank=True, required=False)
+    committee_2_bio = serializers.CharField(allow_blank=True, required=False)
+    committee_3_name = serializers.CharField(allow_blank=True, required=False)
+    committee_3_role = serializers.CharField(allow_blank=True, required=False)
+    committee_3_bio = serializers.CharField(allow_blank=True, required=False)
+    committee_4_name = serializers.CharField(allow_blank=True, required=False)
+    committee_4_role = serializers.CharField(allow_blank=True, required=False)
+    committee_4_bio = serializers.CharField(allow_blank=True, required=False)
+    committee_5_name = serializers.CharField(allow_blank=True, required=False)
+    committee_5_role = serializers.CharField(allow_blank=True, required=False)
+    committee_5_bio = serializers.CharField(allow_blank=True, required=False)
+    committee_6_name = serializers.CharField(allow_blank=True, required=False)
+    committee_6_role = serializers.CharField(allow_blank=True, required=False)
+    committee_6_bio = serializers.CharField(allow_blank=True, required=False)
     
     privacy_hero_image_url = serializers.SerializerMethodField()
 
@@ -216,6 +247,15 @@ class SiteSettingsSerializer(serializers.ModelSerializer):
             'contact_hero_image_url', 'faq_hero_image_url',
             'about_hero_image_url', 'about_mission_image_url',
             'about_leader_1_image_url', 'about_leader_2_image_url', 'about_leader_3_image_url',
+            'leader_1_name', 'leader_1_title', 'leader_1_bio',
+            'leader_2_name', 'leader_2_title', 'leader_2_bio',
+            'leader_3_name', 'leader_3_title', 'leader_3_bio',
+            'committee_1_name', 'committee_1_role', 'committee_1_bio',
+            'committee_2_name', 'committee_2_role', 'committee_2_bio',
+            'committee_3_name', 'committee_3_role', 'committee_3_bio',
+            'committee_4_name', 'committee_4_role', 'committee_4_bio',
+            'committee_5_name', 'committee_5_role', 'committee_5_bio',
+            'committee_6_name', 'committee_6_role', 'committee_6_bio',
             'privacy_hero_image_url',
         ]
 

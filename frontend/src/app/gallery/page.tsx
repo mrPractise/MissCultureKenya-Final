@@ -14,7 +14,6 @@ const galleryCategories = [
     id: 'pageant-nights',
     title: 'Pageant Nights',
     description: 'Stage moments, crowning ceremonies, talent performances — the glamour and purpose combined.',
-    signal: 'This is a real, prestigious event',
     color: 'bg-red-600',
     lightColor: 'bg-red-50',
     textColor: 'text-red-600'
@@ -23,7 +22,6 @@ const galleryCategories = [
     id: 'cultural-events',
     title: 'Cultural Events',
     description: 'Traditional showcases, heritage festivals, artisan exhibitions — culture in its authentic form.',
-    signal: 'This is about real heritage',
     color: 'bg-green-600',
     lightColor: 'bg-green-50',
     textColor: 'text-green-600'
@@ -32,7 +30,6 @@ const galleryCategories = [
     id: 'behind-the-scenes',
     title: 'Behind the Scenes',
     description: 'Rehearsals, fittings, prep work, candid moments — humanizes the ambassadors and team.',
-    signal: 'Real people, real effort',
     color: 'bg-purple-600',
     lightColor: 'bg-purple-50',
     textColor: 'text-purple-600'
@@ -41,7 +38,6 @@ const galleryCategories = [
     id: 'community-work',
     title: 'Community Work',
     description: 'Outreach programs, youth mentorship, artisan support — the impact beyond the stage.',
-    signal: 'This creates real change',
     color: 'bg-yellow-600',
     lightColor: 'bg-yellow-50',
     textColor: 'text-yellow-600'
@@ -50,7 +46,6 @@ const galleryCategories = [
     id: 'global-diplomacy',
     title: 'Global Diplomacy',
     description: 'International conferences, cross-border events, diplomatic forums — Kenya on the world stage.',
-    signal: 'This has global reach',
     color: 'bg-blue-600',
     lightColor: 'bg-blue-50',
     textColor: 'text-blue-600'
@@ -59,7 +54,6 @@ const galleryCategories = [
     id: 'awards-recognition',
     title: 'Awards & Recognition',
     description: 'Trophies, certificates, media features, partner acknowledgements — external validation.',
-    signal: 'This is credible & recognized',
     color: 'bg-emerald-600',
     lightColor: 'bg-emerald-50',
     textColor: 'text-emerald-600'
@@ -142,69 +136,6 @@ const GalleryPage = () => {
   const displayPhotos = photos.length > 0 ? photos.map(transformPhoto) : []
   const displayVideos = videos.length > 0 ? videos.map(transformVideo) : []
 
-  const defaultPhotos = [
-    {
-      id: 1, title: 'Crowning Ceremony — Miss Culture Global Kenya 2024', category: 'Pageant Nights',
-      image: '', photographer: 'Official Photographer', date: '2024-06-15', location: 'KICC, Nairobi',
-      caption: '800 guests, 12 designers, one unforgettable night celebrating Kenya\'s textile traditions', likes: 312, featured: true
-    },
-    {
-      id: 2, title: 'Heritage Gala — Traditional Attire Showcase', category: 'Cultural Events',
-      image: '', photographer: 'Cultural Media Team', date: '2024-03-20', location: 'National Museum, Nairobi',
-      caption: 'Over 200 guests witnessed 15 communities showcase their heritage through fashion', likes: 245, featured: true
-    },
-    {
-      id: 3, title: 'Rehearsal Moments — Behind the Glamour', category: 'Behind the Scenes',
-      image: '', photographer: 'Studio Team', date: '2024-06-14', location: 'KICC Backstage',
-      caption: '48 hours of preparation condensed into moments of focus, laughter, and determination', likes: 156, featured: false
-    },
-    {
-      id: 4, title: 'Youth Mentorship Workshop — Nyeri County', category: 'Community Work',
-      image: '', photographer: 'Outreach Team', date: '2024-02-10', location: 'Nyeri, Kenya',
-      caption: '45 young leaders trained in cultural preservation and community advocacy', likes: 203, featured: false
-    },
-    {
-      id: 5, title: 'Kenya at the Global Cultural Forum — Dubai', category: 'Global Diplomacy',
-      image: '', photographer: 'Press Corps', date: '2024-01-25', location: 'Dubai, UAE',
-      caption: 'Representing Kenya among 50+ nations at the international cultural diplomacy summit', likes: 278, featured: true
-    },
-    {
-      id: 6, title: 'Excellence in Cultural Preservation Award', category: 'Awards & Recognition',
-      image: '', photographer: 'Events Team', date: '2023-12-10', location: 'Nairobi, Kenya',
-      caption: 'Recognized by the Ministry of Culture for outstanding contribution to heritage preservation', likes: 334, featured: true
-    },
-    {
-      id: 7, title: 'Traditional Dance Finals — Cultural Competition', category: 'Cultural Events',
-      image: '', photographer: 'Performance Media', date: '2024-04-08', location: 'Alliance Française, Nairobi',
-      caption: '8 dance troupes from across Kenya competed in a celebration of movement and rhythm', likes: 189, featured: false
-    },
-    {
-      id: 8, title: 'Ambassador Fitting — Designer Collaboration', category: 'Behind the Scenes',
-      image: '', photographer: 'Fashion Desk', date: '2024-06-12', location: 'Nairobi Fashion Hub',
-      caption: '3 Kenyan designers, 6 outfits, and a vision to showcase modern heritage on stage', likes: 167, featured: false
-    },
-    {
-      id: 9, title: 'Artisan Market — Community Economic Empowerment', category: 'Community Work',
-      image: '', photographer: 'Field Team', date: '2024-01-18', location: 'Mombasa, Kenya',
-      caption: '30 artisans showcased handcrafted goods, generating KES 2.5M in direct sales', likes: 145, featured: false
-    },
-    {
-      id: 10, title: 'Talent Performance Night — Solo Showcase', category: 'Pageant Nights',
-      image: '', photographer: 'Stage Media', date: '2024-06-14', location: 'KICC, Nairobi',
-      caption: 'Contestants performed original pieces blending traditional and contemporary art forms', likes: 221, featured: false
-    },
-    {
-      id: 11, title: 'Cross-Border Cultural Exchange — Tanzania', category: 'Global Diplomacy',
-      image: '', photographer: 'Diplomatic Corps', date: '2023-11-05', location: 'Dar es Salaam, Tanzania',
-      caption: 'Strengthening East African cultural ties through shared heritage and collaboration', likes: 198, featured: false
-    },
-    {
-      id: 12, title: 'Media Feature — National Television Spotlight', category: 'Awards & Recognition',
-      image: '', photographer: 'Media Relations', date: '2024-05-20', location: 'Nairobi, Kenya',
-      caption: 'Featured on KTN News for transforming cultural pageantry into community empowerment', likes: 256, featured: false
-    }
-  ]
-
   const handlePhotoClick = (index: number) => {
     setSelectedPhotoIndex(index)
     setIsPhotoModalOpen(true)
@@ -215,24 +146,8 @@ const GalleryPage = () => {
     setIsVideoModalOpen(true)
   }
 
-  const finalPhotos = displayPhotos.length > 0 ? displayPhotos : defaultPhotos
-  const finalVideos = displayVideos.length > 0 ? displayVideos : [
-    {
-      id: 1, title: 'Watch the Crowning Moment (3:14)', category: 'Pageant Nights',
-      thumbnail: '', videoUrl: '', duration: '3:14', views: '12.5K',
-      date: '2024-06-15', description: 'The emotional crowning ceremony of Miss Culture Global Kenya 2024.', caption: 'Watch the Crowning Moment (3:14)'
-    },
-    {
-      id: 2, title: '2024 Cultural Walk Highlight Reel (5:22)', category: 'Cultural Events',
-      thumbnail: '', videoUrl: '', duration: '5:22', views: '8.3K',
-      date: '2024-03-20', description: 'A vibrant recap of our annual cultural heritage walk through Nairobi.', caption: '2024 Cultural Walk Highlight Reel (5:22)'
-    },
-    {
-      id: 3, title: 'Susan\'s Acceptance Speech (4:08)', category: 'Behind the Scenes',
-      thumbnail: '', videoUrl: '', duration: '4:08', views: '15.2K',
-      date: '2024-06-15', description: 'A powerful speech on cultural preservation and youth empowerment.', caption: 'Susan\'s Acceptance Speech (4:08)'
-    }
-  ]
+  const finalPhotos = displayPhotos
+  const finalVideos = displayVideos
 
   const filteredPhotos = selectedCategory === 'All'
     ? finalPhotos
@@ -285,11 +200,6 @@ const GalleryPage = () => {
             <p className="text-lg sm:text-xl md:text-2xl text-gray-100 max-w-3xl mx-auto px-4 drop-shadow-lg font-light leading-relaxed">
               From pageant stages to community workshops, diplomatic forums to cultural celebrations — this is where words become images.
             </p>
-            <div className="mt-8 flex flex-wrap justify-center gap-3 text-sm text-gray-300">
-              <span className="bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full border border-white/10">What does this organisation actually do?</span>
-              <span className="bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full border border-white/10">Can I see proof?</span>
-              <span className="bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full border border-white/10">What does a live event look like?</span>
-            </div>
           </motion.div>
         </div>
       </section>
@@ -328,10 +238,7 @@ const GalleryPage = () => {
                   <Camera className={`w-5 h-5 ${selectedCategory === cat.title ? 'text-white' : cat.textColor}`} />
                 </div>
                 <h3 className="text-lg font-bold mb-2">{cat.title}</h3>
-                <p className={`text-sm leading-relaxed mb-3 ${selectedCategory === cat.title ? 'text-white/80' : 'text-gray-600'}`}>{cat.description}</p>
-                <div className={`text-xs font-semibold uppercase tracking-wide ${selectedCategory === cat.title ? 'text-white/60' : 'text-gray-400'}`}>
-                  Shows: &ldquo;{cat.signal}&rdquo;
-                </div>
+                <p className={`text-sm leading-relaxed ${selectedCategory === cat.title ? 'text-white/80' : 'text-gray-600'}`}>{cat.description}</p>
               </motion.button>
             ))}
           </div>
@@ -345,6 +252,21 @@ const GalleryPage = () => {
         <div className="absolute bottom-20 right-10 w-96 h-96 bg-green-500/5 rounded-full blur-3xl" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          {/* Empty Gallery State */}
+          {!loading && finalPhotos.length === 0 && finalVideos.length === 0 ? (
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+              className="text-center py-20"
+            >
+              <Camera className="w-20 h-20 text-gray-300 mx-auto mb-6" />
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">Gallery Coming Soon</h3>
+              <p className="text-gray-600 max-w-lg mx-auto leading-relaxed">Photos and videos from our events, community work, and cultural celebrations will appear here once uploaded. Check back soon!</p>
+            </motion.div>
+          ) : (
+          <>
           {/* Category Filter Pills */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -401,7 +323,7 @@ const GalleryPage = () => {
               </div>
             ) : filteredPhotos.length === 0 ? (
               <div className="text-center py-12">
-                <p className="text-gray-600">No photos available in this category. Add photos in Django admin.</p>
+                <p className="text-gray-600">No photos in this category yet.</p>
               </div>
             ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -503,7 +425,7 @@ const GalleryPage = () => {
             </h2>
             {filteredVideos.length === 0 ? (
               <div className="text-center py-12">
-                <p className="text-gray-600">No videos available in this category. Add videos in Django admin.</p>
+                <p className="text-gray-600">No videos in this category yet.</p>
               </div>
             ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -559,6 +481,8 @@ const GalleryPage = () => {
             )}
           </motion.div>
 
+          </>
+          )}
         </div>
       </section>
 
