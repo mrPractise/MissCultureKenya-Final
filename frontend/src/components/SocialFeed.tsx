@@ -17,7 +17,7 @@ const SocialFeed = () => {
         if (postsData.length > 0) {
           setSocialPosts(postsData.slice(0, 4).map((post: any) => ({
             id: post.id,
-            platform: post.platform === 'instagram' ? 'Instagram' : post.platform === 'facebook' ? 'Facebook' : post.platform === 'twitter' ? 'Twitter' : post.platform === 'tiktok' ? 'TikTok' : post.platform,
+            platform: post.platform === 'instagram' ? 'Instagram' : post.platform === 'facebook' ? 'Facebook' : post.platform === 'twitter' ? 'X' : post.platform === 'tiktok' ? 'TikTok' : post.platform,
             content: post.content,
             image: post.image_url || '',
             videoUrl: post.video_url || '',
@@ -134,7 +134,7 @@ const SocialFeed = () => {
           className="text-center mt-12"
         >
           <motion.a
-            href="https://instagram.com/misscultureglobalkenya"
+            href="https://www.instagram.com/misscultureglobalkenya?igsh=MmpjY3Z5ODZ5NThx"
             target="_blank"
             rel="noopener noreferrer"
             whileHover={{ scale: 1.05, boxShadow: "0 20px 60px rgba(168, 85, 247, 0.4)" }}

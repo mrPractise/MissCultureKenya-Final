@@ -146,6 +146,49 @@ const GalleryPage = () => {
     setIsVideoModalOpen(true)
   }
 
+  const [photoLikes, setPhotoLikes] = useState<{[id: number]: { liked: boolean; count: number }}>({})
+
+  const togglePhotoLike = (e: React.MouseEvent, photoId: number, currentLikes: number) => {
+    e.stopPropagation()
+    const current = photoLikes[photoId]
+    if (current?.liked) {
+      setPhotoLikes(prev => ({ ...prev, [photoId]: { liked: false, count: currentLikes } }))
+    } else {
+      setPhotoLikes(prev => ({ ...prev, [photoId]: { liked: true, count: currentLikes + 1 } }))
+    }
+  }
+
+  const handlePhotoShare = async (e: React.MouseEvent, photo: any) => {
+    e.stopPropagation()
+    const photoUrl = photo.image || window.location.href
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: photo.title, url: photoUrl })
+      } else {
+        await navigator.clipboard.writeText(photoUrl)
+        alert('Link copied!')
+      }
+    } catch {}
+  }
+
+  const handlePhotoDownload = async (e: React.MouseEvent, photo: any) => {
+    e.stopPropagation()
+    try {
+      const response = await fetch(photo.image)
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `${photo.title || 'photo'}.jpg`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      window.URL.revokeObjectURL(url)
+    } catch {
+      window.open(photo.image, '_blank')
+    }
+  }
+
   const finalPhotos = displayPhotos
   const finalVideos = displayVideos
 
@@ -365,13 +408,13 @@ const GalleryPage = () => {
                   {/* Hover Actions */}
                   <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <div className="flex space-x-4 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-150">
-                      <button className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center hover:bg-white/40 transition-colors duration-200 border border-white/20">
-                        <Heart className="w-6 h-6 text-white" />
+                      <button onClick={(e) => togglePhotoLike(e, photo.id, photo.likes)} className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors duration-200 border ${photoLikes[photo.id]?.liked ? 'bg-red-500/30 border-red-500/40' : 'bg-white/20 border-white/20 hover:bg-white/40'}`}>
+                        <Heart className={`w-6 h-6 text-white ${photoLikes[photo.id]?.liked ? 'fill-current' : ''}`} />
                       </button>
-                      <button className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center hover:bg-white/40 transition-colors duration-200 border border-white/20">
+                      <button onClick={(e) => handlePhotoShare(e, photo)} className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center hover:bg-white/40 transition-colors duration-200 border border-white/20">
                         <Share2 className="w-6 h-6 text-white" />
                       </button>
-                      <button className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center hover:bg-white/40 transition-colors duration-200 border border-white/20">
+                      <button onClick={(e) => handlePhotoDownload(e, photo)} className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center hover:bg-white/40 transition-colors duration-200 border border-white/20">
                         <Download className="w-6 h-6 text-white" />
                       </button>
                     </div>
@@ -399,8 +442,8 @@ const GalleryPage = () => {
                         )}
                       </div>
                       <div className="flex items-center space-x-1.5 bg-black/30 px-2 py-1 rounded-full backdrop-blur-sm">
-                        <Heart className="w-3.5 h-3.5 text-red-400 fill-red-400" />
-                        <span className="font-medium">{photo.likes}</span>
+                        <Heart className={`w-3.5 h-3.5 ${photoLikes[photo.id]?.liked ? 'text-red-400 fill-red-400' : 'text-red-400 fill-red-400'}`} />
+                        <span className="font-medium">{photoLikes[photo.id]?.count ?? photo.likes}</span>
                       </div>
                     </div>
                   </div>
@@ -519,7 +562,10 @@ const GalleryPage = () => {
       <PhotoLightboxModal
         isOpen={isPhotoModalOpen}
         onClose={() => setIsPhotoModalOpen(false)}
-        photos={filteredPhotos}
+        photos={filteredPhotos.map(p => ({
+          ...p,
+          likes: photoLikes[p.id]?.count ?? p.likes,
+        }))}
         currentIndex={selectedPhotoIndex}
         onNavigate={setSelectedPhotoIndex}
       />

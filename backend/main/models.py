@@ -76,6 +76,8 @@ class CulturalHeritage(models.Model):
     description = models.TextField()
     image = cloudinary.models.CloudinaryField('image', folder='missculture/heritage', blank=True, null=True)
     audio_clip = cloudinary.models.CloudinaryField('audio_clip', folder='missculture/audio', resource_type='video', blank=True, null=True)
+    video_clip = cloudinary.models.CloudinaryField('video_clip', folder='missculture/heritage-video', resource_type='video', blank=True, null=True)
+    video_url = models.URLField('video_url', blank=True, help_text="External video link (YouTube, etc.) — overrides uploaded video clip")
     featured = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     gallery = GenericRelation(KenyaGalleryPhoto)
@@ -154,6 +156,32 @@ class Partner(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class TeamMember(models.Model):
+    """Model for leadership team members displayed on the About page"""
+    TEAM_TYPE = [
+        ('leadership', 'Leadership'),
+        ('committee', 'Organizing Committee'),
+    ]
+    name = models.CharField(max_length=100)
+    title = models.CharField(max_length=200, blank=True, help_text="Role or title (e.g. Miss Culture Global Kenya, Director of Operations)")
+    role = models.CharField(max_length=200, blank=True, help_text="Committee role (only for committee members)")
+    bio = models.TextField(blank=True)
+    image = cloudinary.models.CloudinaryField('image', folder='missculture/team', blank=True, null=True)
+    team_type = models.CharField(max_length=20, choices=TEAM_TYPE, default='leadership')
+    order = models.PositiveIntegerField(default=0, help_text="Display order (lower = shown first)")
+    featured = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "About - Team Member"
+        verbose_name_plural = "About - Team Members"
+        ordering = ['order', 'name']
+
+    def __str__(self):
+        return f"{self.name} ({self.get_team_type_display()})"
 
 
 class SiteSettings(models.Model):
@@ -271,7 +299,7 @@ class SocialMediaPost(models.Model):
     platform = models.CharField(max_length=50, choices=[
         ('instagram', 'Instagram'),
         ('facebook', 'Facebook'),
-        ('twitter', 'Twitter'),
+        ('x', 'X'),
         ('tiktok', 'TikTok'),
     ])
     post_id = models.CharField(max_length=100)

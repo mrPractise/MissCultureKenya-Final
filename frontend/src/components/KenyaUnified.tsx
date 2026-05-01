@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 import {
   MapPin, Users, Landmark, Music, Palette, ChevronDown,
   Volume2, Camera, BookOpen, Sparkles, ArrowRight, Heart,
-  Globe, Calendar, ChevronRight
+  Globe, Calendar, ChevronRight, Play, Headphones
 } from 'lucide-react'
 import Link from 'next/link'
 import apiClient from '@/lib/api'
@@ -44,6 +44,8 @@ type Heritage = {
   description: string
   image?: string | null
   image_url?: string | null
+  audio_clip_url?: string | null
+  video_clip_url?: string | null
   gallery_photos?: GalleryPhoto[]
 }
 
@@ -68,6 +70,17 @@ type DiscoverPayload = {
 /* ── helpers ── */
 const getImage = (item: { image?: string | null; image_url?: string | null }) =>
   item.image_url || item.image || ''
+
+const getYouTubeEmbedUrl = (url: string): string | null => {
+  if (!url) return null
+  const watchMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/)
+  if (watchMatch) return `https://www.youtube.com/embed/${watchMatch[1]}?autoplay=0&rel=0`
+  const embedMatch = url.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/)
+  if (embedMatch) return `https://www.youtube.com/embed/${embedMatch[1]}?autoplay=0&rel=0`
+  const shortsMatch = url.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/)
+  if (shortsMatch) return `https://www.youtube.com/embed/${shortsMatch[1]}?autoplay=0&rel=0`
+  return null
+}
 
 const getGalleryImages = (item: { gallery_photos?: GalleryPhoto[] }) =>
   (item.gallery_photos || []).filter(p => p.image_url).map(p => p.image_url!)
@@ -477,7 +490,7 @@ const KenyaUnified = () => {
               From Soil to Stage
             </h2>
             <p className="text-green-100 max-w-2xl mx-auto mt-4">
-              How does a nation&apos;s heritage become a global platform for change? Here is the arc.
+              How Kenya&apos;s heritage becomes a global platform for change — the arc from soil to stage.
             </p>
           </motion.div>
 
@@ -555,6 +568,7 @@ const KenyaUnified = () => {
               heritage.map((item, idx) => {
               const img = getImage(item)
               const gallery = getGalleryImages(item)
+              const ytEmbed = getYouTubeEmbedUrl(item.video_clip_url || '')
               return (
                 <motion.div
                   key={item.id}
@@ -562,7 +576,28 @@ const KenyaUnified = () => {
                   transition={{ duration: 0.4, delay: idx * 0.06 }}
                   className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden group hover:shadow-md transition-shadow duration-300"
                 >
-                  {img ? (
+                  {/* Video or Image */}
+                  {item.video_clip_url && ytEmbed ? (
+                    <div className="aspect-video w-full">
+                      <iframe
+                        src={ytEmbed}
+                        title={item.title}
+                        className="w-full h-full"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    </div>
+                  ) : item.video_clip_url && !ytEmbed ? (
+                    <div className="aspect-video w-full bg-black">
+                      <video
+                        src={item.video_clip_url}
+                        title={item.title}
+                        className="w-full h-full"
+                        controls
+                        poster={img || undefined}
+                      />
+                    </div>
+                  ) : img ? (
                     <div className="h-48 overflow-hidden">
                       <img src={img} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                     </div>
@@ -572,9 +607,22 @@ const KenyaUnified = () => {
                     </div>
                   )}
                   <div className="p-5">
-                    <p className="text-xs uppercase tracking-wide text-yellow-600 font-semibold">{item.heritage_type}</p>
-                    <h4 className="mt-1 font-bold text-gray-900 text-lg">{item.title}</h4>
+                    <div className="flex items-center gap-2 mb-1">
+                      <p className="text-xs uppercase tracking-wide text-yellow-600 font-semibold">{item.heritage_type}</p>
+                      {item.video_clip_url && <Play className="w-3 h-3 text-red-500" />}
+                      {item.audio_clip_url && <Headphones className="w-3 h-3 text-blue-500" />}
+                    </div>
+                    <h4 className="font-bold text-gray-900 text-lg">{item.title}</h4>
                     <p className="mt-2 text-sm text-gray-600 leading-relaxed">{item.description}</p>
+                    {/* Audio player */}
+                    {item.audio_clip_url && (
+                      <div className="mt-3 flex items-center gap-2 bg-blue-50 rounded-lg p-2">
+                        <Volume2 className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                        <audio controls className="w-full h-8" preload="none">
+                          <source src={item.audio_clip_url} />
+                        </audio>
+                      </div>
+                    )}
                   </div>
                   {gallery.length > 0 && (
                     <div className="px-5 pb-5">

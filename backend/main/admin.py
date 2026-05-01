@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.contenttypes.admin import GenericTabularInline
 from .models import (
     Ambassador, CulturalCommunity, CulturalHeritage, KenyaRegion,
-    Achievement, Partner, SocialMediaPost, KenyaGalleryPhoto, SiteSettings
+    Achievement, Partner, SocialMediaPost, KenyaGalleryPhoto, SiteSettings, TeamMember
 )
 
 
@@ -141,3 +141,12 @@ class SiteSettingsAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):
         return not SiteSettings.objects.exists()
+
+
+@admin.register(TeamMember)
+class TeamMemberAdmin(admin.ModelAdmin):
+    list_display = ['name', 'team_type', 'title', 'role', 'order', 'featured']
+    list_filter = ['team_type', 'featured']
+    list_editable = ['order', 'featured']
+    search_fields = ['name', 'title', 'role', 'bio']
+    ordering = ['team_type', 'order', 'name']

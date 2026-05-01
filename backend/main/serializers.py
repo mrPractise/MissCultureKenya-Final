@@ -2,7 +2,7 @@ from rest_framework import serializers
 import cloudinary
 from .models import (
     Ambassador, CulturalCommunity, CulturalHeritage, KenyaRegion,
-    Achievement, Partner, SocialMediaPost, KenyaGalleryPhoto, SiteSettings
+    Achievement, Partner, SocialMediaPost, KenyaGalleryPhoto, SiteSettings, TeamMember
 )
 
 
@@ -53,6 +53,7 @@ class CulturalCommunitySerializer(serializers.ModelSerializer):
 class CulturalHeritageSerializer(serializers.ModelSerializer):
     image_url = serializers.SerializerMethodField()
     audio_clip_url = serializers.SerializerMethodField()
+    video_clip_url = serializers.SerializerMethodField()
     gallery_photos = KenyaGalleryPhotoSerializer(many=True, read_only=True, source='gallery')
 
     def get_image_url(self, obj):
@@ -60,6 +61,11 @@ class CulturalHeritageSerializer(serializers.ModelSerializer):
 
     def get_audio_clip_url(self, obj):
         return _cloudinary_url(obj.audio_clip, resource_type='video')
+
+    def get_video_clip_url(self, obj):
+        if obj.video_url:
+            return obj.video_url
+        return _cloudinary_url(obj.video_clip, resource_type='video')
 
     class Meta:
         model = CulturalHeritage
@@ -98,6 +104,17 @@ class PartnerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Partner
+        fields = '__all__'
+
+
+class TeamMemberSerializer(serializers.ModelSerializer):
+    image_url = serializers.SerializerMethodField()
+
+    def get_image_url(self, obj):
+        return _cloudinary_url(obj.image)
+
+    class Meta:
+        model = TeamMember
         fields = '__all__'
 
 

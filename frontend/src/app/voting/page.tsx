@@ -175,7 +175,7 @@ const VotingPage = () => {
                 View Upcoming Events
               </Link>
               <a
-                href="https://instagram.com/misscultureglobalkenya"
+                href="https://www.instagram.com/misscultureglobalkenya?igsh=MmpjY3Z5ODZ5NThx"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-3 rounded-full font-semibold text-sm transition-colors"

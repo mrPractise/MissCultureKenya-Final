@@ -50,9 +50,16 @@ class PhotoSerializer(serializers.ModelSerializer):
 
 class VideoSerializer(serializers.ModelSerializer):
     video_url = serializers.SerializerMethodField()
+    video_file_url = serializers.SerializerMethodField()
     thumbnail_url = serializers.SerializerMethodField()
 
     def get_video_url(self, obj):
+        # Prioritize external URL (YouTube etc.) over uploaded file
+        if obj.video_url:
+            return obj.video_url
+        return _cloudinary_url(obj.video_file, resource_type='video')
+
+    def get_video_file_url(self, obj):
         return _cloudinary_url(obj.video_file, resource_type='video')
 
     def get_thumbnail_url(self, obj):

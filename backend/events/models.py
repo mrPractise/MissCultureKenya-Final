@@ -213,3 +213,25 @@ class EventSettings(models.Model):
         if not self.pk and EventSettings.objects.exists():
             return
         super().save(*args, **kwargs)
+
+
+class TicketCategory(models.Model):
+    """Model for flexible ticket categories per event (e.g. VIP, Couple, At the Gate)"""
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='ticket_categories')
+    name = models.CharField(max_length=100, help_text="E.g. VIP, Single, Couple, At the Gate, Early Bird")
+    price = models.DecimalField(max_digits=10, decimal_places=2, help_text="Price in KES. Use 0 for free tickets.")
+    description = models.CharField(max_length=200, blank=True, help_text="Brief description of what this ticket includes")
+    available = models.PositiveIntegerField(default=0, help_text="Number of tickets currently available")
+    total = models.PositiveIntegerField(default=0, help_text="Total tickets in this category")
+    is_active = models.BooleanField(default=True)
+    order = models.PositiveIntegerField(default=0, help_text="Display order (lower = shown first)")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Events - Ticket Category"
+        verbose_name_plural = "Events - Ticket Categories"
+        ordering = ['order', 'price']
+
+    def __str__(self):
+        return f"{self.event.title} – {self.name}"

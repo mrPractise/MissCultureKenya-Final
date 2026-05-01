@@ -10,13 +10,13 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from .models import (
     Ambassador, CulturalCommunity, CulturalHeritage, KenyaRegion,
-    Achievement, Partner, SocialMediaPost, SiteSettings
+    Achievement, Partner, SocialMediaPost, SiteSettings, TeamMember
 )
 from .serializers import (
     AmbassadorSerializer, CulturalCommunitySerializer, CulturalHeritageSerializer,
     KenyaRegionSerializer, AchievementSerializer,
     PartnerSerializer, SocialMediaPostSerializer, DiscoverKenyaSerializer,
-    SiteSettingsSerializer
+    SiteSettingsSerializer, TeamMemberSerializer
 )
 
 
@@ -78,6 +78,15 @@ class SocialMediaPostViewSet(viewsets.ReadOnlyModelViewSet):
     search_fields = ['content']
     ordering_fields = ['created_at', 'imported_at']
     ordering = ['-created_at']
+
+
+class TeamMemberViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = TeamMember.objects.all()
+    serializer_class = TeamMemberSerializer
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields = ['team_type', 'featured']
+    ordering_fields = ['order', 'name']
+    ordering = ['order', 'name']
 
 
 class SiteSettingsAPIView(APIView):

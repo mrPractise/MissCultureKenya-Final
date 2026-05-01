@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { Mail, Phone, MapPin, Send, X } from 'lucide-react'
 import { useState } from 'react'
 import apiClient from '@/lib/api'
+import type { ApiError } from '@/lib/api'
 
 interface ContactModalProps {
   isOpen: boolean
@@ -26,11 +27,13 @@ const ContactModal = ({ isOpen, onClose, type = 'general' }: ContactModalProps) 
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle')
+  const [errorMessage, setErrorMessage] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
     setSubmitStatus('idle')
+    setErrorMessage('')
 
     try {
       await apiClient.sendContactMessage({
@@ -59,8 +62,16 @@ const ContactModal = ({ isOpen, onClose, type = 'general' }: ContactModalProps) 
         onClose()
         setSubmitStatus('idle')
       }, 1500)
-    } catch (err) {
+    } catch (err: any) {
       setSubmitStatus('error')
+      const apiErr = err as ApiError
+      if (apiErr?.message) {
+        setErrorMessage(apiErr.message)
+      } else if (err?.message) {
+        setErrorMessage(err.message)
+      } else {
+        setErrorMessage('Failed to send message. Please try again or email us directly at info@misscultureglobalkenya.com')
+      }
     } finally {
       setIsSubmitting(false)
     }
@@ -322,9 +333,11 @@ const ContactModal = ({ isOpen, onClose, type = 'general' }: ContactModalProps) 
               </button>
             </div>
             {submitStatus === 'error' && (
-              <p className="text-red-600 text-sm text-right mt-2">
-                Failed to send message. Please try again or email us directly at info@misscultureglobalkenya.com
-              </p>
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4 mt-2">
+                <p className="text-red-700 font-medium text-sm">Failed to send message</p>
+                {errorMessage && <p className="text-red-600 text-sm mt-1">{errorMessage}</p>}
+                <p className="text-red-600 text-xs mt-1">If the problem persists, email us directly at info@misscultureglobalkenya.com</p>
+              </div>
             )}
           </form>
         </div>

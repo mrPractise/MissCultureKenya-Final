@@ -338,7 +338,7 @@ const EventsPage = () => {
             <span className="inline-flex items-center gap-2 text-green-700 font-semibold tracking-wider uppercase text-sm mb-3">
               <Quote className="w-4 h-4" /> What Past Attendees Say
             </span>
-            <h3 className="text-2xl sm:text-3xl font-bold text-gray-900">Is It Worth Attending?</h3>
+            <h3 className="text-2xl sm:text-3xl font-bold text-gray-900">What Past Attendees Say</h3>
           </motion.div>
 
           <div className="grid md:grid-cols-3 gap-6 mb-14">
@@ -417,11 +417,11 @@ const EventsPage = () => {
           <motion.div {...fadeInUp} className="mt-12 bg-green-50 border border-green-100 rounded-2xl p-8 text-center">
             <h4 className="text-xl font-bold text-gray-900 mb-2">Can&apos;t make it in person?</h4>
             <p className="text-gray-600 mb-4">
-              Follow us on Instagram and YouTube for live coverage — and sign up to be first to know about the next event.
+              Follow us on Instagram and TikTok for live coverage — and sign up to be first to know about the next event.
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               <a
-                href="https://instagram.com/misscultureglobalkenya"
+                href="https://www.instagram.com/misscultureglobalkenya?igsh=MmpjY3Z5ODZ5NThx"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-full font-semibold text-sm transition-colors"
@@ -429,12 +429,12 @@ const EventsPage = () => {
                 Follow on Instagram
               </a>
               <a
-                href="https://youtube.com/misscultureglobalkenya"
+                href="https://www.tiktok.com/@miss.culture.global.ke?_r=1&_t=ZS-95zsRay3Mii"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-red-700 hover:bg-red-800 text-white px-5 py-2.5 rounded-full font-semibold text-sm transition-colors"
+                className="inline-flex items-center gap-2 bg-gray-900 hover:bg-black text-white px-5 py-2.5 rounded-full font-semibold text-sm transition-colors"
               >
-                Subscribe on YouTube
+                Follow on TikTok
               </a>
             </div>
           </motion.div>

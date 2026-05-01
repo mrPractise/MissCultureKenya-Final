@@ -4,7 +4,7 @@ from .views import (
     AmbassadorViewSet, CulturalCommunityViewSet, CulturalHeritageViewSet,
     KenyaRegionViewSet, AchievementViewSet,
     PartnerViewSet, SocialMediaPostViewSet, DiscoverKenyaAPIView,
-    SiteSettingsAPIView, contact_message
+    SiteSettingsAPIView, contact_message, TeamMemberViewSet
 )
 
 router = DefaultRouter()
@@ -15,6 +15,7 @@ router.register(r'regions', KenyaRegionViewSet)
 router.register(r'achievements', AchievementViewSet)
 router.register(r'partners', PartnerViewSet)
 router.register(r'social-media', SocialMediaPostViewSet)
+router.register(r'team', TeamMemberViewSet)
 
 urlpatterns = [
     path('settings/', SiteSettingsAPIView.as_view(), name='site-settings'),

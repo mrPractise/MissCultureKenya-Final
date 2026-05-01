@@ -2,9 +2,10 @@
 
 import { motion } from 'framer-motion'
 import { Heart, Globe, Award, Target, BookOpen, ExternalLink, Sparkles, Handshake, Dumbbell, ChevronRight, Users, Shield, Lightbulb, Landmark } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useSiteSettings } from '@/lib/useSiteSettings'
+import apiClient from '@/lib/api'
 
 const AboutPage = () => {
   const settings = useSiteSettings()
@@ -35,7 +36,7 @@ const AboutPage = () => {
       image: settings.about_leader_1_image_url || '',
     },
     {
-      name: settings.leader_2_name || 'James Mwangi',
+      name: settings.leader_2_name || 'Pacific Awuor Oriato',
       title: settings.leader_2_title || 'Director of Operations',
       bio: settings.leader_2_bio || 'Oversees all operational aspects of the organization with a focus on community engagement and event management. James has a background in event planning and cultural tourism.',
       image: settings.about_leader_2_image_url || '',
@@ -47,6 +48,34 @@ const AboutPage = () => {
       image: settings.about_leader_3_image_url || '',
     }
   ]
+
+  const [apiLeaders, setApiLeaders] = useState<any[]>([])
+  const [leadersLoading, setLeadersLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchLeaders = async () => {
+      try {
+        setLeadersLoading(true)
+        const response = await apiClient.getTeamMembers({ team_type: 'leadership' })
+        const data = Array.isArray(response) ? response : (response.results || [])
+        if (data.length > 0) {
+          setApiLeaders(data.map((m: any) => ({
+            name: m.name,
+            title: m.title || '',
+            bio: m.bio || '',
+            image: m.image_url || '',
+          })))
+        }
+      } catch {
+        // Fall back to SiteSettings data
+      } finally {
+        setLeadersLoading(false)
+      }
+    }
+    fetchLeaders()
+  }, [])
+
+  const displayLeaders = apiLeaders.length > 0 ? apiLeaders : currentLeadership
 
   const organizingCommittee = [
     { name: settings.committee_1_name || 'Robert Ochieng', role: settings.committee_1_role || 'Event Coordinator', bio: settings.committee_1_bio || 'Specializes in organizing cultural events and festivals across Kenya.' },
@@ -354,7 +383,7 @@ const AboutPage = () => {
           </motion.div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
-            {currentLeadership.map((leader, index) => (
+            {displayLeaders.map((leader, index) => (
               <motion.div
                 key={leader.name}
                 initial={{ opacity: 0, y: 30 }}
@@ -374,7 +403,7 @@ const AboutPage = () => {
                   </div>
                 ) : (
                   <div className="h-32 bg-gradient-to-br from-green-600 to-green-800 flex items-center justify-center">
-                    <span className="text-5xl font-bold text-white/80">{leader.name.split(' ').map(n => n[0]).join('')}</span>
+                    <span className="text-5xl font-bold text-white/80">{leader.name.split(' ').map((n: string) => n[0]).join('')}</span>
                   </div>
                 )}
                 <div className="p-8">

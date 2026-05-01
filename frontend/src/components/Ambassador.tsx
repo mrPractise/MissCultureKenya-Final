@@ -139,14 +139,14 @@ const Ambassador = () => {
     {
       title: 'Her Identity',
       quote: "I am not just an ambassador. I am a mirror held up to Kenya — showing the world what we truly are.",
-      desc: "What does the ambassador role mean to her personally? Not a title — a responsibility. Susan carries the weight of 44 communities in every appearance, every speech, every moment on the global stage.",
+      desc: "Susan carries the weight of 44 communities in every appearance, every speech, every moment on the global stage.",
       icon: User,
       color: 'green',
     },
     {
       title: 'Her Mission',
       quote: "Every appearance, every speech, every cultural showcase is an act of diplomacy — building bridges between Kenya and the world through shared humanity.",
-      desc: "This is not about looking good. This is about building understanding across continents. Through authentic storytelling and genuine connection, Susan bridges divides and creates pathways for cultural exchange.",
+      desc: "Through authentic storytelling and genuine connection, Susan bridges divides and creates pathways for cultural exchange across continents.",
       icon: Globe,
       color: 'red',
     },
@@ -160,7 +160,7 @@ const Ambassador = () => {
     {
       title: 'Her Invitation',
       quote: "Follow her journey, attend her events, and vote for the next generation of ambassadors who will carry this torch forward.",
-      desc: "This is not a spectator mission. Susan invites every Kenyan — and every friend of Kenya — to participate. Follow, attend, support, and help grow the movement.",
+      desc: "Susan invites every Kenyan — and every friend of Kenya — to participate. Follow, attend, support, and help grow the movement.",
       icon: Heart,
       color: 'green',
     },
@@ -283,7 +283,7 @@ const Ambassador = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div {...fadeInUp} className="text-center mb-10">
             <span className="inline-flex items-center gap-2 text-green-700 font-semibold tracking-wider uppercase text-sm mb-3">
-              <Award className="w-4 h-4" /> Has She Actually Done Anything?
+              <Award className="w-4 h-4" /> Proven Impact
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">
               Impact, Not Just Words

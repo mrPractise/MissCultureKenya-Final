@@ -1,21 +1,22 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { Mail, Phone, MapPin, Clock, Send, Instagram, Facebook, Twitter, Youtube, MessageCircle, ChevronDown, ArrowRight } from 'lucide-react'
+import { Mail, Phone, MapPin, Clock, Send, Instagram, Facebook, MessageCircle, ChevronDown, ArrowRight } from 'lucide-react'
 import { useState } from 'react'
 import Link from 'next/link'
 import ContactModal from '@/components/ContactModal'
+import TikTokIcon from '@/components/TikTokIcon'
 import apiClient from '@/lib/api'
+import type { ApiError } from '@/lib/api'
 import { useSiteSettings } from '@/lib/useSiteSettings'
 
 const contactInfo = [
   {
     icon: Mail,
     title: 'Email (Primary)',
-    details: 'info@misscultureglobalkenya.org',
+    details: 'info@misscultureglobalkenya.com',
     description: 'We respond within 24-48 hours on business days.',
     color: 'bg-green-50 text-green-600',
-    priority: 'Best for detailed inquiries'
   },
   {
     icon: Phone,
@@ -23,7 +24,6 @@ const contactInfo = [
     details: '+254 721 706983',
     description: 'Call or WhatsApp, Mon-Fri 9AM-5PM EAT.',
     color: 'bg-blue-50 text-blue-600',
-    priority: 'Best for urgent matters'
   },
   {
     icon: MapPin,
@@ -31,7 +31,6 @@ const contactInfo = [
     details: 'Syokimau Country Club, Nairobi, Kenya',
     description: 'Visitors welcome by appointment only.',
     color: 'bg-red-50 text-red-600',
-    priority: 'In-person meetings'
   },
   {
     icon: MessageCircle,
@@ -39,14 +38,12 @@ const contactInfo = [
     details: 'Instagram DM or Facebook Messenger',
     description: 'Response times vary; email is faster for urgent matters.',
     color: 'bg-purple-50 text-purple-600',
-    priority: 'Casual inquiries'
   }
 ]
 
 const miniFAQ = [
   { question: 'Looking for event tickets?', answer: 'Visit our Events page for upcoming events and ticketing.', link: '/events' },
   { question: 'Want to vote?', answer: 'Head to the Voting page to cast your vote.', link: '/voting' },
-  { question: 'Need a media kit?', answer: 'Download our media kit from the Partnership page.', link: '/partnership' },
   { question: 'Want to donate?', answer: 'Visit the Contribute page for secure donation options.', link: '/contribute' }
 ]
 
@@ -62,10 +59,9 @@ const subjectOptions = [
 ]
 
 const socialLinks = [
-  { name: 'Instagram', icon: Instagram, href: 'https://instagram.com/misscultureglobalkenya', color: 'hover:text-pink-600' },
-  { name: 'Facebook', icon: Facebook, href: 'https://facebook.com/misscultureglobalkenya', color: 'hover:text-blue-600' },
-  { name: 'Twitter', icon: Twitter, href: 'https://twitter.com/missculturekenya', color: 'hover:text-blue-400' },
-  { name: 'YouTube', icon: Youtube, href: 'https://youtube.com/misscultureglobalkenya', color: 'hover:text-red-600' }
+  { name: 'Instagram', icon: Instagram, href: 'https://www.instagram.com/misscultureglobalkenya?igsh=MmpjY3Z5ODZ5NThx', color: 'hover:text-pink-600' },
+  { name: 'Facebook', icon: Facebook, href: 'https://www.facebook.com/share/1E3tuDcxXT/', color: 'hover:text-blue-600' },
+  { name: 'TikTok', icon: TikTokIcon, href: 'https://www.tiktok.com/@miss.culture.global.ke?_r=1&_t=ZS-95zsRay3Mii', color: 'hover:text-gray-200' }
 ]
 
 const ContactPage = () => {
@@ -81,6 +77,7 @@ const ContactPage = () => {
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle')
+  const [errorMessage, setErrorMessage] = useState('')
 
   return (
     <div className="min-h-screen bg-white">
@@ -157,7 +154,6 @@ const ContactPage = () => {
                       <h3 className="text-lg font-bold text-gray-900 mb-1">{info.title}</h3>
                       <p className="text-green-700 font-semibold mb-1">{info.details}</p>
                       <p className="text-gray-600 text-sm leading-relaxed">{info.description}</p>
-                      <span className="text-xs text-gray-400 mt-1 inline-block">{info.priority}</span>
                     </div>
                   </motion.div>
                 ))}
@@ -194,6 +190,7 @@ const ContactPage = () => {
                 e.preventDefault()
                 setIsSubmitting(true)
                 setSubmitStatus('idle')
+                setErrorMessage('')
                 try {
                   await apiClient.sendContactMessage({
                     name: `${contactForm.firstName} ${contactForm.lastName}`,
@@ -205,8 +202,16 @@ const ContactPage = () => {
                   })
                   setSubmitStatus('success')
                   setContactForm({ firstName: '', lastName: '', email: '', phone: '', subject: '', message: '' })
-                } catch {
+                } catch (err: any) {
                   setSubmitStatus('error')
+                  const apiErr = err as ApiError
+                  if (apiErr?.message) {
+                    setErrorMessage(apiErr.message)
+                  } else if (err?.message) {
+                    setErrorMessage(err.message)
+                  } else {
+                    setErrorMessage('Network error — please check your connection and try again.')
+                  }
                 } finally {
                   setIsSubmitting(false)
                 }
@@ -256,7 +261,9 @@ const ContactPage = () => {
                 )}
                 {submitStatus === 'error' && (
                   <div className="bg-red-50 border border-red-200 rounded-xl p-4">
-                    <p className="text-red-700 font-medium text-sm">Failed to send message. Please try again or email us directly at info@misscultureglobalkenya.org</p>
+                    <p className="text-red-700 font-medium text-sm">Failed to send message</p>
+                    {errorMessage && <p className="text-red-600 text-sm mt-1">{errorMessage}</p>}
+                    <p className="text-red-600 text-xs mt-1">If the problem persists, email us directly at info@misscultureglobalkenya.com</p>
                   </div>
                 )}
 

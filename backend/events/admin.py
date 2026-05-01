@@ -1,5 +1,12 @@
 from django.contrib import admin
-from .models import Event, EventInquiry, EventCategory, EventSettings
+from .models import Event, EventInquiry, EventCategory, EventSettings, TicketCategory
+
+
+class TicketCategoryInline(admin.TabularInline):
+    model = TicketCategory
+    extra = 1
+    fields = ['name', 'price', 'description', 'available', 'total', 'is_active', 'order']
+    ordering = ['order', 'price']
 
 
 @admin.register(Event)
@@ -12,6 +19,7 @@ class EventAdmin(admin.ModelAdmin):
     readonly_fields = ['created_at', 'updated_at']
     date_hierarchy = 'start_date'
     filter_horizontal = ['gallery']
+    inlines = [TicketCategoryInline]
 
 
 @admin.register(EventInquiry)
@@ -72,3 +80,12 @@ class EventSettingsAdmin(admin.ModelAdmin):
     def has_add_permission(self, request):
         # Only allow one settings instance
         return not EventSettings.objects.exists()
+
+
+@admin.register(TicketCategory)
+class TicketCategoryAdmin(admin.ModelAdmin):
+    list_display = ['name', 'event', 'price', 'available', 'total', 'is_active', 'order']
+    list_filter = ['is_active', 'event']
+    list_editable = ['is_active', 'order']
+    search_fields = ['name', 'event__title']
+    ordering = ['event', 'order', 'price']

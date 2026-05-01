@@ -1,37 +1,31 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Instagram, Facebook, Twitter, Youtube } from 'lucide-react'
+import { Instagram, Facebook } from 'lucide-react'
+import TikTokIcon from '@/components/TikTokIcon'
 
 const FollowCTA = () => {
   const socialLinks = [
     {
       name: 'Instagram',
       icon: Instagram,
-      href: 'https://instagram.com/misscultureglobalkenya',
+      href: 'https://www.instagram.com/misscultureglobalkenya?igsh=MmpjY3Z5ODZ5NThx',
       color: 'bg-red-600',
       hoverColor: 'bg-red-700'
     },
     {
       name: 'Facebook',
       icon: Facebook,
-      href: 'https://facebook.com/misscultureglobalkenya',
+      href: 'https://www.facebook.com/share/1E3tuDcxXT/',
       color: 'bg-green-600',
       hoverColor: 'bg-green-700'
     },
     {
-      name: 'Twitter',
-      icon: Twitter,
-      href: 'https://twitter.com/missculturekenya',
+      name: 'TikTok',
+      icon: TikTokIcon,
+      href: 'https://www.tiktok.com/@miss.culture.global.ke?_r=1&_t=ZS-95zsRay3Mii',
       color: 'bg-gray-900',
       hoverColor: 'bg-black'
-    },
-    {
-      name: 'YouTube',
-      icon: Youtube,
-      href: 'https://youtube.com/misscultureglobalkenya',
-      color: 'bg-red-700',
-      hoverColor: 'bg-red-800'
     }
   ]
 

@@ -78,6 +78,7 @@ class Video(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     video_file = cloudinary.models.CloudinaryField('video_file', folder='missculture/gallery/videos', resource_type='video', blank=True, null=True)
+    video_url = models.URLField(blank=True, help_text="YouTube or other external video link. If provided, this takes priority over uploaded video_file.")
     thumbnail = cloudinary.models.CloudinaryField('thumbnail', folder='missculture/gallery/video_thumbnails', blank=True, null=True)
     category = models.CharField(max_length=30, choices=CATEGORIES)
     collection = models.ForeignKey(PhotoCollection, on_delete=models.SET_NULL, null=True, blank=True, related_name='videos')

@@ -1,8 +1,8 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Calendar, Clock, MapPin, Users, DollarSign, ExternalLink, Share2, Heart, X } from 'lucide-react'
-import { useState } from 'react'
+import { Calendar, Clock, MapPin, Users, ExternalLink, Share2, X } from 'lucide-react'
+import { useState, useCallback } from 'react'
 import PaymentModal from './PaymentModal'
 
 interface TicketCategory {
@@ -41,17 +41,27 @@ interface EventDetailsModalProps {
 }
 
 const EventDetailsModal = ({ isOpen, onClose, event }: EventDetailsModalProps) => {
-  const [hasVoted, setHasVoted] = useState(false)
   const [selectedTicketCategory, setSelectedTicketCategory] = useState<string | null>(null)
   const [ticketQuantities, setTicketQuantities] = useState<{[key: string]: number}>({})
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false)
 
-  if (!isOpen || !event) return null
+  const handleShare = useCallback(async () => {
+    if (!event) return
+    const eventUrl = `https://misscultureglobalkenya.com/events/${event.id}`
+    const shareData = {
+      title: event.title,
+      text: `Check out ${event.title} — ${event.date} at ${event.venue}`,
+      url: eventUrl,
+    }
+    if (navigator.share) {
+      try { await navigator.share(shareData) } catch {}
+    } else {
+      await navigator.clipboard.writeText(`${shareData.text}\n${shareData.url}`)
+      alert('Link copied to clipboard!')
+    }
+  }, [event])
 
-  const handleVote = () => {
-    setHasVoted(true)
-    // In a real app, this would send a vote to the backend
-  }
+  if (!isOpen || !event) return null
 
   const updateQuantity = (ticketName: string, quantity: number) => {
     setTicketQuantities(prev => ({
@@ -183,8 +193,13 @@ const EventDetailsModal = ({ isOpen, onClose, event }: EventDetailsModalProps) =
                   {event.contactEmail && (
                     <div>
                       <span className="text-gray-500">Contact: </span>
-                      <span className="font-medium text-gray-900">{event.contactEmail}</span>
-                      {event.contactPhone && <span className="text-gray-400"> · {event.contactPhone}</span>}
+                      <a href={`mailto:${event.contactEmail}`} className="font-medium text-green-700 hover:text-green-600 underline underline-offset-2">{event.contactEmail}</a>
+                      {event.contactPhone && (
+                        <>
+                          <span className="text-gray-400"> · </span>
+                          <a href={`tel:${event.contactPhone}`} className="font-medium text-green-700 hover:text-green-600 underline underline-offset-2">{event.contactPhone}</a>
+                        </>
+                      )}
                     </div>
                   )}
                 </div>
@@ -282,21 +297,12 @@ const EventDetailsModal = ({ isOpen, onClose, event }: EventDetailsModalProps) =
                 <span>Get Tickets{getTotalTickets() > 0 ? ` (${getTotalTickets()})` : ''}</span>
               </button>
 
-              <button className="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-semibold text-sm transition-colors duration-300 flex items-center justify-center space-x-2">
+              <button 
+                onClick={handleShare}
+                className="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-semibold text-sm transition-colors duration-300 flex items-center justify-center space-x-2"
+              >
                 <Share2 className="w-4 h-4" />
                 <span>Share</span>
-              </button>
-
-              <button
-                onClick={() => handleVote()}
-                className={`px-4 py-2.5 rounded-xl font-semibold text-sm transition-colors duration-300 flex items-center justify-center space-x-2 ${
-                  hasVoted
-                    ? 'bg-green-100 text-green-700'
-                    : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
-                }`}
-              >
-                <Heart className={`w-4 h-4 ${hasVoted ? 'fill-green-600' : ''}`} />
-                <span>{hasVoted ? 'Voted' : 'Vote'}</span>
               </button>
             </div>
           </div>

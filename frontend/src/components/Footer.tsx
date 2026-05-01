@@ -2,7 +2,8 @@
 
 import { motion } from 'framer-motion'
 import Image from 'next/image'
-import { Mail, Phone, MapPin, Instagram, Facebook, Twitter, Youtube, ExternalLink, Star } from 'lucide-react'
+import { Mail, Phone, MapPin, Instagram, Facebook, ExternalLink, Star } from 'lucide-react'
+import TikTokIcon from '@/components/TikTokIcon'
 
 type FooterLink = { name: string; href: string; highlight?: boolean }
 
@@ -32,10 +33,9 @@ const Footer = () => {
   }
 
   const socialLinks = [
-    { name: 'Instagram', icon: Instagram, href: 'https://instagram.com/misscultureglobalkenya' },
-    { name: 'Facebook', icon: Facebook, href: 'https://facebook.com/misscultureglobalkenya' },
-    { name: 'Twitter', icon: Twitter, href: 'https://twitter.com/missculturekenya' },
-    { name: 'YouTube', icon: Youtube, href: 'https://youtube.com/misscultureglobalkenya' }
+    { name: 'Instagram', icon: Instagram, href: 'https://www.instagram.com/misscultureglobalkenya?igsh=MmpjY3Z5ODZ5NThx' },
+    { name: 'Facebook', icon: Facebook, href: 'https://www.facebook.com/share/1E3tuDcxXT/' },
+    { name: 'TikTok', icon: TikTokIcon, href: 'https://www.tiktok.com/@miss.culture.global.ke?_r=1&_t=ZS-95zsRay3Mii' }
   ]
 
   return (
