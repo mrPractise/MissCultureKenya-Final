@@ -26,7 +26,7 @@ const Footer = () => {
       { name: 'Partnership', href: '/partnership' },
       { name: 'Contribute', href: '/contribute' },
       { name: 'FAQ', href: '/faq' },
-      { name: 'Media Inquiries', href: '/media' },
+      { name: 'Media Inquiries', href: '/contact' },
       { name: 'Privacy Policy', href: '/privacy' }
     ]
   }
