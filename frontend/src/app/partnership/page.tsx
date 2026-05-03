@@ -2,8 +2,9 @@
 
 import { motion } from 'framer-motion'
 import { Eye, Heart, Globe, Camera, ChevronRight } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import ContactModal from '@/components/ContactModal'
 import apiClient from '@/lib/api'
 import { useSiteSettings } from '@/lib/useSiteSettings'
 
@@ -37,6 +38,7 @@ const valuePropositions = [
 const PartnershipPage = () => {
   const [sponsors, setSponsors] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false)
   const settings = useSiteSettings()
 
   useEffect(() => {
@@ -45,21 +47,36 @@ const PartnershipPage = () => {
         setLoading(true)
         const response = await apiClient.getPartners()
         const partnersData = Array.isArray(response) ? response : (response.results || [])
-        setSponsors(partnersData.map((partner: any) => ({
-          name: partner.name,
-          logo: partner.logo_url || partner.logo || '',
-          description: partner.description || `Supporting ${partner.partner_type || 'our mission'}`,
-          since: partner.since || 'Partner'
-        })))
+        if (partnersData.length > 0) {
+          setSponsors(partnersData.map((partner: any) => ({
+            name: partner.name,
+            logo: partner.logo_url || partner.logo || '',
+            description: partner.description || `Supporting ${partner.partner_type || 'our mission'}`,
+            since: partner.since || 'Partner'
+          })))
+        } else {
+          setSponsors(fallbackSponsors)
+        }
       } catch (err) {
         console.error('Error fetching partners:', err)
-        setSponsors([])
+        setSponsors(fallbackSponsors)
       } finally {
         setLoading(false)
       }
     }
     fetchPartners()
   }, [])
+
+  const fallbackSponsors = [
+    { name: 'Kenya Tourism Board', logo: '', description: 'Promoting Kenya\'s cultural heritage globally', since: 'Partner since 2022' },
+    { name: 'Safaricom Foundation', logo: '', description: 'Empowering communities through technology', since: 'Event sponsor — Heritage Gala 2024' },
+    { name: 'Equity Bank', logo: '', description: 'Supporting youth empowerment programs', since: 'Partner since 2023' },
+    { name: 'KCB Bank', logo: '', description: 'Investing in cultural preservation', since: 'Program sponsor since 2021' },
+    { name: 'Coca-Cola East Africa', logo: '', description: 'Community development partner', since: 'Event sponsor — Cultural Walk 2024' },
+    { name: 'Kenya Airways', logo: '', description: 'Connecting Kenya to the world', since: 'Global outreach partner' },
+    { name: 'Tusker', logo: '', description: 'Celebrating Kenyan spirit and culture', since: 'Event sponsor since 2023' },
+    { name: 'Nation Media Group', logo: '', description: 'Media partner for cultural visibility', since: 'Media partner since 2022' }
+  ]
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -166,7 +183,7 @@ const PartnershipPage = () => {
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               {loading ? (
                 <div className="col-span-full text-center py-12">
                   <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
@@ -187,9 +204,9 @@ const PartnershipPage = () => {
                     className="rounded-2xl bg-white/10 backdrop-blur-md border border-white/10 p-6 hover:bg-white/20 transition-all duration-300 group cursor-pointer text-center"
                     title={sponsor.since || sponsor.description}
                   >
-                    <div className="mb-4 h-28 flex items-center justify-center bg-white rounded-xl p-5 group-hover:scale-105 transition-transform duration-300">
+                    <div className="mb-4 h-16 flex items-center justify-center bg-white rounded-xl p-4 group-hover:scale-105 transition-transform duration-300">
                       {sponsor.logo ? (
-                        <img src={sponsor.logo} alt={sponsor.name} className="max-h-full max-w-full object-contain" />
+                        <img src={sponsor.logo} alt={sponsor.name} className="max-h-full w-auto object-contain" />
                       ) : (
                         <span className="text-gray-500 font-semibold text-sm text-center">{sponsor.name}</span>
                       )}
@@ -202,17 +219,23 @@ const PartnershipPage = () => {
             </div>
 
             <div className="mt-16 text-center">
-              <Link
-                href="/contact"
+              <button
+                onClick={() => setIsContactModalOpen(true)}
                 className="inline-flex items-center gap-2 bg-red-600 text-white px-10 py-4 rounded-full font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
               >
                 Become a Partner <ChevronRight className="w-5 h-5" />
-              </Link>
+              </button>
             </div>
           </motion.div>
         </div>
       </section>
 
+      {/* Contact Modal */}
+      <ContactModal
+        isOpen={isContactModalOpen}
+        onClose={() => setIsContactModalOpen(false)}
+        type="partnership"
+      />
     </div>
   )
 }

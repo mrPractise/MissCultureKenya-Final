@@ -263,16 +263,35 @@ const EventsPage = () => {
                     key={event.id}
                     {...stagger}
                     transition={{ duration: 0.5, delay: index * 0.08 }}
-                    className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group cursor-pointer border border-gray-100 flex flex-col sm:flex-row"
+                    className="bg-white rounded-2xl transition-all duration-300 overflow-hidden group cursor-pointer border border-gray-100 flex flex-col sm:flex-row"
                     onClick={() => handleEventClick(event)}
                   >
-                    {/* Date badge */}
-                    <div className="sm:w-28 flex-shrink-0 bg-green-900 text-white flex flex-col items-center justify-center p-4 sm:p-6">
-                      <span className="text-3xl sm:text-4xl font-bold">{dateInfo.day}</span>
-                      <span className="text-sm font-semibold text-green-300 uppercase">{dateInfo.month}</span>
+                    {/* Event Image with date overlay */}
+                    <div className="sm:w-48 flex-shrink-0 relative h-40 sm:h-auto overflow-hidden">
+                      {event.image ? (
+                        <img
+                          src={event.image}
+                          alt={event.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-green-900 flex items-center justify-center">
+                          <Calendar className="w-10 h-10 text-green-400/40" />
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent sm:bg-gradient-to-r sm:from-black/50 sm:via-transparent sm:to-transparent" />
+                      {/* Date badge overlay */}
+                      <div className="absolute bottom-2 left-2 bg-white/95 backdrop-blur-sm rounded-lg px-2.5 py-1.5 shadow-sm">
+                        <p className="text-lg font-bold text-gray-900 leading-none">{dateInfo.day}</p>
+                        <p className="text-[10px] font-bold text-green-700 uppercase tracking-wider">{dateInfo.month}</p>
+                      </div>
+                      {/* Price tag */}
+                      <div className="absolute top-2 right-2 bg-green-600 text-white px-2 py-0.5 rounded-full text-xs font-bold">
+                        {event.price}
+                      </div>
                     </div>
 
-                    <div className="flex-1 p-6 flex flex-col">
+                    <div className="flex-1 p-5 sm:p-6 flex flex-col">
                       {/* Category + Audience tags */}
                       <div className="flex flex-wrap items-center gap-2 mb-2">
                         <span className="bg-green-100 text-green-700 px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide">
@@ -323,16 +342,6 @@ const EventsPage = () => {
       {/* ===================== 4. URGENCY & SOCIAL PROOF ===================== */}
       <div className="py-16 sm:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Scarcity */}
-          <motion.div {...fadeInUp} className="bg-red-50 border border-red-100 rounded-2xl p-8 sm:p-10 text-center mb-10">
-            <Sparkles className="w-8 h-8 text-red-500 mx-auto mb-4" />
-            <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">Seats Are Filling Fast</h3>
-            <p className="text-gray-600 max-w-2xl mx-auto leading-relaxed">
-              Only limited tickets remaining for the Heritage Gala. Secure yours before they are gone — 
-              this event sells out every year.
-            </p>
-          </motion.div>
-
           {/* Social Proof / Testimonials */}
           <motion.div {...fadeInUp} className="text-center mb-10">
             <span className="inline-flex items-center gap-2 text-green-700 font-semibold tracking-wider uppercase text-sm mb-3">
@@ -376,7 +385,7 @@ const EventsPage = () => {
                     key={event.id}
                     {...stagger}
                     transition={{ duration: 0.5, delay: index * 0.08 }}
-                    className="bg-white rounded-2xl shadow-md overflow-hidden group border border-gray-100 flex flex-col sm:flex-row hover:shadow-lg transition-shadow"
+                    className="bg-white rounded-2xl overflow-hidden group border border-gray-100 flex flex-col sm:flex-row transition-shadow"
                   >
                     <div className="sm:w-2/5 h-40 sm:h-auto overflow-hidden relative">
                       {event.image ? (
@@ -413,31 +422,6 @@ const EventsPage = () => {
             </div>
           )}
 
-          {/* No-ticket CTA */}
-          <motion.div {...fadeInUp} className="mt-12 bg-green-50 border border-green-100 rounded-2xl p-8 text-center">
-            <h4 className="text-xl font-bold text-gray-900 mb-2">Can&apos;t make it in person?</h4>
-            <p className="text-gray-600 mb-4">
-              Follow us on Instagram and TikTok for live coverage — and sign up to be first to know about the next event.
-            </p>
-            <div className="flex flex-wrap justify-center gap-3">
-              <a
-                href="https://www.instagram.com/misscultureglobalkenya?igsh=MmpjY3Z5ODZ5NThx"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-full font-semibold text-sm transition-colors"
-              >
-                Follow on Instagram
-              </a>
-              <a
-                href="https://www.tiktok.com/@miss.culture.global.ke?_r=1&_t=ZS-95zsRay3Mii"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-gray-900 hover:bg-black text-white px-5 py-2.5 rounded-full font-semibold text-sm transition-colors"
-              >
-                Follow on TikTok
-              </a>
-            </div>
-          </motion.div>
         </div>
       </div>
 
