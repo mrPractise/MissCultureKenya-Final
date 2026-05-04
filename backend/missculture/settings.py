@@ -192,6 +192,14 @@ cloudinary.config(
     secure=True,
 )
 
+# Daraja / M-Pesa Configuration
+MPESA_CONSUMER_KEY = config('MPESA_CONSUMER_KEY', default='')
+MPESA_CONSUMER_SECRET = config('MPESA_CONSUMER_SECRET', default='')
+MPESA_SHORTCODE = config('MPESA_SHORTCODE', default='174379')  # Sandbox test shortcode
+MPESA_PASSKEY = config('MPESA_PASSKEY', default='bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919')
+MPESA_ENVIRONMENT = config('MPESA_ENVIRONMENT', default='sandbox')  # 'sandbox' or 'production'
+MPESA_CALLBACK_URL = config('MPESA_CALLBACK_URL', default='')
+
 # Override default file storage to use Cloudinary for media
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 

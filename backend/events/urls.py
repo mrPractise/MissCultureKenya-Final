@@ -4,7 +4,7 @@ from .views import (
     EventViewSet, EventInquiryViewSet, EventCategoryViewSet, EventSettingsViewSet,
     TicketCategoryViewSet, ContestantViewSet, PaymentViewSet,
     TicketViewSet, VoteTransactionViewSet, AuditLogViewSet,
-    verify_votes_by_phone, ticket_lookup,
+    verify_votes_by_phone, ticket_lookup, mpesa_callback,
 )
 
 router = DefaultRouter()
@@ -23,4 +23,5 @@ urlpatterns = [
     path('', include(router.urls)),
     path('verify-votes/', verify_votes_by_phone, name='verify-votes'),
     path('ticket-lookup/', ticket_lookup, name='ticket-lookup'),
+    path('mpesa-callback/', mpesa_callback, name='mpesa-callback'),
 ]

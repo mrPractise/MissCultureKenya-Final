@@ -234,11 +234,6 @@ export default function ContestantPage({ params }: { params: Promise<{ eventSlug
             id: event.id,
             title: event.title,
             vote_price: event.vote_price,
-            paybill_number: event.paybill_number,
-            account_number: event.account_number,
-            account_name: event.account_name,
-            payment_method: event.payment_method,
-            till_number: event.till_number,
           }}
           contestant={{
             id: contestant.id,

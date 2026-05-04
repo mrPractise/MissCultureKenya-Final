@@ -158,16 +158,18 @@ class ContestantPublicSerializer(serializers.ModelSerializer):
 
 class PaymentSerializer(serializers.ModelSerializer):
     event_title = serializers.CharField(source='event.title', read_only=True)
+    contestant_name = serializers.CharField(source='contestant.name', read_only=True, default=None)
     verified_by_name = serializers.CharField(source='verified_by.username', read_only=True, default=None)
 
     class Meta:
         model = Payment
         fields = [
-            'id', 'event', 'event_title', 'phone_number', 'mpesa_code',
-            'amount', 'status', 'payment_type', 'verified_by', 'verified_by_name',
-            'verified_at', 'created_at', 'updated_at',
+            'id', 'event', 'event_title', 'contestant', 'contestant_name',
+            'phone_number', 'mpesa_code', 'amount', 'status', 'payment_type',
+            'checkout_request_id', 'merchant_request_id',
+            'verified_by', 'verified_by_name', 'verified_at', 'created_at', 'updated_at',
         ]
-        read_only_fields = ['verified_by', 'verified_at']
+        read_only_fields = ['verified_by', 'verified_at', 'checkout_request_id', 'merchant_request_id']
 
 
 class PaymentCreateSerializer(serializers.ModelSerializer):
@@ -274,3 +276,24 @@ class VoteVerifySerializer(serializers.Serializer):
     mpesa_code = serializers.CharField()
     status = serializers.CharField()
     created_at = serializers.DateTimeField()
+
+
+# ── Daraja STK Push ──────────────────────────────────────────────────────────
+
+class STKPushRequestSerializer(serializers.Serializer):
+    """Serializer for initiating an STK Push payment for voting"""
+    phone_number = serializers.CharField(max_length=20, required=True)
+    amount = serializers.DecimalField(max_digits=10, decimal_places=2, required=True, min_value=1)
+    contestant_id = serializers.IntegerField(required=True)
+
+
+class STKPushResponseSerializer(serializers.Serializer):
+    """Serializer for STK Push response"""
+    success = serializers.BooleanField()
+    checkout_request_id = serializers.CharField(allow_null=True)
+    merchant_request_id = serializers.CharField(allow_null=True)
+    response_code = serializers.CharField(allow_null=True)
+    response_description = serializers.CharField(allow_null=True)
+    error = serializers.CharField(allow_null=True)
+    vote_count = serializers.IntegerField(allow_null=True, help_text="Estimated vote count (informational)")
+    message = serializers.CharField(allow_null=True)

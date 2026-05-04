@@ -459,11 +459,6 @@ const VotingPage = () => {
             id: selectedEvent.id,
             title: selectedEvent.title,
             vote_price: selectedEvent.vote_price,
-            paybill_number: selectedEvent.paybill_number,
-            account_number: selectedEvent.account_number,
-            account_name: selectedEvent.account_name,
-            payment_method: selectedEvent.payment_method,
-            till_number: selectedEvent.till_number,
           }}
           contestant={{
             id: selectedContestant.id,

@@ -147,6 +147,11 @@ const apiClient = {
     return handle(client.post('/api/events/payments/', data))
   },
 
+  // Initiate Daraja STK Push for voting
+  initiateVotePayment(eventId: number | string, data: { phone_number: string; amount: number; contestant_id: number }) {
+    return handle(client.post(`/api/events/events/${eventId}/initiate_vote_payment/`, data))
+  },
+
   // Ticket categories for an event
   getTicketCategories(eventId: number | string, params = {}) {
     return handle(client.get('/api/events/ticket-categories/', { params: { event: eventId, ...params } }))

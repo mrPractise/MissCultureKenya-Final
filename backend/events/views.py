@@ -23,8 +23,10 @@ from .serializers import (
     TicketSerializer, TicketDetailSerializer,
     VoteTransactionSerializer, AuditLogSerializer,
     LiveResultSerializer, VoteVerifySerializer,
+    STKPushRequestSerializer, STKPushResponseSerializer,
 )
 from .utils import generate_ticket_code, calculate_vote_count
+from .daraja import initiate_stk_push, process_callback
 
 
 # ── Event ViewSet ────────────────────────────────────────────────────────────
@@ -277,6 +279,92 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
             'total_transactions': votes.count(),
             'votes': serializer.data,
         })
+
+    @action(detail=True, methods=['post'])
+    def initiate_vote_payment(self, request, pk=None):
+        """
+        Initiate an M-Pesa STK Push for voting.
+        Creates a pending Payment record and triggers STK Push to user's phone.
+        """
+        event = self.get_object()
+
+        if not event.voting_enabled or not event.is_voting_active:
+            return Response(
+                {'error': 'Voting is not currently active for this event.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        serializer = STKPushRequestSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        phone_number = serializer.validated_data['phone_number']
+        amount = serializer.validated_data['amount']
+        contestant_id = serializer.validated_data['contestant_id']
+
+        # Validate contestant exists and is active
+        try:
+            contestant = Contestant.objects.get(id=contestant_id, event=event, is_active=True)
+        except Contestant.DoesNotExist:
+            return Response(
+                {'error': 'Contestant not found or not active in this event.'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        # Calculate vote count for informational purposes
+        vote_count = calculate_vote_count(amount, event.vote_price)
+
+        # Create pending payment record
+        payment = Payment.objects.create(
+            event=event,
+            contestant=contestant,
+            phone_number=phone_number,
+            amount=amount,
+            status='pending',
+            payment_type='vote',
+        )
+
+        # Build callback URL
+        callback_url = getattr(settings, 'MPESA_CALLBACK_URL', '')
+        if not callback_url:
+            # Fallback: construct from request
+            host = request.get_host()
+            scheme = 'https' if request.is_secure() else 'http'
+            callback_url = f"{scheme}://{host}/api/mpesa-callback/"
+
+        # Initiate STK Push
+        stk_result = initiate_stk_push(
+            phone_number=phone_number,
+            amount=float(amount),
+            account_reference=f"VOTE{event.id}",
+            transaction_desc=f"Vote for {contestant.name}",
+            callback_url=callback_url,
+        )
+
+        # Update payment with STK details
+        payment.checkout_request_id = stk_result.get('checkout_request_id') or ''
+        payment.merchant_request_id = stk_result.get('merchant_request_id') or ''
+        payment.stk_response = stk_result
+        payment.save()
+
+        if stk_result.get('success'):
+            return Response({
+                'success': True,
+                'checkout_request_id': payment.checkout_request_id,
+                'merchant_request_id': payment.merchant_request_id,
+                'message': 'STK Push sent to your phone. Please enter your M-Pesa PIN to complete payment.',
+                'vote_count': vote_count,
+                'payment_id': payment.id,
+            })
+        else:
+            # Mark payment as failed
+            payment.status = 'failed'
+            payment.save()
+            return Response({
+                'success': False,
+                'error': stk_result.get('error', 'Failed to initiate STK Push.'),
+                'payment_id': payment.id,
+            }, status=status.HTTP_502_BAD_GATEWAY)
 
     def _process_ticket_payment(self, payment, event):
         """Generate tickets after successful payment verification."""
@@ -598,6 +686,85 @@ def ticket_lookup(request):
             {'error': f'Ticket with code "{code}" not found.'},
             status=status.HTTP_404_NOT_FOUND
         )
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def mpesa_callback(request):
+    """
+    M-Pesa Daraja STK Push callback endpoint.
+    M-Pesa POSTs the transaction result here after the customer completes the PIN entry.
+    """
+    try:
+        result = process_callback(request.body)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+    checkout_request_id = result.get('checkout_request_id', '')
+
+    if not checkout_request_id:
+        return Response(
+            {'error': 'Missing CheckoutRequestID in callback'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    try:
+        payment = Payment.objects.get(checkout_request_id=checkout_request_id)
+    except Payment.DoesNotExist:
+        return Response(
+            {'error': f'Payment with CheckoutRequestID {checkout_request_id} not found.'},
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    # Update payment with callback data
+    payment.stk_response['callback'] = result
+    payment.save()
+
+    if result.get('success'):
+        # Payment successful — update payment and create vote transaction
+        payment.status = 'successful'
+        payment.mpesa_code = result.get('mpesa_receipt_number') or payment.mpesa_code
+        payment.save()
+
+        event = payment.event
+        contestant = payment.contestant
+
+        if contestant:
+            vote_count = calculate_vote_count(payment.amount, event.vote_price)
+
+            if vote_count > 0:
+                VoteTransaction.objects.create(
+                    event=event,
+                    contestant=contestant,
+                    payment=payment,
+                    vote_count=vote_count,
+                    phone_number=result.get('phone_number') or payment.phone_number,
+                    mpesa_code=payment.mpesa_code or '',
+                    status='successful',
+                    ip_address=None,
+                )
+
+                # Audit log
+                AuditLog.objects.create(
+                    action='payment_verified',
+                    actor='system',
+                    details=json.dumps({
+                        'payment_id': payment.id,
+                        'mpesa_code': payment.mpesa_code,
+                        'amount': str(payment.amount),
+                        'vote_count': vote_count,
+                        'contestant': contestant.name,
+                        'source': 'daraja_callback',
+                    }),
+                    event=event,
+                )
+
+        return Response({'status': 'success', 'message': 'Payment processed successfully'})
+    else:
+        # Payment failed or cancelled
+        payment.status = 'failed'
+        payment.save()
+        return Response({'status': 'failed', 'message': result.get('result_desc', 'Payment failed')})
 
 
 # ── Helper ───────────────────────────────────────────────────────────────────

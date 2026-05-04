@@ -324,6 +324,7 @@ class Payment(models.Model):
     ]
 
     event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='payments')
+    contestant = models.ForeignKey(Contestant, on_delete=models.SET_NULL, null=True, blank=True, related_name='payments', help_text="Contestant being voted for (for vote payments)")
     phone_number = models.CharField(max_length=20)
     mpesa_code = models.CharField(max_length=20, unique=True, null=True, blank=True, help_text="M-Pesa transaction code (must be unique). Leave blank for pending payments.")
     amount = models.DecimalField(max_digits=10, decimal_places=2)
@@ -331,6 +332,12 @@ class Payment(models.Model):
     payment_type = models.CharField(max_length=10, choices=PAYMENT_TYPE_CHOICES)
     verified_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, help_text="Admin who verified this payment")
     verified_at = models.DateTimeField(null=True, blank=True)
+
+    # Daraja STK Push fields
+    checkout_request_id = models.CharField(max_length=50, blank=True, help_text="Daraja CheckoutRequestID from STK Push")
+    merchant_request_id = models.CharField(max_length=50, blank=True, help_text="Daraja MerchantRequestID from STK Push")
+    stk_response = models.JSONField(default=dict, blank=True, help_text="Raw STK Push response/callback data for debugging")
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
