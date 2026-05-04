@@ -47,36 +47,21 @@ const PartnershipPage = () => {
         setLoading(true)
         const response = await apiClient.getPartners()
         const partnersData = Array.isArray(response) ? response : (response.results || [])
-        if (partnersData.length > 0) {
-          setSponsors(partnersData.map((partner: any) => ({
-            name: partner.name,
-            logo: partner.logo_url || partner.logo || '',
-            description: partner.description || `Supporting ${partner.partner_type || 'our mission'}`,
-            since: partner.since || 'Partner'
-          })))
-        } else {
-          setSponsors(fallbackSponsors)
-        }
+        setSponsors(partnersData.map((partner: any) => ({
+          name: partner.name,
+          logo: partner.logo_url || partner.logo || '',
+          description: partner.description || `Supporting ${partner.partner_type || 'our mission'}`,
+          since: partner.since || 'Partner'
+        })))
       } catch (err) {
         console.error('Error fetching partners:', err)
-        setSponsors(fallbackSponsors)
+        setSponsors([])
       } finally {
         setLoading(false)
       }
     }
     fetchPartners()
   }, [])
-
-  const fallbackSponsors = [
-    { name: 'Kenya Tourism Board', logo: '', description: 'Promoting Kenya\'s cultural heritage globally', since: 'Partner since 2022' },
-    { name: 'Safaricom Foundation', logo: '', description: 'Empowering communities through technology', since: 'Event sponsor — Heritage Gala 2024' },
-    { name: 'Equity Bank', logo: '', description: 'Supporting youth empowerment programs', since: 'Partner since 2023' },
-    { name: 'KCB Bank', logo: '', description: 'Investing in cultural preservation', since: 'Program sponsor since 2021' },
-    { name: 'Coca-Cola East Africa', logo: '', description: 'Community development partner', since: 'Event sponsor — Cultural Walk 2024' },
-    { name: 'Kenya Airways', logo: '', description: 'Connecting Kenya to the world', since: 'Global outreach partner' },
-    { name: 'Tusker', logo: '', description: 'Celebrating Kenyan spirit and culture', since: 'Event sponsor since 2023' },
-    { name: 'Nation Media Group', logo: '', description: 'Media partner for cultural visibility', since: 'Media partner since 2022' }
-  ]
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -190,8 +175,9 @@ const PartnershipPage = () => {
                   <p className="mt-4 text-green-100">Loading partners...</p>
                 </div>
               ) : sponsors.length === 0 ? (
-                <div className="col-span-full text-center py-12">
-                  <p className="text-green-100">No partners available. Add partners in Django admin.</p>
+                <div className="col-span-full text-center py-16">
+                  <p className="text-green-100 text-lg font-light">Our partner announcements are coming soon.</p>
+                  <p className="text-green-200/60 text-sm mt-2">Be the first to partner with us!</p>
                 </div>
               ) : (
                 sponsors.map((sponsor, index) => (
