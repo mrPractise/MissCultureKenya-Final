@@ -24,4 +24,5 @@ urlpatterns = [
     path('verify-votes/', verify_votes_by_phone, name='verify-votes'),
     path('ticket-lookup/', ticket_lookup, name='ticket-lookup'),
     path('mpesa-callback/', mpesa_callback, name='mpesa-callback'),
+    path('cb/', mpesa_callback, name='mpesa-callback-short'),
 ]
