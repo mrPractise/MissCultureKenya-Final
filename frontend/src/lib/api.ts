@@ -12,32 +12,81 @@ interface ApiError {
   detail?: string
   errors?: Record<string, string[]>
   status?: number
+  raw?: string
+  code?: string
 }
 
 function extractError(err: any): ApiError {
-  if (axios.isAxiosError(err) && err.response) {
-    const data = err.response.data
-    const status = err.response.status
-    // DRF returns { detail: "..." } or { field_name: ["error"] }
-    if (typeof data === 'object' && data !== null) {
-      const errors: Record<string, string[]> = {}
-      let message = data.detail || data.message || data.error || ''
-      for (const [key, value] of Object.entries(data)) {
-        if (key === 'detail' || key === 'message' || key === 'error') continue
-        if (Array.isArray(value)) {
-          errors[key] = value.map(String)
-        } else if (typeof value === 'string') {
-          errors[key] = [value]
+  // Defensive: log the raw error structure for debugging
+  try {
+    console.error('Raw error:', JSON.stringify({
+      isAxiosError: axios.isAxiosError(err),
+      hasResponse: !!err?.response,
+      status: err?.response?.status,
+      dataType: typeof err?.response?.data,
+      data: err?.response?.data,
+      requestStatus: err?.request?.status,
+      message: err?.message,
+      code: err?.code,
+    }, null, 2))
+  } catch {
+    // ignore stringify failures
+  }
+
+  if (axios.isAxiosError(err)) {
+    if (err.response) {
+      const data = err.response.data
+      const status = err.response.status
+
+      // DRF returns { detail: "..." } or { field_name: ["error"] } or { error: "..." }
+      if (data && typeof data === 'object') {
+        const errors: Record<string, string[]> = {}
+        let message = data.detail || data.message || data.error || data.title || ''
+
+        for (const [key, value] of Object.entries(data)) {
+          if (['detail', 'message', 'error', 'title', 'status'].includes(key)) continue
+          if (Array.isArray(value)) {
+            errors[key] = value.map(String)
+          } else if (typeof value === 'string') {
+            errors[key] = [value]
+          } else if (value !== null && value !== undefined) {
+            errors[key] = [String(value)]
+          }
+        }
+
+        if (!message && Object.keys(errors).length > 0) {
+          message = Object.entries(errors).map(([k, v]) => `${k}: ${v.join(', ')}`).join('; ')
+        }
+
+        return {
+          message: message || `Request failed (HTTP ${status})`,
+          errors: Object.keys(errors).length ? errors : undefined,
+          detail: data.detail,
+          status,
+          raw: JSON.stringify(data),
         }
       }
-      if (!message && Object.keys(errors).length > 0) {
-        message = Object.entries(errors).map(([k, v]) => `${k}: ${v.join(', ')}`).join('; ')
+
+      // Non-JSON response (e.g. HTML error page)
+      const dataStr = String(data || '')
+      return {
+        message: dataStr.slice(0, 200) || `Request failed (HTTP ${status})`,
+        status,
+        raw: dataStr.slice(0, 500),
       }
-      return { message: message || `Request failed (HTTP ${status})`, errors: Object.keys(errors).length ? errors : undefined, detail: data.detail, status }
     }
-    return { message: String(data) || `Request failed (HTTP ${status})`, status }
+
+    // Request was made but no response received (network/CORS)
+    return {
+      message: err.message || 'Network error — server did not respond. Check that the backend is running.',
+      code: err.code,
+    }
   }
-  return { message: err?.message || 'Network error — please check your connection and try again.' }
+
+  // Non-Axios error
+  return {
+    message: err?.message || String(err) || 'An unexpected error occurred.',
+  }
 }
 
 async function handle(promise: Promise<any>) {
