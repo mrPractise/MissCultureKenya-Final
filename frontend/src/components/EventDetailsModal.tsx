@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import { Calendar, Clock, MapPin, Users, ExternalLink, Share2, X } from 'lucide-react'
 import { useState, useCallback } from 'react'
+import Link from 'next/link'
 import PaymentModal from './PaymentModal'
 
 interface TicketCategory {
@@ -62,6 +63,7 @@ const EventDetailsModal = ({ isOpen, onClose, event }: EventDetailsModalProps) =
   }, [event])
 
   if (!isOpen || !event) return null
+  const hasTicketCategories = Boolean(event.ticketCategories && event.ticketCategories.length > 0)
 
   const updateQuantity = (ticketName: string, quantity: number) => {
     setTicketQuantities(prev => ({
@@ -284,18 +286,29 @@ const EventDetailsModal = ({ isOpen, onClose, event }: EventDetailsModalProps) =
           {/* Sticky Action Bar */}
           <div className="flex-shrink-0 border-t border-gray-100 bg-white px-5 py-3 lg:px-6 lg:py-4">
             <div className="flex gap-3">
-              <button 
-                onClick={() => setIsPaymentModalOpen(true)}
-                disabled={getTotalTickets() === 0}
-                className={`flex-1 px-4 py-2.5 rounded-xl font-semibold text-sm transition-colors duration-300 flex items-center justify-center space-x-2 ${
-                  getTotalTickets() > 0 
-                    ? 'bg-red-600 hover:bg-red-700 text-white shadow-lg shadow-red-600/20' 
-                    : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                }`}
-              >
-                <ExternalLink className="w-4 h-4" />
-                <span>Get Tickets{getTotalTickets() > 0 ? ` (${getTotalTickets()})` : ''}</span>
-              </button>
+              {hasTicketCategories ? (
+                <button
+                  onClick={() => setIsPaymentModalOpen(true)}
+                  disabled={getTotalTickets() === 0}
+                  title={getTotalTickets() === 0 ? 'Select a ticket quantity above to continue' : undefined}
+                  className={`flex-1 px-4 py-2.5 rounded-xl font-semibold text-sm transition-colors duration-300 flex items-center justify-center space-x-2 ${
+                    getTotalTickets() > 0
+                      ? 'bg-red-600 hover:bg-red-700 text-white shadow-lg shadow-red-600/20'
+                      : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                  }`}
+                >
+                  <ExternalLink className="w-4 h-4" />
+                  <span>Get Tickets{getTotalTickets() > 0 ? ` (${getTotalTickets()})` : ''}</span>
+                </button>
+              ) : (
+                <Link
+                  href={`/events/${event.id}`}
+                  className="flex-1 px-4 py-2.5 rounded-xl font-semibold text-sm transition-colors duration-300 flex items-center justify-center space-x-2 bg-red-600 hover:bg-red-700 text-white shadow-lg shadow-red-600/20"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                  <span>Get Tickets</span>
+                </Link>
+              )}
 
               <button 
                 onClick={handleShare}
@@ -305,6 +318,11 @@ const EventDetailsModal = ({ isOpen, onClose, event }: EventDetailsModalProps) =
                 <span>Share</span>
               </button>
             </div>
+            {hasTicketCategories && getTotalTickets() === 0 && (
+              <p className="mt-2 text-xs text-gray-500">
+                Select a ticket quantity above to enable checkout.
+              </p>
+            )}
           </div>
         </div>
       </motion.div>
