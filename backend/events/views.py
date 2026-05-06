@@ -367,31 +367,59 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
             }, status=status.HTTP_502_BAD_GATEWAY)
 
     def _process_ticket_payment(self, payment, event):
-        """Generate tickets after successful payment verification."""
-        # Determine how many tickets to issue based on ticket category
-        ticket_category_id = getattr(payment, '_ticket_category_id', None)
-        ticket_category = None
-        if ticket_category_id:
-            try:
-                ticket_category = TicketCategory.objects.get(id=ticket_category_id, event=event)
-            except TicketCategory.DoesNotExist:
-                pass
-
-        # Generate one ticket per payment (can be extended for multiple)
         event_year = event.start_date.year
-        ticket_code = generate_ticket_code(event.ticket_prefix, event_year)
+        ticket_breakdown = payment.ticket_breakdown or {}
+        tickets = []
 
-        ticket = Ticket.objects.create(
-            event=event,
-            ticket_category=ticket_category,
-            payment=payment,
-            ticket_code=ticket_code,
-            full_name=payment.phone_number,  # Will be updated by admin
-            email='',
-            phone=payment.phone_number,
-        )
+        if ticket_breakdown:
+            for category_id, qty in ticket_breakdown.items():
+                try:
+                    ticket_category = TicketCategory.objects.get(id=int(category_id), event=event)
+                except TicketCategory.DoesNotExist:
+                    continue
 
-        return {'ticket_id': ticket.id, 'ticket_code': ticket.ticket_code}
+                qty = max(1, int(qty))
+                for _ in range(qty):
+                    ticket_code = generate_ticket_code(event.ticket_prefix, event_year)
+                    ticket = Ticket.objects.create(
+                        event=event,
+                        ticket_category=ticket_category,
+                        payment=payment,
+                        ticket_code=ticket_code,
+                        full_name=payment.full_name or payment.phone_number,
+                        email=payment.email or '',
+                        phone=payment.phone_number,
+                    )
+                    tickets.append({'ticket_id': ticket.id, 'ticket_code': ticket.ticket_code, 'ticket_category': ticket_category.id})
+
+                ticket_category.available = max(0, int(ticket_category.available or 0) - qty)
+                ticket_category.save(update_fields=['available'])
+        else:
+            ticket_category = payment.ticket_category
+            if ticket_category and ticket_category.event_id != event.id:
+                ticket_category = None
+
+            quantity = int(payment.ticket_quantity or 1)
+            quantity = max(1, quantity)
+
+            for _ in range(quantity):
+                ticket_code = generate_ticket_code(event.ticket_prefix, event_year)
+                ticket = Ticket.objects.create(
+                    event=event,
+                    ticket_category=ticket_category,
+                    payment=payment,
+                    ticket_code=ticket_code,
+                    full_name=payment.full_name or payment.phone_number,
+                    email=payment.email or '',
+                    phone=payment.phone_number,
+                )
+                tickets.append({'ticket_id': ticket.id, 'ticket_code': ticket.ticket_code, 'ticket_category': ticket_category.id if ticket_category else None})
+
+            if ticket_category:
+                ticket_category.available = max(0, int(ticket_category.available or 0) - quantity)
+                ticket_category.save(update_fields=['available'])
+
+        return {'tickets': tickets, 'ticket_count': len(tickets)}
 
     def _process_vote_payment(self, payment, event, request):
         """Calculate and create vote transactions after successful payment."""
@@ -400,8 +428,9 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
         if vote_count == 0:
             return {'error': 'Payment amount is less than vote price. No votes created.'}
 
-        # Get contestant — could be specified in payment or request
         contestant_id = request.data.get('contestant_id') if request else None
+        if not contestant_id:
+            contestant_id = payment.contestant_id
 
         if not contestant_id:
             return {'error': 'contestant_id is required for vote processing.'}
@@ -560,11 +589,86 @@ class PaymentViewSet(viewsets.ModelViewSet):
         return PaymentSerializer
 
     def perform_create(self, serializer):
-        """When admin creates a payment with status=successful, process it."""
         payment = serializer.save()
 
         if payment.status == 'successful':
-            # Log the creation
+            if self.request and self.request.user and self.request.user.is_authenticated:
+                payment.verified_by = self.request.user
+                payment.verified_at = timezone.now()
+                payment.save(update_fields=['verified_by', 'verified_at', 'updated_at'])
+
+            results = {}
+            if payment.payment_type == 'ticket':
+                if not payment.tickets.exists():
+                    event = payment.event
+                    event_year = event.start_date.year
+                    created = []
+                    ticket_breakdown = payment.ticket_breakdown or {}
+                    if ticket_breakdown:
+                        for category_id, qty in ticket_breakdown.items():
+                            try:
+                                ticket_category = TicketCategory.objects.get(id=int(category_id), event=event)
+                            except TicketCategory.DoesNotExist:
+                                continue
+
+                            qty = max(1, int(qty))
+                            for _ in range(qty):
+                                ticket_code = generate_ticket_code(event.ticket_prefix, event_year)
+                                ticket = Ticket.objects.create(
+                                    event=event,
+                                    ticket_category=ticket_category,
+                                    payment=payment,
+                                    ticket_code=ticket_code,
+                                    full_name=payment.full_name or payment.phone_number,
+                                    email=payment.email or '',
+                                    phone=payment.phone_number,
+                                )
+                                created.append({'ticket_id': ticket.id, 'ticket_code': ticket.ticket_code, 'ticket_category': ticket_category.id})
+
+                            ticket_category.available = max(0, int(ticket_category.available or 0) - qty)
+                            ticket_category.save(update_fields=['available'])
+                    else:
+                        ticket_category = payment.ticket_category
+                        if ticket_category and ticket_category.event_id != event.id:
+                            ticket_category = None
+
+                        quantity = int(payment.ticket_quantity or 1)
+                        quantity = max(1, quantity)
+
+                        for _ in range(quantity):
+                            ticket_code = generate_ticket_code(event.ticket_prefix, event_year)
+                            ticket = Ticket.objects.create(
+                                event=event,
+                                ticket_category=ticket_category,
+                                payment=payment,
+                                ticket_code=ticket_code,
+                                full_name=payment.full_name or payment.phone_number,
+                                email=payment.email or '',
+                                phone=payment.phone_number,
+                            )
+                            created.append({'ticket_id': ticket.id, 'ticket_code': ticket.ticket_code, 'ticket_category': ticket_category.id if ticket_category else None})
+
+                        if ticket_category:
+                            ticket_category.available = max(0, int(ticket_category.available or 0) - quantity)
+                            ticket_category.save(update_fields=['available'])
+
+                    results = {'tickets': created, 'ticket_count': len(created)}
+            elif payment.payment_type == 'vote':
+                if payment.contestant_id and not payment.vote_transactions.exists():
+                    event = payment.event
+                    vote_count = calculate_vote_count(payment.amount, event.vote_price)
+                    if vote_count > 0:
+                        vote = VoteTransaction.objects.create(
+                            event=event,
+                            contestant=payment.contestant,
+                            payment=payment,
+                            vote_count=vote_count,
+                            phone_number=payment.phone_number,
+                            mpesa_code=payment.mpesa_code or '',
+                            status='successful',
+                        )
+                        results = {'vote_id': vote.id, 'vote_count': vote_count, 'contestant': payment.contestant.name}
+
             AuditLog.objects.create(
                 action='payment_verified',
                 actor=self.request.user.username if self.request.user.is_authenticated else 'admin',
@@ -574,6 +678,7 @@ class PaymentViewSet(viewsets.ModelViewSet):
                     'amount': str(payment.amount),
                     'payment_type': payment.payment_type,
                     'event_id': payment.event_id,
+                    'results': results,
                 }),
                 event=payment.event,
             )

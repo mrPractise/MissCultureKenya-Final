@@ -160,11 +160,15 @@ class PaymentSerializer(serializers.ModelSerializer):
     event_title = serializers.CharField(source='event.title', read_only=True)
     contestant_name = serializers.CharField(source='contestant.name', read_only=True, default=None)
     verified_by_name = serializers.CharField(source='verified_by.username', read_only=True, default=None)
+    ticket_category_name = serializers.CharField(source='ticket_category.name', read_only=True, default=None)
 
     class Meta:
         model = Payment
         fields = [
             'id', 'event', 'event_title', 'contestant', 'contestant_name',
+            'ticket_category', 'ticket_category_name', 'ticket_quantity',
+            'ticket_breakdown',
+            'full_name', 'email',
             'phone_number', 'mpesa_code', 'amount', 'status', 'payment_type',
             'checkout_request_id', 'merchant_request_id',
             'verified_by', 'verified_by_name', 'verified_at', 'created_at', 'updated_at',
@@ -177,9 +181,19 @@ class PaymentCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payment
         fields = [
-            'event', 'phone_number', 'mpesa_code', 'amount',
+            'event', 'contestant', 'ticket_category', 'ticket_quantity',
+            'ticket_breakdown',
+            'full_name', 'email',
+            'phone_number', 'mpesa_code', 'amount',
             'status', 'payment_type',
         ]
+
+    def validate_ticket_quantity(self, value):
+        if value is None:
+            return 1
+        if int(value) < 1:
+            raise serializers.ValidationError("ticket_quantity must be at least 1.")
+        return value
 
     def validate_mpesa_code(self, value):
         # Allow blank/null for pending payments
@@ -188,6 +202,39 @@ class PaymentCreateSerializer(serializers.ModelSerializer):
         if Payment.objects.filter(mpesa_code=value).exists():
             raise serializers.ValidationError("This M-Pesa transaction code has already been used.")
         return value
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        payment_type = attrs.get('payment_type')
+        if payment_type == 'ticket':
+            ticket_category = attrs.get('ticket_category')
+            ticket_breakdown = attrs.get('ticket_breakdown') or {}
+            if not ticket_category and not ticket_breakdown:
+                raise serializers.ValidationError({'ticket_category': 'Select at least one ticket category.'})
+            if ticket_category and ticket_breakdown:
+                raise serializers.ValidationError({'ticket_breakdown': 'Provide either ticket_category or ticket_breakdown, not both.'})
+            if not attrs.get('full_name'):
+                raise serializers.ValidationError({'full_name': 'full_name is required for ticket payments.'})
+            if not attrs.get('email'):
+                raise serializers.ValidationError({'email': 'email is required for ticket payments.'})
+            if ticket_breakdown:
+                if not isinstance(ticket_breakdown, dict):
+                    raise serializers.ValidationError({'ticket_breakdown': 'ticket_breakdown must be an object like {"12": 2, "15": 1}.'})
+                cleaned = {}
+                for k, v in ticket_breakdown.items():
+                    try:
+                        category_id = int(k)
+                    except Exception:
+                        raise serializers.ValidationError({'ticket_breakdown': 'Ticket category keys must be numeric IDs.'})
+                    try:
+                        qty = int(v)
+                    except Exception:
+                        raise serializers.ValidationError({'ticket_breakdown': 'Ticket quantities must be integers.'})
+                    if qty < 1:
+                        raise serializers.ValidationError({'ticket_breakdown': 'Ticket quantities must be at least 1.'})
+                    cleaned[category_id] = qty
+                attrs['ticket_breakdown'] = cleaned
+        return attrs
 
 
 # ── Ticket ───────────────────────────────────────────────────────────────────

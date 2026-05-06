@@ -17,22 +17,6 @@ interface ApiError {
 }
 
 function extractError(err: any): ApiError {
-  // Defensive: log the raw error structure for debugging
-  try {
-    console.error('Raw error:', JSON.stringify({
-      isAxiosError: axios.isAxiosError(err),
-      hasResponse: !!err?.response,
-      status: err?.response?.status,
-      dataType: typeof err?.response?.data,
-      data: err?.response?.data,
-      requestStatus: err?.request?.status,
-      message: err?.message,
-      code: err?.code,
-    }, null, 2))
-  } catch {
-    // ignore stringify failures
-  }
-
   if (axios.isAxiosError(err)) {
     if (err.response) {
       const data = err.response.data
@@ -69,8 +53,11 @@ function extractError(err: any): ApiError {
 
       // Non-JSON response (e.g. HTML error page)
       const dataStr = String(data || '')
+      const looksLikeHtml = /<!doctype html|<html[\s>]/i.test(dataStr)
       return {
-        message: dataStr.slice(0, 200) || `Request failed (HTTP ${status})`,
+        message: looksLikeHtml
+          ? `Server error (HTTP ${status}). The backend returned an HTML error page. Check backend logs and migrations.`
+          : (dataStr.slice(0, 200) || `Request failed (HTTP ${status})`),
         status,
         raw: dataStr.slice(0, 500),
       }
@@ -95,8 +82,6 @@ async function handle(promise: Promise<any>) {
     return res.data
   } catch (err) {
     const apiErr = extractError(err)
-    // Log for developer console debugging
-    console.error('API Error:', apiErr)
     throw apiErr
   }
 }
@@ -192,7 +177,20 @@ const apiClient = {
   },
 
   // Create a pending payment (for votes or tickets)
-  createPayment(data: { event: number; phone_number: string; mpesa_code: string; amount: number; status: string; payment_type: string }) {
+  createPayment(data: {
+    event: number
+    phone_number: string
+    mpesa_code?: string
+    amount: number
+    status: string
+    payment_type: string
+    contestant?: number
+    ticket_category?: number
+    ticket_quantity?: number
+    ticket_breakdown?: Record<string, number>
+    full_name?: string
+    email?: string
+  }) {
     return handle(client.post('/api/events/payments/', data))
   },
 

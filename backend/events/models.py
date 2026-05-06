@@ -325,6 +325,11 @@ class Payment(models.Model):
 
     event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='payments')
     contestant = models.ForeignKey(Contestant, on_delete=models.SET_NULL, null=True, blank=True, related_name='payments', help_text="Contestant being voted for (for vote payments)")
+    ticket_category = models.ForeignKey(TicketCategory, on_delete=models.SET_NULL, null=True, blank=True, related_name='payments')
+    ticket_quantity = models.PositiveIntegerField(default=1)
+    ticket_breakdown = models.JSONField(default=dict, blank=True)
+    full_name = models.CharField(max_length=200, blank=True)
+    email = models.EmailField(blank=True)
     phone_number = models.CharField(max_length=20)
     mpesa_code = models.CharField(max_length=20, unique=True, null=True, blank=True, help_text="M-Pesa transaction code (must be unique). Leave blank for pending payments.")
     amount = models.DecimalField(max_digits=10, decimal_places=2)

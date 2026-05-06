@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import { Calendar, Clock, MapPin, Users, ExternalLink, Share2, ArrowLeft, Vote, Copy, Check, Ticket, AlertCircle, Loader2, Mail, Phone, User } from 'lucide-react'
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import apiClient from '@/lib/api'
 import type { ApiError } from '@/lib/api'
 
@@ -18,21 +18,34 @@ interface TicketCategoryData {
   is_active: boolean
 }
 
+interface ContestantData {
+  id: number
+  name: string
+  bio: string
+  photo_url: string | null
+  contestant_number: number
+  slug: string
+}
+
 const EventDetailPage = () => {
   const params = useParams()
+  const router = useRouter()
   const eventId = params?.id as string
   const [event, setEvent] = useState<any>(null)
   const [rawData, setRawData] = useState<any>(null)
   const [ticketCategories, setTicketCategories] = useState<TicketCategoryData[]>([])
+  const [contestants, setContestants] = useState<ContestantData[]>([])
+  const [contestantsLoading, setContestantsLoading] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
   // Ticket registration state
   const [showTicketForm, setShowTicketForm] = useState(false)
-  const [selectedCategory, setSelectedCategory] = useState<number | null>(null)
+  const [ticketQuantities, setTicketQuantities] = useState<Record<number, number>>({})
   const [regName, setRegName] = useState('')
   const [regEmail, setRegEmail] = useState('')
   const [regPhone, setRegPhone] = useState('')
+  const [regMpesaCode, setRegMpesaCode] = useState('')
   const [regSubmitting, setRegSubmitting] = useState(false)
   const [regError, setRegError] = useState('')
   const [regSuccess, setRegSuccess] = useState<any>(null)
@@ -83,6 +96,17 @@ const EventDetailPage = () => {
         } catch {
           // Ticket categories not available, that's OK
         }
+
+        setContestantsLoading(true)
+        try {
+          const cData = await apiClient.getEventContestants(data.id, { is_active: true })
+          const cResults = Array.isArray(cData) ? cData : (cData?.results || [])
+          setContestants(cResults)
+        } catch {
+          setContestants([])
+        } finally {
+          setContestantsLoading(false)
+        }
       } catch (err: any) {
         const apiErr = err as ApiError
         setError(apiErr?.message || 'Failed to load event. It may not exist or has been removed.')
@@ -112,21 +136,96 @@ const EventDetailPage = () => {
     })
   }
 
+  const selectedItems = ticketCategories
+    .map((tc) => ({ tc, qty: ticketQuantities[tc.id] || 0 }))
+    .filter((x) => x.qty > 0)
+
+  const totalTickets = selectedItems.reduce((sum, x) => sum + x.qty, 0)
+  const totalAmount = selectedItems.reduce((sum, x) => sum + (Number(x.tc.price) * x.qty), 0)
+  const requiresPayment = totalAmount > 0
+
+  const updateTicketQuantity = (ticketCategoryId: number, nextQty: number) => {
+    const tc = ticketCategories.find((x) => x.id === ticketCategoryId)
+    const maxAvail = Number(tc?.available || 0)
+    const clamped = maxAvail > 0 ? Math.max(0, Math.min(nextQty, maxAvail)) : Math.max(0, nextQty)
+    setTicketQuantities((prev) => ({ ...prev, [ticketCategoryId]: clamped }))
+  }
+
+  const startCheckout = () => {
+    const numericEventId = Number(eventId)
+    if (!numericEventId || !Number.isFinite(numericEventId)) return
+    if (selectedItems.length === 0) {
+      setRegError('Select at least one ticket category and quantity')
+      return
+    }
+    const draft = {
+      eventId: numericEventId,
+      items: selectedItems.map((x) => ({ ticket_category_id: x.tc.id, quantity: x.qty })),
+      totalTickets,
+      totalAmount,
+    }
+    sessionStorage.setItem(`checkout:event:${numericEventId}`, JSON.stringify(draft))
+    router.push(`/events/${numericEventId}/checkout`)
+  }
+
   const handleRegisterTicket = async () => {
     if (!regName || !regEmail) {
       setRegError('Name and email are required')
       return
     }
+    if (selectedItems.length === 0) {
+      setRegError('Select at least one ticket category and quantity')
+      return
+    }
+
+    for (const item of selectedItems) {
+      const maxAvail = Number(item.tc.available || 0)
+      if (maxAvail > 0 && item.qty > maxAvail) {
+        setRegError(`Only ${maxAvail} ticket(s) available for "${item.tc.name}"`)
+        return
+      }
+    }
+
+    if (requiresPayment) {
+      startCheckout()
+      return
+    }
+
     setRegSubmitting(true)
     setRegError('')
     try {
-      const result = await apiClient.registerFreeTicket(Number(eventId), {
-        full_name: regName,
-        email: regEmail,
-        phone: regPhone ? `+254${regPhone}` : '',
-        ticket_category: selectedCategory || undefined,
-      })
-      setRegSuccess(result)
+      if (requiresPayment) {
+        const breakdown: Record<string, number> = {}
+        for (const item of selectedItems) breakdown[String(item.tc.id)] = item.qty
+
+        const payment = await apiClient.createPayment({
+          event: Number(eventId),
+          phone_number: `+254${regPhone}`,
+          mpesa_code: regMpesaCode.trim().toUpperCase(),
+          amount: totalAmount,
+          status: 'pending',
+          payment_type: 'ticket',
+          ticket_breakdown: breakdown,
+          ticket_quantity: totalTickets,
+          full_name: regName,
+          email: regEmail,
+        })
+        setRegSuccess({ payment_pending: true, payment })
+      } else {
+        const ticketCodes: string[] = []
+        for (const item of selectedItems) {
+          for (let i = 0; i < item.qty; i += 1) {
+            const result = await apiClient.registerFreeTicket(Number(eventId), {
+              full_name: regName,
+              email: regEmail,
+              phone: regPhone ? `+254${regPhone}` : '',
+              ticket_category: item.tc.id,
+            })
+            if (result?.ticket_code) ticketCodes.push(result.ticket_code)
+          }
+        }
+        setRegSuccess({ ticket_codes: ticketCodes })
+      }
     } catch (err) {
       const apiErr = err as ApiError
       setRegError(apiErr.message || 'Failed to register ticket')
@@ -161,8 +260,7 @@ const EventDetailPage = () => {
     )
   }
 
-  const isFreeEvent = ticketCategories.length > 0 && ticketCategories.every(tc => Number(tc.price) === 0)
-  const hasPaidTickets = ticketCategories.some(tc => Number(tc.price) > 0)
+  const isVotingOpen = Boolean(event.voting_enabled && (event.is_voting_active || event.event_status === 'voting_open'))
 
   return (
     <div className="min-h-screen bg-white">
@@ -182,7 +280,7 @@ const EventDetailPage = () => {
             <span className="bg-green-600 text-white px-3 py-1 rounded-full text-xs font-bold uppercase">{event.category}</span>
             {event.audience && <span className="bg-white/20 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-medium">{event.audience}</span>}
             <span className="bg-white/20 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-medium">{event.price}</span>
-            {event.voting_enabled && (
+            {isVotingOpen && (
               <Link href="/voting" className="bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold uppercase flex items-center gap-1 hover:bg-red-700 transition-colors">
                 <Vote className="w-3 h-3" /> Voting Open
               </Link>
@@ -222,6 +320,53 @@ const EventDetailPage = () => {
               <p className="text-gray-600 leading-relaxed">{event.description}</p>
             </div>
 
+            {(contestantsLoading || contestants.length > 0) && (
+              <div>
+                <div className="flex items-center justify-between gap-4 mb-3">
+                  <h2 className="text-xl font-bold text-gray-900">Participants</h2>
+                  {!event.voting_enabled && (
+                    <span className="text-xs font-semibold text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
+                      Voting not open yet
+                    </span>
+                  )}
+                </div>
+                {contestantsLoading ? (
+                  <p className="text-sm text-gray-500">Loading participants...</p>
+                ) : (
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    {contestants.map((c) => (
+                      <div key={c.id} className="border border-gray-200 rounded-xl p-4 bg-white">
+                        <div className="flex items-start gap-3">
+                          {c.photo_url ? (
+                            <img
+                              src={c.photo_url}
+                              alt={c.name}
+                              className="w-12 h-12 rounded-xl object-cover flex-shrink-0"
+                            />
+                          ) : (
+                            <div className="w-12 h-12 rounded-xl bg-green-50 border border-green-100 flex items-center justify-center flex-shrink-0">
+                              <Users className="w-5 h-5 text-green-600" />
+                            </div>
+                          )}
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center justify-between gap-3">
+                              <p className="font-semibold text-gray-900 truncate">{c.name}</p>
+                              <span className="text-xs font-bold text-green-700 bg-green-50 border border-green-200 px-2 py-0.5 rounded-full flex-shrink-0">
+                                #{c.contestant_number}
+                              </span>
+                            </div>
+                            {c.bio && (
+                              <p className="text-sm text-gray-600 mt-1 line-clamp-3">{c.bio}</p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Ticket Categories */}
             {ticketCategories.length > 0 && (
               <div>
@@ -230,25 +375,66 @@ const EventDetailPage = () => {
                   {ticketCategories.map((tc) => (
                     <div
                       key={tc.id}
-                      onClick={() => {
-                        setSelectedCategory(tc.id)
-                        setShowTicketForm(true)
-                      }}
-                      className={`p-4 border-2 rounded-xl flex justify-between items-center cursor-pointer transition-all ${
-                        selectedCategory === tc.id ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-green-300 hover:bg-green-50/50'
-                      }`}
+                      className="p-4 border-2 rounded-xl flex justify-between items-center transition-all border-gray-200 hover:border-green-300 hover:bg-green-50/50"
                     >
                       <div>
                         <h4 className="font-semibold text-gray-900">{tc.name}</h4>
                         {tc.description && <p className="text-xs text-gray-500">{tc.description}</p>}
                         <p className="text-xs text-gray-400 mt-1">{tc.available} of {tc.total} available</p>
                       </div>
-                      <span className="text-lg font-bold text-green-700">
-                        {Number(tc.price) === 0 ? 'Free' : `KES ${Number(tc.price).toLocaleString()}`}
-                      </span>
+                      <div className="flex items-center gap-4">
+                        <span className="text-lg font-bold text-green-700 whitespace-nowrap">
+                          {Number(tc.price) === 0 ? 'Free' : `KES ${Number(tc.price).toLocaleString()}`}
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => updateTicketQuantity(tc.id, (ticketQuantities[tc.id] || 0) - 1)}
+                            disabled={(ticketQuantities[tc.id] || 0) <= 0}
+                            className="w-9 h-9 rounded-xl bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 disabled:cursor-not-allowed text-gray-700 font-bold"
+                          >
+                            -
+                          </button>
+                          <span className="w-8 text-center font-semibold text-gray-900">
+                            {ticketQuantities[tc.id] || 0}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => updateTicketQuantity(tc.id, (ticketQuantities[tc.id] || 0) + 1)}
+                            disabled={Number(tc.available) > 0 && (ticketQuantities[tc.id] || 0) >= Number(tc.available)}
+                            className="w-9 h-9 rounded-xl bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 disabled:cursor-not-allowed text-gray-700 font-bold"
+                          >
+                            +
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   ))}
                 </div>
+                {totalTickets > 0 && (
+                  <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-semibold text-gray-900">{totalTickets} ticket{totalTickets > 1 ? 's' : ''} selected</p>
+                      <p className="text-xs text-gray-600">
+                        Total: {totalAmount === 0 ? 'Free' : `KES ${totalAmount.toLocaleString()}`}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setRegError('')
+                        if (totalAmount > 0) {
+                          startCheckout()
+                          return
+                        }
+                        setShowTicketForm(true)
+                      }}
+                      className="bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-colors"
+                    >
+                      {totalAmount > 0 ? 'Checkout' : 'Continue'}
+                    </button>
+                  </div>
+                )}
               </div>
             )}
 
@@ -259,18 +445,33 @@ const EventDetailPage = () => {
                   <div>
                     <h3 className="font-bold text-gray-900 flex items-center gap-2">
                       <Vote className="w-5 h-5 text-red-600" />
-                      Voting is Open
+                      {isVotingOpen ? 'Voting is Open' : 'Voting is Closed'}
                     </h3>
                     <p className="text-sm text-gray-600 mt-1">
                       KES {event.vote_price} per vote | {event.contestant_count} contestants | {event.total_votes} votes cast
                     </p>
+                    {!isVotingOpen && (
+                      <p className="text-xs text-gray-500 mt-1">
+                        Voting is enabled for this event, but it is not currently active.
+                      </p>
+                    )}
                   </div>
-                  <Link
-                    href="/voting"
-                    className="bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-colors"
-                  >
-                    Vote Now
-                  </Link>
+                  {isVotingOpen ? (
+                    <Link
+                      href="/voting"
+                      className="bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-colors"
+                    >
+                      Vote Now
+                    </Link>
+                  ) : (
+                    <button
+                      type="button"
+                      disabled
+                      className="bg-gray-200 text-gray-500 px-5 py-2.5 rounded-xl font-semibold text-sm cursor-not-allowed"
+                    >
+                      Vote Closed
+                    </button>
+                  )}
                 </div>
               </div>
             )}
@@ -292,14 +493,34 @@ const EventDetailPage = () => {
               <div className="bg-gray-50 rounded-xl p-6 border border-gray-200 space-y-4">
                 <h3 className="font-bold text-gray-900">Register for This Event</h3>
 
-                {isFreeEvent ? (
+                {!requiresPayment ? (
                   <p className="text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg p-3">
                     This is a free event. Fill in your details and your ticket will be generated immediately.
                   </p>
                 ) : (
                   <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-3">
-                    This is a paid event. After registration, complete M-Pesa payment. Your ticket will be issued once payment is verified.
+                    This is a paid ticket. Pay via M-Pesa, then enter your M-Pesa code below to submit for verification.
                   </p>
+                )}
+
+                {selectedItems.length > 0 && (
+                  <div className="bg-white border border-gray-200 rounded-xl p-4">
+                    <p className="text-sm font-semibold text-gray-900 mb-2">Your Order</p>
+                    <div className="space-y-1">
+                      {selectedItems.map(({ tc, qty }) => (
+                        <div key={tc.id} className="flex items-center justify-between text-sm">
+                          <span className="text-gray-700">{tc.name} <span className="text-gray-400">x{qty}</span></span>
+                          <span className="font-semibold text-gray-900">
+                            {Number(tc.price) === 0 ? 'Free' : `KES ${(Number(tc.price) * qty).toLocaleString()}`}
+                          </span>
+                        </div>
+                      ))}
+                      <div className="border-t border-gray-100 pt-2 mt-2 flex items-center justify-between">
+                        <span className="text-sm font-bold text-gray-900">Total</span>
+                        <span className="text-sm font-bold text-green-700">{totalAmount === 0 ? 'Free' : `KES ${totalAmount.toLocaleString()}`}</span>
+                      </div>
+                    </div>
+                  </div>
                 )}
 
                 <div>
@@ -345,6 +566,22 @@ const EventDetailPage = () => {
                   </div>
                 </div>
 
+                {requiresPayment && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">M-Pesa Code *</label>
+                    <input
+                      type="text"
+                      value={regMpesaCode}
+                      onChange={(e) => { setRegMpesaCode(e.target.value); setRegError('') }}
+                      placeholder="e.g. QWE12ABC3D"
+                      className="w-full px-3 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                    />
+                    <p className="mt-1 text-xs text-gray-500">
+                      Enter the transaction code from your M-Pesa message after paying.
+                    </p>
+                  </div>
+                )}
+
                 {regError && (
                   <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-xl">
                     <AlertCircle className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />
@@ -365,7 +602,7 @@ const EventDetailPage = () => {
                     className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white py-2.5 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2"
                   >
                     {regSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Ticket className="w-4 h-4" />}
-                    {isFreeEvent ? 'Get Free Ticket' : 'Register'}
+                    {!requiresPayment ? 'Get Ticket' : 'Submit Payment'}
                   </button>
                 </div>
               </div>
@@ -377,17 +614,28 @@ const EventDetailPage = () => {
                 <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto">
                   <Check className="w-6 h-6 text-green-600" />
                 </div>
-                <h3 className="font-bold text-green-900 text-lg">Ticket Registered!</h3>
-                {regSuccess.ticket_code && (
-                  <div className="bg-white rounded-lg p-3 inline-block">
-                    <p className="text-xs text-gray-500">Ticket Code</p>
-                    <p className="text-xl font-bold font-mono text-green-700 tracking-widest">{regSuccess.ticket_code}</p>
+                <h3 className="font-bold text-green-900 text-lg">
+                  {regSuccess?.ticket_code || regSuccess?.ticket_codes?.length ? 'Ticket Registered!' : 'Payment Submitted!'}
+                </h3>
+                {(regSuccess.ticket_code || regSuccess?.ticket_codes?.length) && (
+                  <div className="bg-white rounded-lg p-3 inline-block text-left">
+                    <p className="text-xs text-gray-500 mb-2">Ticket Code{regSuccess?.ticket_codes?.length > 1 ? 's' : ''}</p>
+                    {regSuccess.ticket_code && (
+                      <p className="text-xl font-bold font-mono text-green-700 tracking-widest">{regSuccess.ticket_code}</p>
+                    )}
+                    {Array.isArray(regSuccess.ticket_codes) && regSuccess.ticket_codes.length > 0 && (
+                      <div className="space-y-1">
+                        {regSuccess.ticket_codes.map((code: string) => (
+                          <p key={code} className="text-sm font-bold font-mono text-green-700 tracking-widest">{code}</p>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
                 <p className="text-sm text-green-700">
-                  {isFreeEvent
+                  {regSuccess?.ticket_code || regSuccess?.ticket_codes?.length
                     ? 'Your ticket is ready! Save your ticket code.'
-                    : 'Complete M-Pesa payment. Your ticket will be issued once verified by admin.'}
+                    : 'Your payment has been submitted for verification. Your ticket will be issued after confirmation.'}
                 </p>
                 {regSuccess.ticket_code && (
                   <Link
@@ -396,6 +644,19 @@ const EventDetailPage = () => {
                   >
                     <Ticket className="w-4 h-4" /> View Ticket
                   </Link>
+                )}
+                {Array.isArray(regSuccess.ticket_codes) && regSuccess.ticket_codes.length > 0 && (
+                  <div className="flex flex-wrap justify-center gap-2">
+                    {regSuccess.ticket_codes.map((code: string) => (
+                      <Link
+                        key={code}
+                        href={`/events/${eventId}/ticket/${code}`}
+                        className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-xl font-semibold text-sm transition-colors"
+                      >
+                        <Ticket className="w-4 h-4" /> View {code}
+                      </Link>
+                    ))}
+                  </div>
                 )}
               </div>
             )}

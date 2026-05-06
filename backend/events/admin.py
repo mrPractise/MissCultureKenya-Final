@@ -1,8 +1,10 @@
 from django.contrib import admin
+from django.utils import timezone
 from .models import (
     Event, EventInquiry, EventCategory, EventSettings,
     TicketCategory, Contestant, Payment, Ticket, VoteTransaction, AuditLog
 )
+from .utils import generate_ticket_code, calculate_vote_count
 
 
 # ── Inlines ──────────────────────────────────────────────────────────────────
@@ -198,10 +200,87 @@ class PaymentAdmin(admin.ModelAdmin):
             payment.verified_by = request.user
             payment.verified_at = timezone.now()
             payment.save()
+            results = {}
+            if payment.payment_type == 'ticket':
+                if not payment.tickets.exists():
+                    event = payment.event
+                    event_year = event.start_date.year
+                    created_codes = []
+                    ticket_breakdown = payment.ticket_breakdown or {}
+                    if ticket_breakdown:
+                        for category_id, qty in ticket_breakdown.items():
+                            try:
+                                ticket_category = TicketCategory.objects.get(id=int(category_id), event=event)
+                            except TicketCategory.DoesNotExist:
+                                continue
+
+                            qty = max(1, int(qty))
+                            for _ in range(qty):
+                                code = generate_ticket_code(event.ticket_prefix, event_year)
+                                Ticket.objects.create(
+                                    event=event,
+                                    ticket_category=ticket_category,
+                                    payment=payment,
+                                    ticket_code=code,
+                                    full_name=payment.full_name or payment.phone_number,
+                                    email=payment.email or '',
+                                    phone=payment.phone_number,
+                                )
+                                created_codes.append(code)
+
+                            ticket_category.available = max(0, int(ticket_category.available or 0) - qty)
+                            ticket_category.save(update_fields=['available'])
+                    else:
+                        ticket_category = payment.ticket_category
+                        if ticket_category and ticket_category.event_id != event.id:
+                            ticket_category = None
+
+                        quantity = int(payment.ticket_quantity or 1)
+                        quantity = max(1, quantity)
+
+                        for _ in range(quantity):
+                            code = generate_ticket_code(event.ticket_prefix, event_year)
+                            Ticket.objects.create(
+                                event=event,
+                                ticket_category=ticket_category,
+                                payment=payment,
+                                ticket_code=code,
+                                full_name=payment.full_name or payment.phone_number,
+                                email=payment.email or '',
+                                phone=payment.phone_number,
+                            )
+                            created_codes.append(code)
+
+                        if ticket_category:
+                            ticket_category.available = max(0, int(ticket_category.available or 0) - quantity)
+                            ticket_category.save(update_fields=['available'])
+
+                    results = {'ticket_codes': created_codes, 'ticket_count': len(created_codes)}
+                    AuditLog.objects.create(
+                        action='ticket_issued',
+                        actor=request.user.username,
+                        details=f"Issued {len(created_codes)} ticket(s) for payment {payment.mpesa_code}: {', '.join(created_codes)}",
+                        event=event,
+                    )
+            elif payment.payment_type == 'vote':
+                if payment.contestant_id and not payment.vote_transactions.exists():
+                    event = payment.event
+                    vote_count = calculate_vote_count(payment.amount, event.vote_price)
+                    if vote_count > 0:
+                        vote = VoteTransaction.objects.create(
+                            event=event,
+                            contestant=payment.contestant,
+                            payment=payment,
+                            vote_count=vote_count,
+                            phone_number=payment.phone_number,
+                            mpesa_code=payment.mpesa_code or '',
+                            status='successful',
+                        )
+                        results = {'vote_id': vote.id, 'vote_count': vote_count}
             AuditLog.objects.create(
                 action='payment_verified',
                 actor=request.user.username,
-                details=f"Admin marked payment {payment.mpesa_code} (KES {payment.amount}) as successful",
+                details=f"Admin marked payment {payment.mpesa_code} (KES {payment.amount}) as successful. Results: {results}",
                 event=payment.event,
             )
             updated += 1

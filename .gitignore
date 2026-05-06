@@ -72,6 +72,10 @@ build/
 ehthumbs.db
 Thumbs.db
 
+# Local binaries
+/ngrok.exe
+/ngrok.zip
+
 # Logs
 logs
 *.log
