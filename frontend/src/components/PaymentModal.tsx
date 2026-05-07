@@ -10,7 +10,7 @@ interface TicketCategory {
   id: number
   name: string
   price: string
-  price_value?: string
+  price_value?: string | number
   description: string
   available: number
   total: number
