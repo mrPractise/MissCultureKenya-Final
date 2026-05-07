@@ -1,10 +1,11 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { Mail, Phone, MapPin, Clock, Send, Instagram, Facebook, Twitter, Youtube, MessageCircle, ChevronDown, ArrowRight } from 'lucide-react'
+import { Mail, Phone, MapPin, Clock, Send, Instagram, Facebook, MessageCircle, ChevronDown, ArrowRight } from 'lucide-react'
 import { useState } from 'react'
 import Link from 'next/link'
 import ContactModal from '@/components/ContactModal'
+import TikTokIcon from '@/components/TikTokIcon'
 import apiClient from '@/lib/api'
 import { useSiteSettings } from '@/lib/useSiteSettings'
 
@@ -61,10 +62,9 @@ const subjectOptions = [
 ]
 
 const socialLinks = [
-  { name: 'Instagram', icon: Instagram, href: 'https://instagram.com/misscultureglobalkenya', color: 'hover:text-pink-600' },
-  { name: 'Facebook', icon: Facebook, href: 'https://facebook.com/misscultureglobalkenya', color: 'hover:text-blue-600' },
-  { name: 'Twitter', icon: Twitter, href: 'https://twitter.com/missculturekenya', color: 'hover:text-blue-400' },
-  { name: 'YouTube', icon: Youtube, href: 'https://youtube.com/misscultureglobalkenya', color: 'hover:text-red-600' }
+  { name: 'Instagram', icon: Instagram, href: 'https://www.instagram.com/misscultureglobalkenya?igsh=MmpjY3Z5ODZ5NThx', color: 'hover:text-pink-600' },
+  { name: 'Facebook', icon: Facebook, href: 'https://www.facebook.com/share/1E3tuDcxXT/', color: 'hover:text-blue-600' },
+  { name: 'TikTok', icon: TikTokIcon, href: 'https://www.tiktok.com/@miss.culture.global.ke?_r=1&_t=ZS-95zsRay3Mii', color: 'hover:text-gray-900' }
 ]
 
 const ContactPage = () => {

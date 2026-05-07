@@ -2,7 +2,7 @@
 
 import { useState, useEffect, use } from 'react'
 import { motion } from 'framer-motion'
-import { Vote, Trophy, ArrowLeft, Share2, Loader2, AlertCircle, Check, Copy } from 'lucide-react'
+import { Vote, Trophy, ArrowLeft, Share2, Loader2, AlertCircle, Check, Copy, Shield, Star, Target } from 'lucide-react'
 import Link from 'next/link'
 import apiClient from '@/lib/api'
 import type { ApiError } from '@/lib/api'
@@ -12,6 +12,9 @@ interface ContestantData {
   id: number
   name: string
   bio: string
+  beliefs?: string
+  achievements?: string
+  mission_statement?: string
   photo_url: string | null
   contestant_number: number
   slug: string
@@ -181,8 +184,42 @@ export default function ContestantPage({ params }: { params: Promise<{ eventSlug
                 </h1>
 
                 {contestant.bio && (
-                  <div className="mb-6">
+                  <div className="mb-8">
+                    <h3 className="text-lg font-bold text-gray-900 mb-2 flex items-center gap-2">
+                      About Me
+                    </h3>
                     <p className="text-gray-600 leading-relaxed whitespace-pre-line">{contestant.bio}</p>
+                  </div>
+                )}
+
+                <div className="grid sm:grid-cols-2 gap-6 mb-8">
+                  {contestant.beliefs && (
+                    <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                      <h4 className="font-bold text-gray-900 mb-2 flex items-center gap-2 text-sm uppercase tracking-wider">
+                        <Shield className="w-4 h-4 text-green-600" />
+                        My Beliefs
+                      </h4>
+                      <p className="text-sm text-gray-600 leading-relaxed">{contestant.beliefs}</p>
+                    </div>
+                  )}
+                  {contestant.mission_statement && (
+                    <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                      <h4 className="font-bold text-gray-900 mb-2 flex items-center gap-2 text-sm uppercase tracking-wider">
+                        <Target className="w-4 h-4 text-green-600" />
+                        My Mission
+                      </h4>
+                      <p className="text-sm text-gray-600 leading-relaxed">{contestant.mission_statement}</p>
+                    </div>
+                  )}
+                </div>
+
+                {contestant.achievements && (
+                  <div className="mb-8 bg-green-50/50 rounded-xl p-5 border border-green-100">
+                    <h4 className="font-bold text-gray-900 mb-3 flex items-center gap-2 text-sm uppercase tracking-wider">
+                      <Star className="w-4 h-4 text-green-600" />
+                      Achievements
+                    </h4>
+                    <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">{contestant.achievements}</p>
                   </div>
                 )}
 

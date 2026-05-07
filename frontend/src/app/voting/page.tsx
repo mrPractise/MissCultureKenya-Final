@@ -7,11 +7,15 @@ import Link from 'next/link'
 import apiClient from '@/lib/api'
 import type { ApiError } from '@/lib/api'
 import VotePaymentModal from '@/components/VotePaymentModal'
+import ContestantDetailsModal from '@/components/ContestantDetailsModal'
 
 interface Contestant {
   id: number
   name: string
   bio: string
+  beliefs?: string
+  achievements?: string
+  mission_statement?: string
   photo_url: string | null
   contestant_number: number
   slug: string
@@ -59,6 +63,7 @@ const VotingPage = () => {
 
   // Vote modal state
   const [voteModalOpen, setVoteModalOpen] = useState(false)
+  const [detailsModalOpen, setDetailsModalOpen] = useState(false)
   const [selectedContestant, setSelectedContestant] = useState<Contestant | null>(null)
 
   // Verify votes state
@@ -110,8 +115,14 @@ const VotingPage = () => {
   const handleVoteClick = useCallback((contestant: Contestant) => {
     if (!selectedEvent) return
     setSelectedContestant(contestant)
+    setDetailsModalOpen(false) // Close details if open
     setVoteModalOpen(true)
   }, [selectedEvent])
+
+  const handleDetailsClick = useCallback((contestant: Contestant) => {
+    setSelectedContestant(contestant)
+    setDetailsModalOpen(true)
+  }, [])
 
   const handleVerifyVotes = async () => {
     if (!verifyPhone || verifyPhone.length < 9) {
@@ -288,7 +299,10 @@ const VotingPage = () => {
                       className="bg-white rounded-2xl border border-gray-100 overflow-hidden group"
                     >
                       {/* Photo */}
-                      <div className="relative aspect-[3/4] overflow-hidden bg-gray-100">
+                      <div 
+                        className="relative aspect-[3/4] overflow-hidden bg-gray-100 cursor-pointer"
+                        onClick={() => handleDetailsClick(contestant)}
+                      >
                         {contestant.photo_url ? (
                           <img
                             src={contestant.photo_url}
@@ -300,6 +314,10 @@ const VotingPage = () => {
                             <span className="text-4xl font-bold text-green-300">#{contestant.contestant_number}</span>
                           </div>
                         )}
+                        {/* Overlay on hover */}
+                        <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <span className="bg-white/90 text-gray-900 px-4 py-2 rounded-full text-xs font-bold shadow-lg">View Profile</span>
+                        </div>
                         {/* Number Badge */}
                         <div className="absolute top-3 left-3 bg-green-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold">
                           {contestant.contestant_number}
@@ -468,6 +486,15 @@ const VotingPage = () => {
           }}
         />
       )}
+
+      {/* Contestant Details Modal */}
+      <ContestantDetailsModal
+        isOpen={detailsModalOpen}
+        onClose={() => setDetailsModalOpen(false)}
+        contestant={selectedContestant}
+        onVote={handleVoteClick}
+        isVotingActive={selectedEvent?.is_voting_active || false}
+      />
     </div>
   )
 }

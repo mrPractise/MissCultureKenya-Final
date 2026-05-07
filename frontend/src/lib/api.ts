@@ -199,6 +199,11 @@ const apiClient = {
     return handle(client.post(`/api/events/events/${eventId}/initiate_vote_payment/`, data))
   },
 
+  // Initiate Daraja STK Push for ticket purchase
+  initiateTicketPayment(eventId: number | string, data: { phone_number: string; full_name: string; email: string; ticket_breakdown: Record<string, number> }) {
+    return handle(client.post(`/api/events/events/${eventId}/initiate_ticket_payment/`, data))
+  },
+
   // Ticket categories for an event
   getTicketCategories(eventId: number | string, params = {}) {
     return handle(client.get('/api/events/ticket-categories/', { params: { event: eventId, ...params } }))
@@ -212,6 +217,11 @@ const apiClient = {
   // Single ticket by ID
   getTicket(ticketId: number | string) {
     return handle(client.get(`/api/events/tickets/${ticketId}/`))
+  },
+
+  // Payment status check
+  getPaymentStatus(paymentId: number | string) {
+    return handle(client.get(`/api/events/payments/${paymentId}/`))
   },
 }
 

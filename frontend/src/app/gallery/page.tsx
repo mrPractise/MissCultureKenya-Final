@@ -71,6 +71,8 @@ const GalleryPage = () => {
   const [categories, setCategories] = useState<string[]>(['All'])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [likedPhotoIds, setLikedPhotoIds] = useState<Record<number, boolean>>({})
+  const [shareStatus, setShareStatus] = useState<string>('')
   const settings = useSiteSettings()
 
   useEffect(() => {
@@ -156,6 +158,46 @@ const GalleryPage = () => {
   const filteredVideos = selectedCategory === 'All'
     ? finalVideos
     : finalVideos.filter(video => video.category === selectedCategory)
+
+  const handlePhotoLike = (e: React.MouseEvent<HTMLButtonElement>, photoId: number) => {
+    e.stopPropagation()
+    setLikedPhotoIds(prev => ({
+      ...prev,
+      [photoId]: !prev[photoId],
+    }))
+  }
+
+  const handlePhotoShare = async (e: React.MouseEvent<HTMLButtonElement>, photo: any) => {
+    e.stopPropagation()
+    const shareUrl = `${window.location.origin}/gallery`
+
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: photo.title || 'MissCulture Kenya Photo',
+          text: photo.caption || 'Check out this photo from MissCulture Kenya.',
+          url: shareUrl,
+        })
+        setShareStatus('Photo shared successfully.')
+      } else {
+        await navigator.clipboard.writeText(shareUrl)
+        setShareStatus('Photo link copied to clipboard.')
+      }
+    } catch (err) {
+      console.error('Share failed', err)
+      setShareStatus('Unable to share this photo right now.')
+    }
+  }
+
+  const handlePhotoDownload = (e: React.MouseEvent<HTMLButtonElement>, photo: any) => {
+    e.stopPropagation()
+    const link = document.createElement('a')
+    link.href = photo.image
+    link.download = `${photo.title || 'missculture-photo'}.jpg`
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+  }
 
   const getCategoryInfo = (categoryName: string) => {
     return galleryCategories.find(c => c.id === categoryName.toLowerCase().replace(/\s+/g, '-'))
@@ -299,6 +341,13 @@ const GalleryPage = () => {
               ))
             )}
           </motion.div>
+          {shareStatus && (
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
+              <div className="rounded-full bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700 text-center">
+                {shareStatus}
+              </div>
+            </div>
+          )}
 
           {/* Photo Gallery */}
           <motion.div
@@ -365,13 +414,25 @@ const GalleryPage = () => {
                   {/* Hover Actions */}
                   <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <div className="flex space-x-4 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-150">
-                      <button className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center hover:bg-white/40 transition-colors duration-200 border border-white/20">
-                        <Heart className="w-6 h-6 text-white" />
+                      <button
+                        onClick={(e) => handlePhotoLike(e, photo.id)}
+                        title="Like photo"
+                        className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center hover:bg-white/40 transition-colors duration-200 border border-white/20"
+                      >
+                        <Heart className={`w-6 h-6 ${likedPhotoIds[photo.id] ? 'fill-red-500 text-red-500' : 'text-white'}`} />
                       </button>
-                      <button className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center hover:bg-white/40 transition-colors duration-200 border border-white/20">
+                      <button
+                        onClick={(e) => handlePhotoShare(e, photo)}
+                        title="Share photo"
+                        className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center hover:bg-white/40 transition-colors duration-200 border border-white/20"
+                      >
                         <Share2 className="w-6 h-6 text-white" />
                       </button>
-                      <button className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center hover:bg-white/40 transition-colors duration-200 border border-white/20">
+                      <button
+                        onClick={(e) => handlePhotoDownload(e, photo)}
+                        title="Download photo"
+                        className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center hover:bg-white/40 transition-colors duration-200 border border-white/20"
+                      >
                         <Download className="w-6 h-6 text-white" />
                       </button>
                     </div>

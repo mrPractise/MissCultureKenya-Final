@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Check, Phone, DollarSign, AlertCircle, Loader2, Smartphone } from 'lucide-react'
+import { X, Check, Phone, AlertCircle, Loader2, Smartphone, CheckCircle } from 'lucide-react'
 import apiClient from '@/lib/api'
 import type { ApiError } from '@/lib/api'
 
@@ -27,9 +27,75 @@ const VotePaymentModal = ({ isOpen, onClose, event, contestant }: VotePaymentMod
   const [amount, setAmount] = useState('')
   const [phone, setPhone] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [agreedToTerms, setAgreedToTerms] = useState(false)
+
+  // Load saved phone
+  useEffect(() => {
+    const saved = localStorage.getItem('mcgk_user_info')
+    if (saved) {
+      try {
+        const { phone } = JSON.parse(saved)
+        if (phone) setPhone(phone)
+      } catch (e) {}
+    }
+  }, [isOpen])
+
+  // Save phone on change
+  useEffect(() => {
+    if (phone) {
+      const saved = localStorage.getItem('mcgk_user_info')
+      let info = {}
+      if (saved) {
+        try { info = JSON.parse(saved) } catch (e) {}
+      }
+      localStorage.setItem('mcgk_user_info', JSON.stringify({ ...info, phone }))
+    }
+  }, [phone])
+
   const [error, setError] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
   const [checkoutId, setCheckoutId] = useState('')
+  const [paymentId, setPaymentId] = useState<number | null>(null)
+  const [paymentStatus, setPaymentStatus] = useState<'pending' | 'successful' | 'failed'>('pending')
+  const pollingInterval = useRef<NodeJS.Timeout | null>(null)
+
+  useEffect(() => {
+    if (step === 2 && paymentId && paymentStatus === 'pending') {
+      startPolling()
+    } else if (step !== 2 || paymentStatus !== 'pending') {
+      stopPolling()
+    }
+    return () => stopPolling()
+  }, [step, paymentId, paymentStatus])
+
+  const startPolling = () => {
+    if (pollingInterval.current) return
+    pollingInterval.current = setInterval(checkStatus, 3000)
+  }
+
+  const stopPolling = () => {
+    if (pollingInterval.current) {
+      clearInterval(pollingInterval.current)
+      pollingInterval.current = null
+    }
+  }
+
+  const checkStatus = async () => {
+    if (!paymentId) return
+    try {
+      const data = await apiClient.getPaymentStatus(paymentId)
+      if (data.status === 'successful') {
+        setPaymentStatus('successful')
+        stopPolling()
+      } else if (data.status === 'failed' || data.status === 'cancelled') {
+        setPaymentStatus('failed')
+        setError(data.stk_response?.callback?.result_desc || 'Payment failed or was cancelled.')
+        stopPolling()
+      }
+    } catch (err) {
+      console.error('Polling error', err)
+    }
+  }
 
   const votePrice = event.vote_price || 10
   const amountNum = parseFloat(amount) || 0
@@ -58,6 +124,7 @@ const VotePaymentModal = ({ isOpen, onClose, event, contestant }: VotePaymentMod
 
       if (result.success) {
         setCheckoutId(result.checkout_request_id)
+        setPaymentId(result.payment_id || null)
         setSuccessMessage(result.message)
         setStep(2)
       } else {
@@ -78,6 +145,9 @@ const VotePaymentModal = ({ isOpen, onClose, event, contestant }: VotePaymentMod
     setError('')
     setSuccessMessage('')
     setCheckoutId('')
+    setPaymentId(null)
+    setPaymentStatus('pending')
+    setAgreedToTerms(false)
     onClose()
   }
 
@@ -138,14 +208,14 @@ const VotePaymentModal = ({ isOpen, onClose, event, contestant }: VotePaymentMod
                     Amount (KES)
                   </label>
                   <div className="relative">
-                    <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-semibold">KES</span>
                     <input
                       type="number"
                       value={amount}
                       onChange={(e) => { setAmount(e.target.value); setError('') }}
                       placeholder="100"
                       min={votePrice}
-                      className="w-full pl-9 pr-3 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 text-lg font-semibold"
+                      className="w-full pl-14 pr-3 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 text-lg font-semibold"
                     />
                   </div>
                   {amountNum >= votePrice && (
@@ -199,10 +269,25 @@ const VotePaymentModal = ({ isOpen, onClose, event, contestant }: VotePaymentMod
                   </div>
                 )}
 
+                <div className="bg-gray-50 border border-gray-200 rounded-xl p-3.5 flex items-start gap-3">
+                  <div className="pt-0.5">
+                    <input
+                      type="checkbox"
+                      id="vote-terms-agreement"
+                      checked={agreedToTerms}
+                      onChange={(e) => setAgreedToTerms(e.target.checked)}
+                      className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500 cursor-pointer"
+                    />
+                  </div>
+                  <label htmlFor="vote-terms-agreement" className="text-xs text-gray-600 leading-tight cursor-pointer">
+                    I agree to the <a href="/terms" target="_blank" className="text-green-600 font-bold hover:underline">Terms & Conditions</a> and <a href="/privacy" target="_blank" className="text-green-600 font-bold hover:underline">Privacy Policy</a>.
+                  </label>
+                </div>
+
                 <button
                   onClick={handleSubmit}
-                  disabled={submitting}
-                  className="w-full bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white py-3 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2"
+                  disabled={submitting || !phone || phone.length < 9 || !amount || !agreedToTerms}
+                  className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white py-3.5 rounded-xl font-bold transition-all transform hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2"
                 >
                   {submitting ? (
                     <>
@@ -219,37 +304,74 @@ const VotePaymentModal = ({ isOpen, onClose, event, contestant }: VotePaymentMod
               </div>
             )}
 
-            {/* Step 2: STK Push Sent */}
+            {/* Step 2: STK Push Sent / Processing */}
             {step === 2 && (
               <div className="space-y-4 text-center">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-                  <Smartphone className="w-8 h-8 text-green-600" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-900">M-Pesa Prompt Sent</h3>
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ duration: 0.5, type: 'spring' }}
+                  className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto ${
+                    paymentStatus === 'successful' ? 'bg-green-100' : 
+                    paymentStatus === 'failed' ? 'bg-red-100' : 'bg-blue-100'
+                  }`}
+                >
+                  {paymentStatus === 'successful' ? (
+                    <CheckCircle className="w-8 h-8 text-green-600" />
+                  ) : paymentStatus === 'failed' ? (
+                    <AlertCircle className="w-8 h-8 text-red-600" />
+                  ) : (
+                    <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+                  )}
+                </motion.div>
+
+                <h3 className="text-xl font-bold text-gray-900">
+                  {paymentStatus === 'successful' ? 'Votes Confirmed!' : 
+                   paymentStatus === 'failed' ? 'Payment Failed' : 'Waiting for Payment...'}
+                </h3>
                 <p className="text-sm text-gray-600">
-                  A payment request has been sent to your phone (+254{phone}).
+                  {paymentStatus === 'successful' ? `Thank you for supporting ${contestant.name}! Your votes have been counted.` :
+                   paymentStatus === 'failed' ? (error || 'The payment could not be completed.') :
+                   `A payment request has been sent to your phone (+254${phone}).`}
                 </p>
-                <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-left space-y-2">
-                  <p className="text-sm text-green-800 font-medium">What to do next:</p>
-                  <ol className="text-sm text-green-700 space-y-1.5 list-decimal list-inside">
-                    <li>Check your phone for the M-Pesa prompt</li>
-                    <li>Enter your M-Pesa PIN to authorize the payment</li>
-                    <li>Your votes will be confirmed automatically</li>
-                  </ol>
-                </div>
+
+                {paymentStatus === 'pending' && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-left space-y-2">
+                    <p className="text-sm text-blue-800 font-medium">What to do next:</p>
+                    <ol className="text-sm text-blue-700 space-y-1.5 list-decimal list-inside">
+                      <li>Check your phone for the M-Pesa prompt</li>
+                      <li>Enter your M-Pesa PIN to authorize the payment</li>
+                      <li>Keep this window open to confirm your votes</li>
+                    </ol>
+                  </div>
+                )}
+
                 <div className="bg-gray-50 rounded-xl p-3 text-left">
                   <p className="text-xs text-gray-500">Amount: <span className="font-semibold text-gray-700">KES {amountNum.toLocaleString()}</span></p>
                   <p className="text-xs text-gray-500">Expected Votes: <span className="font-semibold text-gray-700">{voteCount}</span></p>
-                  {checkoutId && (
+                  {checkoutId && paymentStatus === 'pending' && (
                     <p className="text-xs text-gray-400 mt-1">Ref: {checkoutId.slice(-8)}</p>
                   )}
                 </div>
-                <button
-                  onClick={handleClose}
-                  className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-semibold transition-colors"
-                >
-                  Done
-                </button>
+
+                <div className="flex gap-3">
+                  {paymentStatus === 'failed' && (
+                    <button
+                      onClick={() => { setStep(1); setPaymentStatus('pending'); setError('') }}
+                      className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 rounded-xl font-semibold transition-colors"
+                    >
+                      Try Again
+                    </button>
+                  )}
+                  <button
+                    onClick={handleClose}
+                    className={`flex-1 py-3 rounded-xl font-semibold transition-colors ${
+                      paymentStatus === 'successful' ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-red-600 hover:bg-red-700 text-white'
+                    }`}
+                  >
+                    {paymentStatus === 'successful' ? 'Close' : 'Done'}
+                  </button>
+                </div>
               </div>
             )}
           </div>

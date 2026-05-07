@@ -1,5 +1,8 @@
 import random
 import string
+import requests
+import json
+from django.conf import settings
 from .models import Ticket
 
 
@@ -52,3 +55,29 @@ def mask_phone_number(phone):
     if not phone or len(phone) < 7:
         return phone
     return f"{phone[:3]}***{phone[-3:]}"
+
+
+def send_telegram_message(message):
+    """
+    Send a notification message to a Telegram chat.
+    Requires TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID in settings.
+    """
+    token = getattr(settings, 'TELEGRAM_BOT_TOKEN', None)
+    chat_id = getattr(settings, 'TELEGRAM_CHAT_ID', None)
+    
+    if not token or not chat_id:
+        return False
+        
+    url = f"https://api.telegram.org/bot{token}/sendMessage"
+    payload = {
+        'chat_id': chat_id,
+        'text': message,
+        'parse_mode': 'HTML'
+    }
+    
+    try:
+        response = requests.post(url, json=payload, timeout=10)
+        return response.status_code == 200
+    except Exception as e:
+        print(f"Telegram notification error: {e}")
+        return False

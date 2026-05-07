@@ -8,8 +8,10 @@ import PaymentModal from './PaymentModal'
 import apiClient from '@/lib/api'
 
 interface TicketCategory {
+  id: number
   name: string
   price: string
+  price_value?: string | number
   description: string
   available: number
   total: number
@@ -112,8 +114,11 @@ const EventDetailsModal = ({ isOpen, onClose, event }: EventDetailsModalProps) =
       const ticket = event.ticketCategories?.find(t => t.name === ticketName)
       if (!ticket || quantity === 0) return total
       
-      // Extract numeric value from price string
-      const priceValue = ticket.price === 'Free' ? 0 : parseInt(ticket.price.replace(/[^\d]/g, ''))
+      // Use price_value if available, otherwise parse price string
+      const priceValue = ticket.price_value 
+        ? parseFloat(ticket.price_value) 
+        : (ticket.price === 'Free' ? 0 : parseFloat(ticket.price.replace(/[^\d.]/g, '')))
+      
       return total + (priceValue * quantity)
     }, 0)
   }
@@ -215,7 +220,7 @@ const EventDetailsModal = ({ isOpen, onClose, event }: EventDetailsModalProps) =
               {(contestantsLoading || contestants.length > 0) && (
                 <div>
                   <div className="flex items-center justify-between gap-4 mb-2">
-                    <h4 className="font-semibold text-gray-900 text-sm">Participants</h4>
+                    <h4 className="font-semibold text-gray-900 text-sm">Contestants</h4>
                     {!event.votingEnabled && (
                       <span className="text-[11px] font-semibold text-gray-600 bg-gray-100 px-2.5 py-1 rounded-full">
                         Voting not open yet
@@ -223,37 +228,22 @@ const EventDetailsModal = ({ isOpen, onClose, event }: EventDetailsModalProps) =
                     )}
                   </div>
                   {contestantsLoading ? (
-                    <p className="text-xs text-gray-500">Loading participants...</p>
+                    <p className="text-xs text-gray-500">Loading contestants...</p>
                   ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      {contestants.map((c) => (
-                        <div key={c.id} className="border border-gray-200 rounded-xl p-3 bg-white">
-                          <div className="flex items-start gap-3">
-                            {c.photo_url ? (
-                              <img
-                                src={c.photo_url}
-                                alt={c.name}
-                                className="w-10 h-10 rounded-xl object-cover flex-shrink-0"
-                              />
-                            ) : (
-                              <div className="w-10 h-10 rounded-xl bg-green-50 border border-green-100 flex items-center justify-center flex-shrink-0">
-                                <Users className="w-4 h-4 text-green-600" />
-                              </div>
-                            )}
-                            <div className="min-w-0 flex-1">
-                              <div className="flex items-center justify-between gap-3">
-                                <p className="font-semibold text-gray-900 text-sm truncate">{c.name}</p>
-                                <span className="text-[11px] font-bold text-green-700 bg-green-50 border border-green-200 px-2 py-0.5 rounded-full flex-shrink-0">
-                                  #{c.contestant_number}
-                                </span>
-                              </div>
-                              {c.bio && (
-                                <p className="text-xs text-gray-600 mt-1 line-clamp-2">{c.bio}</p>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
+                    <div className="border border-gray-200 rounded-xl p-3 bg-white">
+                      <p className="text-xs text-gray-600">
+                        {contestants.length} contestant{contestants.length === 1 ? '' : 's'} added for this event.
+                      </p>
+                      <div className="mt-3">
+                        <Link
+                          href={`/events/${event.id}`}
+                          onClick={onClose}
+                          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-green-600 hover:bg-green-700 text-white text-xs font-semibold transition-colors"
+                        >
+                          View Contestants
+                          <ExternalLink className="w-4 h-4" />
+                        </Link>
+                      </div>
                     </div>
                   )}
                 </div>

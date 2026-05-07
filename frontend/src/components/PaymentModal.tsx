@@ -1,12 +1,16 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Smartphone, X, CheckCircle, ArrowLeft, Building2, Copy, Check } from 'lucide-react'
-import { useState } from 'react'
+import { Smartphone, X, CheckCircle, ArrowLeft, AlertCircle, Loader2, User, Mail, Ticket as TicketIcon } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import apiClient from '@/lib/api'
+import type { ApiError } from '@/lib/api'
 
 interface TicketCategory {
+  id: number
   name: string
   price: string
+  price_value?: string
   description: string
   available: number
   total: number
@@ -41,14 +45,87 @@ interface PaymentModalProps {
   totalTickets: number
 }
 
-const PaymentModal = ({ isOpen, onClose, event, ticketQuantities, totalPrice, totalTickets }: PaymentModalProps) => {
-  const [currentStep, setCurrentStep] = useState<'summary' | 'paybill' | 'success'>('summary')
-  const [copiedField, setCopiedField] = useState<string | null>(null)
+type Step = 'summary' | 'pay' | 'processing'
 
-  const handleCopy = (text: string, field: string) => {
-    navigator.clipboard.writeText(text)
-    setCopiedField(field)
-    setTimeout(() => setCopiedField(null), 2000)
+const PaymentModal = ({ isOpen, onClose, event, ticketQuantities, totalPrice, totalTickets }: PaymentModalProps) => {
+  const [currentStep, setCurrentStep] = useState<Step>('summary')
+  const [phone, setPhone] = useState('')
+  const [fullName, setFullName] = useState('')
+  const [email, setEmail] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [agreedToTerms, setAgreedToTerms] = useState(false)
+
+  // Load saved user info
+  useEffect(() => {
+    const saved = localStorage.getItem('mcgk_user_info')
+    if (saved) {
+      try {
+        const { fullName, email, phone } = JSON.parse(saved)
+        if (fullName) setFullName(fullName)
+        if (email) setEmail(email)
+        if (phone) setPhone(phone)
+      } catch (e) {}
+    }
+  }, [isOpen])
+
+  // Save user info on change
+  useEffect(() => {
+    if (fullName || email || phone) {
+      localStorage.setItem('mcgk_user_info', JSON.stringify({ fullName, email, phone }))
+    }
+  }, [fullName, email, phone])
+
+  const [error, setError] = useState('')
+  const [checkoutId, setCheckoutId] = useState('')
+  const [paymentId, setPaymentId] = useState<number | null>(null)
+  const [paymentStatus, setPaymentStatus] = useState<'pending' | 'successful' | 'failed'>('pending')
+  const [issuedTickets, setIssuedTickets] = useState<any[]>([])
+  const pollingInterval = useRef<NodeJS.Timeout | null>(null)
+
+  useEffect(() => {
+    if (currentStep === 'processing' && paymentId && paymentStatus === 'pending') {
+      startPolling()
+    } else if (currentStep !== 'processing' || paymentStatus !== 'pending') {
+      stopPolling()
+    }
+    return () => stopPolling()
+  }, [currentStep, paymentId, paymentStatus])
+
+  const startPolling = () => {
+    if (pollingInterval.current) return
+    pollingInterval.current = setInterval(checkStatus, 3000)
+  }
+
+  const stopPolling = () => {
+    if (pollingInterval.current) {
+      clearInterval(pollingInterval.current)
+      pollingInterval.current = null
+    }
+  }
+
+  const checkStatus = async () => {
+    if (!paymentId) return
+    try {
+      const data = await apiClient.getPaymentStatus(paymentId)
+      if (data.status === 'successful') {
+        setPaymentStatus('successful')
+        // Fetch tickets for this payment
+        try {
+          const ticketData = await apiClient.get('/api/events/tickets/', { payment: paymentId })
+          const tickets = Array.isArray(ticketData) ? ticketData : (ticketData?.results || [])
+          setIssuedTickets(tickets)
+        } catch (e) {
+          console.error('Failed to fetch issued tickets', e)
+        }
+        stopPolling()
+      } else if (data.status === 'failed' || data.status === 'cancelled') {
+        setPaymentStatus('failed')
+        setError(data.stk_response?.callback?.result_desc || 'Payment failed or was cancelled.')
+        stopPolling()
+      }
+    } catch (err) {
+      console.error('Polling error', err)
+    }
   }
 
   const getSelectedTickets = () => {
@@ -61,15 +138,85 @@ const PaymentModal = ({ isOpen, onClose, event, ticketQuantities, totalPrice, to
       })
   }
 
+  const buildTicketBreakdown = (): Record<string, number> => {
+    if (!event?.ticketCategories) return {}
+    const breakdown: Record<string, number> = {}
+    Object.entries(ticketQuantities).forEach(([ticketName, quantity]) => {
+      if (quantity <= 0) return
+      const ticket = event.ticketCategories?.find(t => t.name === ticketName)
+      if (ticket) {
+        breakdown[String(ticket.id)] = quantity
+      }
+    })
+    return breakdown
+  }
+
+  const handleSubmit = async () => {
+    if (!event) return
+
+    if (!fullName.trim()) {
+      setError('Please enter your full name')
+      return
+    }
+    if (!email.trim() || !email.includes('@')) {
+      setError('Please enter a valid email address')
+      return
+    }
+    if (!phone || phone.length < 9) {
+      setError('Please enter a valid M-Pesa phone number')
+      return
+    }
+
+    setSubmitting(true)
+    setError('')
+
+    try {
+      const breakdown = buildTicketBreakdown()
+      const result = await apiClient.initiateTicketPayment(event.id, {
+        phone_number: phone.startsWith('0') ? phone : `0${phone}`,
+        full_name: fullName.trim(),
+        email: email.trim(),
+        ticket_breakdown: breakdown,
+      })
+
+      if (result.success) {
+        setCheckoutId(result.checkout_request_id || '')
+        setPaymentId(result.payment_id || null)
+        setCurrentStep('processing')
+      } else {
+        setError(result.error || 'Failed to initiate payment. Please try again.')
+      }
+    } catch (err) {
+      const apiErr = err as ApiError
+      setError(apiErr.message || 'Failed to initiate payment. Please try again.')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
   const handleClose = () => {
     setCurrentStep('summary')
-    setCopiedField(null)
+    setPhone('')
+    setFullName('')
+    setEmail('')
+    setError('')
+    setCheckoutId('')
+    setPaymentId(null)
+    setPaymentStatus('pending')
+    setIssuedTickets([])
+    setAgreedToTerms(false)
+    setSubmitting(false)
     onClose()
   }
 
   if (!isOpen || !event) return null
 
   const totalAmount = totalPrice === 0 ? 'Free' : `KSh ${totalPrice.toLocaleString()}`
+
+  // Don't show STK Push for free tickets
+  if (totalPrice === 0) {
+    return null
+  }
 
   return (
     <div className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
@@ -86,7 +233,7 @@ const PaymentModal = ({ isOpen, onClose, event, ticketQuantities, totalPrice, to
           <div className="flex items-center space-x-3">
             {currentStep !== 'summary' && (
               <button
-                onClick={() => setCurrentStep('summary')}
+                onClick={() => { setCurrentStep('summary'); setError('') }}
                 className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
               >
                 <ArrowLeft className="w-5 h-5 text-gray-500" />
@@ -94,7 +241,7 @@ const PaymentModal = ({ isOpen, onClose, event, ticketQuantities, totalPrice, to
             )}
             <div>
               <h2 className="text-xl font-bold text-gray-900">
-                {currentStep === 'summary' ? 'Complete Your Purchase' : currentStep === 'paybill' ? 'M-Pesa Paybill' : 'Payment Confirmed'}
+                {currentStep === 'summary' ? 'Complete Your Purchase' : currentStep === 'pay' ? 'Pay with M-Pesa' : 'M-Pesa Prompt Sent'}
               </h2>
               <p className="text-sm text-gray-500">{event.title}</p>
             </div>
@@ -106,6 +253,7 @@ const PaymentModal = ({ isOpen, onClose, event, ticketQuantities, totalPrice, to
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto">
+          {/* Step 1: Summary */}
           {currentStep === 'summary' && (
             <div className="p-5 space-y-5">
               {/* Order Summary */}
@@ -129,22 +277,22 @@ const PaymentModal = ({ isOpen, onClose, event, ticketQuantities, totalPrice, to
                 </div>
               </div>
 
-              {/* Payment Method - only M-Pesa Paybill */}
+              {/* Payment Method */}
               <div className="bg-green-50 border-2 border-green-200 rounded-xl p-4">
                 <div className="flex items-center space-x-3">
                   <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center flex-shrink-0">
                     <Smartphone className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900">M-Pesa (Paybill)</h4>
-                    <p className="text-xs text-gray-500">Pay via M-Pesa to our business till number</p>
+                    <h4 className="font-semibold text-gray-900">M-Pesa STK Push</h4>
+                    <p className="text-xs text-gray-500">An M-Pesa prompt will be sent to your phone</p>
                   </div>
                   <CheckCircle className="w-5 h-5 text-green-600 ml-auto flex-shrink-0" />
                 </div>
               </div>
 
               <button
-                onClick={() => setCurrentStep('paybill')}
+                onClick={() => setCurrentStep('pay')}
                 className="w-full bg-red-600 hover:bg-red-700 text-white py-3.5 rounded-xl font-semibold text-base transition-colors"
               >
                 Continue to Payment
@@ -152,108 +300,195 @@ const PaymentModal = ({ isOpen, onClose, event, ticketQuantities, totalPrice, to
             </div>
           )}
 
-          {currentStep === 'paybill' && (
-            <div className="p-5 space-y-5">
-              {/* Paybill Instructions */}
+          {/* Step 2: Enter phone + name + email */}
+          {currentStep === 'pay' && (
+            <div className="p-5 space-y-4">
+              {/* Info banner */}
               <div className="bg-green-50 border border-green-200 rounded-xl p-4">
-                <h3 className="font-semibold text-green-900 mb-3 flex items-center gap-2">
-                  <Smartphone className="w-5 h-5" />
-                  M-Pesa Paybill Instructions
-                </h3>
-                <ol className="text-sm text-green-800 space-y-2 list-decimal list-inside">
-                  <li>Go to <strong>M-Pesa</strong> on your phone</li>
-                  <li>Select <strong>Lipa na M-Pesa</strong></li>
-                  <li>Select <strong>Paybill</strong></li>
-                  <li>Enter the Paybill details below</li>
-                  <li>Enter your phone number as the account number</li>
-                  <li>Enter the amount: <strong className="text-red-600">{totalAmount}</strong></li>
-                  <li>Confirm and enter your M-Pesa PIN</li>
-                </ol>
-              </div>
-
-              {/* Paybill Details Card */}
-              <div className="bg-white border-2 border-gray-200 rounded-xl overflow-hidden">
-                <div className="bg-gray-900 text-white px-4 py-3 flex items-center gap-2">
-                  <Building2 className="w-5 h-5" />
-                  <span className="font-semibold">Payment Details</span>
-                </div>
-                <div className="divide-y divide-gray-100">
-                  <div className="flex items-center justify-between px-4 py-3">
-                    <div>
-                      <p className="text-xs text-gray-500 uppercase tracking-wider font-medium">Paybill Number</p>
-                      <p className="text-lg font-bold text-gray-900 font-mono">542542</p>
-                    </div>
-                    <button
-                      onClick={() => handleCopy('542542', 'paybill')}
-                      className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                    >
-                      {copiedField === 'paybill' ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4 text-gray-400" />}
-                    </button>
-                  </div>
-                  <div className="flex items-center justify-between px-4 py-3">
-                    <div>
-                      <p className="text-xs text-gray-500 uppercase tracking-wider font-medium">Account Number</p>
-                      <p className="text-lg font-bold text-gray-900 font-mono">0310848627615</p>
-                    </div>
-                    <button
-                      onClick={() => handleCopy('0310848627615', 'account')}
-                      className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                    >
-                      {copiedField === 'account' ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4 text-gray-400" />}
-                    </button>
-                  </div>
-                  <div className="flex items-center justify-between px-4 py-3">
-                    <div>
-                      <p className="text-xs text-gray-500 uppercase tracking-wider font-medium">Account Name</p>
-                      <p className="text-lg font-bold text-gray-900">The Misscomm Events</p>
-                    </div>
-                    <button
-                      onClick={() => handleCopy('The Misscomm Events', 'name')}
-                      className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                    >
-                      {copiedField === 'name' ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4 text-gray-400" />}
-                    </button>
-                  </div>
-                  <div className="px-4 py-3 bg-red-50">
-                    <p className="text-xs text-gray-500 uppercase tracking-wider font-medium">Amount to Pay</p>
-                    <p className="text-xl font-bold text-red-600">{totalAmount}</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Reference */}
-              <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
-                <p className="text-sm text-yellow-800">
-                  <strong>Important:</strong> After completing payment, send the M-Pesa confirmation message to <strong>info@misscultureglobalkenya.com</strong> or WhatsApp <strong>+254 721 706983</strong> to receive your ticket confirmation.
+                <p className="text-sm text-green-800 font-medium">
+                  Enter your details below. An M-Pesa prompt will be sent directly to your phone.
+                </p>
+                <p className="text-xs text-green-600 mt-1">
+                  Amount: <span className="font-bold">KSh {totalPrice.toLocaleString()}</span> for {totalTickets} ticket{totalTickets > 1 ? 's' : ''}
                 </p>
               </div>
 
+              {/* Full Name */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Full Name
+                </label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    type="text"
+                    value={fullName}
+                    onChange={(e) => { setFullName(e.target.value); setError('') }}
+                    placeholder="John Doe"
+                    className="w-full pl-9 pr-3 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  />
+                </div>
+              </div>
+
+              {/* Email */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Email Address
+                </label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => { setEmail(e.target.value); setError('') }}
+                    placeholder="john@example.com"
+                    className="w-full pl-9 pr-3 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  />
+                </div>
+                <p className="text-xs text-gray-500 mt-1">Your ticket confirmation will be sent here</p>
+              </div>
+
+              {/* Phone Number */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  M-Pesa Phone Number
+                </label>
+                <div className="flex">
+                  <span className="inline-flex items-center px-3 bg-gray-100 border border-r-0 border-gray-300 rounded-l-xl text-sm text-gray-600 font-medium">
+                    +254
+                  </span>
+                  <input
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => { setPhone(e.target.value.replace(/\D/g, '')); setError('') }}
+                    placeholder="712345678"
+                    maxLength={9}
+                    className="flex-1 px-3 py-3 border border-gray-300 rounded-r-xl focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  />
+                </div>
+                <p className="text-xs text-gray-500 mt-1">The M-Pesa prompt will be sent to this number</p>
+              </div>
+
+              {/* Summary */}
+              <div className="bg-gray-50 rounded-xl p-4 space-y-1.5">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">Event</span>
+                  <span className="font-medium text-gray-900">{event.title}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">Tickets</span>
+                  <span className="font-medium text-gray-900">{totalTickets} ticket{totalTickets > 1 ? 's' : ''}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">Amount</span>
+                  <span className="font-bold text-red-600">KSh {totalPrice.toLocaleString()}</span>
+                </div>
+              </div>
+
+              <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 flex items-start gap-3">
+                <div className="pt-1">
+                  <input
+                    type="checkbox"
+                    id="terms-agreement"
+                    checked={agreedToTerms}
+                    onChange={(e) => setAgreedToTerms(e.target.checked)}
+                    className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500 cursor-pointer"
+                  />
+                </div>
+                <label htmlFor="terms-agreement" className="text-sm text-gray-600 leading-tight cursor-pointer">
+                  I agree to the <a href="/terms" target="_blank" className="text-green-600 font-bold hover:underline">Terms & Conditions</a> and <a href="/privacy" target="_blank" className="text-green-600 font-bold hover:underline">Privacy Policy</a>.
+                </label>
+              </div>
+
+              {error && (
+                <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-xl">
+                  <AlertCircle className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />
+                  <p className="text-sm text-red-700">{error}</p>
+                </div>
+              )}
+
               <button
-                onClick={() => setCurrentStep('success')}
-                className="w-full bg-green-600 hover:bg-green-700 text-white py-3.5 rounded-xl font-semibold text-base transition-colors"
+                onClick={handleSubmit}
+                disabled={submitting || !phone || phone.length < 9 || !fullName || !email || !agreedToTerms}
+                className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white py-4 rounded-xl font-bold text-lg transition-all transform hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 shadow-lg shadow-green-600/20"
               >
-                I&apos;ve Completed Payment
+                {submitting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Sending M-Pesa Prompt...
+                  </>
+                ) : (
+                  <>
+                    <Smartphone className="w-4 h-4" />
+                    Pay KSh {totalPrice.toLocaleString()} with M-Pesa
+                  </>
+                )}
               </button>
             </div>
           )}
 
-          {currentStep === 'success' && (
-            <div className="p-6 text-center space-y-5">
+          {/* Step 3: STK Push Sent / Processing */}
+          {currentStep === 'processing' && (
+            <div className="p-6 space-y-5 text-center">
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ duration: 0.5, type: 'spring' }}
-                className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto"
+                className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto ${
+                  paymentStatus === 'successful' ? 'bg-green-100' : 
+                  paymentStatus === 'failed' ? 'bg-red-100' : 'bg-blue-100'
+                }`}
               >
-                <CheckCircle className="w-12 h-12 text-green-600" />
+                {paymentStatus === 'successful' ? (
+                  <CheckCircle className="w-10 h-10 text-green-600" />
+                ) : paymentStatus === 'failed' ? (
+                  <AlertCircle className="w-10 h-10 text-red-600" />
+                ) : (
+                  <Loader2 className="w-10 h-10 text-blue-600 animate-spin" />
+                )}
               </motion.div>
 
               <div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">Payment Submitted!</h3>
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                  {paymentStatus === 'successful' ? 'Payment Successful!' : 
+                   paymentStatus === 'failed' ? 'Payment Failed' : 'Waiting for Payment...'}
+                </h3>
                 <p className="text-gray-600">
-                  Your M-Pesa payment is being processed. You will receive a confirmation once verified.
+                  {paymentStatus === 'successful' ? 'Your tickets have been issued successfully.' :
+                   paymentStatus === 'failed' ? (error || 'The payment could not be completed.') :
+                   `A payment request has been sent to your phone (+254${phone}).`}
                 </p>
               </div>
+
+              {paymentStatus === 'pending' && (
+                <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-left space-y-2">
+                  <p className="text-sm text-blue-800 font-medium">What to do next:</p>
+                  <ol className="text-sm text-blue-700 space-y-1.5 list-decimal list-inside">
+                    <li>Check your phone for the M-Pesa prompt</li>
+                    <li>Enter your M-Pesa PIN to authorize the payment</li>
+                    <li>Keep this window open to receive your tickets</li>
+                  </ol>
+                </div>
+              )}
+
+              {paymentStatus === 'successful' && issuedTickets.length > 0 && (
+                <div className="space-y-3">
+                  <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-left">
+                    <p className="text-xs text-green-600 font-bold uppercase mb-2">Your Ticket Codes</p>
+                    <div className="grid grid-cols-1 gap-2">
+                      {issuedTickets.map((t, i) => (
+                        <div key={i} className="flex items-center justify-between bg-white p-2 rounded-lg border border-green-100">
+                          <span className="font-mono font-bold text-green-700">{t.ticket_code}</span>
+                          <span className="text-[10px] text-gray-400">{t.ticket_category_name}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    A confirmation email has also been sent to <span className="font-medium">{email}</span>.
+                  </p>
+                </div>
+              )}
 
               <div className="bg-gray-50 rounded-xl p-4 text-left space-y-2">
                 <div className="flex justify-between text-sm">
@@ -266,20 +501,28 @@ const PaymentModal = ({ isOpen, onClose, event, ticketQuantities, totalPrice, to
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500">Amount</span>
-                  <span className="font-bold text-red-600">{totalAmount}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Reference</span>
-                  <span className="font-mono text-gray-900 font-medium">#MCGK-{Date.now().toString().slice(-6)}</span>
+                  <span className="font-bold text-red-600">KSh {totalPrice.toLocaleString()}</span>
                 </div>
               </div>
 
-              <button
-                onClick={handleClose}
-                className="w-full bg-red-600 hover:bg-red-700 text-white py-3.5 rounded-xl font-semibold text-base transition-colors"
-              >
-                Done
-              </button>
+              <div className="flex gap-3">
+                {paymentStatus === 'failed' && (
+                  <button
+                    onClick={() => { setCurrentStep('pay'); setPaymentStatus('pending'); setError('') }}
+                    className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-3.5 rounded-xl font-semibold text-base transition-colors"
+                  >
+                    Try Again
+                  </button>
+                )}
+                <button
+                  onClick={handleClose}
+                  className={`flex-1 py-3.5 rounded-xl font-semibold text-base transition-colors ${
+                    paymentStatus === 'successful' ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-red-600 hover:bg-red-700 text-white'
+                  }`}
+                >
+                  {paymentStatus === 'successful' ? 'Close' : 'Done'}
+                </button>
+              </div>
             </div>
           )}
         </div>

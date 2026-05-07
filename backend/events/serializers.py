@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.db.models import Sum, Count
 from .models import (
     Event, EventInquiry, EventCategory, EventSettings,
-    TicketCategory, Contestant, Payment, Ticket, VoteTransaction, AuditLog
+    TicketCategory, ContestantCategory, Contestant, GuestSpeaker, Payment, Ticket, VoteTransaction, AuditLog
 )
 import cloudinary
 
@@ -23,6 +23,9 @@ class EventSerializer(serializers.ModelSerializer):
     contestant_count = serializers.SerializerMethodField()
     total_votes = serializers.SerializerMethodField()
     is_voting_active = serializers.ReadOnlyField()
+    ticket_categories = serializers.SerializerMethodField()
+    guest_speakers = serializers.SerializerMethodField()
+    contestant_categories = serializers.SerializerMethodField()
 
     def get_featured_image_url(self, obj):
         return _cloudinary_url(obj.featured_image)
@@ -35,6 +38,26 @@ class EventSerializer(serializers.ModelSerializer):
             total=Sum('vote_count')
         )
         return result['total'] or 0
+
+    def get_ticket_categories(self, obj):
+        cats = obj.ticket_categories.filter(is_active=True).order_by('order', 'price')
+        return [{
+            'id': c.id,
+            'name': c.name,
+            'price': 'Free' if c.price == 0 else f'KSh {int(c.price):,}',
+            'price_value': str(c.price),
+            'description': c.description,
+            'available': c.available,
+            'total': c.total,
+        } for c in cats]
+
+    def get_guest_speakers(self, obj):
+        speakers = obj.guest_speakers.filter(is_active=True).order_by('order', 'name')
+        return GuestSpeakerSerializer(speakers, many=True).data
+
+    def get_contestant_categories(self, obj):
+        cats = obj.contestant_categories.filter(is_active=True).order_by('order', 'name')
+        return ContestantCategorySerializer(cats, many=True).data
 
     class Meta:
         model = Event
@@ -100,6 +123,14 @@ class TicketCategorySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class ContestantCategorySerializer(serializers.ModelSerializer):
+    event_title = serializers.CharField(source='event.title', read_only=True)
+
+    class Meta:
+        model = ContestantCategory
+        fields = '__all__'
+
+
 # ── Contestant ───────────────────────────────────────────────────────────────
 
 class ContestantSerializer(serializers.ModelSerializer):
@@ -107,6 +138,7 @@ class ContestantSerializer(serializers.ModelSerializer):
     vote_count = serializers.SerializerMethodField()
     event_title = serializers.CharField(source='event.title', read_only=True)
     event_slug = serializers.CharField(source='event.slug', read_only=True)
+    contestant_category_name = serializers.CharField(source='contestant_category.name', read_only=True, default=None)
 
     def get_photo_url(self, obj):
         return _cloudinary_url(obj.photo)
@@ -121,6 +153,8 @@ class ContestantSerializer(serializers.ModelSerializer):
         model = Contestant
         fields = [
             'id', 'event', 'event_title', 'event_slug', 'name', 'bio',
+            'beliefs', 'achievements', 'mission_statement',
+            'contestant_category', 'contestant_category_name',
             'photo', 'photo_url', 'contestant_number', 'slug', 'is_active',
             'vote_count', 'created_at', 'updated_at',
         ]
@@ -132,6 +166,7 @@ class ContestantPublicSerializer(serializers.ModelSerializer):
     vote_count = serializers.SerializerMethodField()
     event_title = serializers.CharField(source='event.title', read_only=True)
     event_slug = serializers.CharField(source='event.slug', read_only=True)
+    contestant_category_name = serializers.CharField(source='contestant_category.name', read_only=True, default=None)
 
     def get_photo_url(self, obj):
         return _cloudinary_url(obj.photo)
@@ -149,8 +184,24 @@ class ContestantPublicSerializer(serializers.ModelSerializer):
     class Meta:
         model = Contestant
         fields = [
-            'id', 'name', 'bio', 'photo_url', 'contestant_number',
+            'id', 'name', 'bio', 'beliefs', 'achievements', 'mission_statement',
+            'photo_url', 'contestant_number',
             'slug', 'vote_count', 'event_title', 'event_slug',
+            'contestant_category', 'contestant_category_name',
+        ]
+
+class GuestSpeakerSerializer(serializers.ModelSerializer):
+    photo_url = serializers.SerializerMethodField()
+    event_title = serializers.CharField(source='event.title', read_only=True)
+
+    def get_photo_url(self, obj):
+        return _cloudinary_url(obj.photo)
+
+    class Meta:
+        model = GuestSpeaker
+        fields = [
+            'id', 'event', 'event_title', 'name', 'title', 'bio',
+            'photo_url', 'is_active', 'order',
         ]
 
 
@@ -332,6 +383,48 @@ class STKPushRequestSerializer(serializers.Serializer):
     phone_number = serializers.CharField(max_length=20, required=True)
     amount = serializers.DecimalField(max_digits=10, decimal_places=2, required=True, min_value=1)
     contestant_id = serializers.IntegerField(required=True)
+
+    def validate(self, data):
+        contestant_id = data.get('contestant_id')
+        amount = data.get('amount')
+        
+        try:
+            contestant = Contestant.objects.select_related('event').get(id=contestant_id)
+            vote_price = contestant.event.vote_price
+            
+            if vote_price and vote_price > 0:
+                if float(amount) % float(vote_price) != 0:
+                    raise serializers.ValidationError({
+                        "amount": f"Amount must be divisible by the vote price of {int(vote_price)} KES."
+                    })
+        except Contestant.DoesNotExist:
+            raise serializers.ValidationError({"contestant_id": "Contestant does not exist."})
+            
+        return data
+
+class STKPushTicketRequestSerializer(serializers.Serializer):
+    phone_number = serializers.CharField(max_length=20, required=True)
+    full_name = serializers.CharField(max_length=200, required=True)
+    email = serializers.EmailField(required=True)
+    ticket_breakdown = serializers.JSONField(required=True)
+
+    def validate_ticket_breakdown(self, value):
+        if not isinstance(value, dict) or not value:
+            raise serializers.ValidationError("ticket_breakdown must be an object like {\"12\": 2, \"15\": 1}.")
+        cleaned = {}
+        for k, v in value.items():
+            try:
+                category_id = int(k)
+            except Exception:
+                raise serializers.ValidationError("Ticket category keys must be numeric IDs.")
+            try:
+                qty = int(v)
+            except Exception:
+                raise serializers.ValidationError("Ticket quantities must be integers.")
+            if qty < 1:
+                raise serializers.ValidationError("Ticket quantities must be at least 1.")
+            cleaned[category_id] = qty
+        return cleaned
 
 
 class STKPushResponseSerializer(serializers.Serializer):

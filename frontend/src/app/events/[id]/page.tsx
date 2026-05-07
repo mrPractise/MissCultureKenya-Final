@@ -22,9 +22,26 @@ interface ContestantData {
   id: number
   name: string
   bio: string
-  photo_url: string | null
   contestant_number: number
   slug: string
+  contestant_category: number | null
+  contestant_category_name: string | null
+}
+
+interface ContestantCategoryData {
+  id: number
+  name: string
+  is_active: boolean
+  order: number
+}
+
+interface GuestSpeakerData {
+  id: number
+  name: string
+  title: string
+  bio: string
+  photo_url: string | null
+  order: number
 }
 
 const EventDetailPage = () => {
@@ -36,6 +53,10 @@ const EventDetailPage = () => {
   const [ticketCategories, setTicketCategories] = useState<TicketCategoryData[]>([])
   const [contestants, setContestants] = useState<ContestantData[]>([])
   const [contestantsLoading, setContestantsLoading] = useState(false)
+  const [showContestants, setShowContestants] = useState(false)
+  const [selectedContestantCategory, setSelectedContestantCategory] = useState<number | 'all' | 'uncategorized'>('all')
+  const [contestantSearch, setContestantSearch] = useState('')
+  const [activeContestantId, setActiveContestantId] = useState<number | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -85,6 +106,8 @@ const EventDetailPage = () => {
           contestant_count: data.contestant_count || 0,
           total_votes: data.total_votes || 0,
           slug: data.slug || '',
+          guest_speakers: (data.guest_speakers || []) as GuestSpeakerData[],
+          contestant_categories: (data.contestant_categories || []) as ContestantCategoryData[],
         }
         setEvent(transformed)
 
@@ -143,6 +166,41 @@ const EventDetailPage = () => {
   const totalTickets = selectedItems.reduce((sum, x) => sum + x.qty, 0)
   const totalAmount = selectedItems.reduce((sum, x) => sum + (Number(x.tc.price) * x.qty), 0)
   const requiresPayment = totalAmount > 0
+
+  const contestantCategories: ContestantCategoryData[] = Array.isArray(event?.contestant_categories)
+    ? event.contestant_categories
+    : []
+
+  const contestantCategoriesById = new Map<number, ContestantCategoryData>(
+    contestantCategories.map((c) => [c.id, c]),
+  )
+
+  const filteredContestants = contestants
+    .filter((c) => {
+      if (selectedContestantCategory === 'all') return true
+      if (selectedContestantCategory === 'uncategorized') return !c.contestant_category
+      return (c.contestant_category || null) === selectedContestantCategory
+    })
+    .filter((c) => {
+      const q = contestantSearch.trim().toLowerCase()
+      if (!q) return true
+      return (
+        c.name.toLowerCase().includes(q) ||
+        String(c.contestant_number).includes(q) ||
+        (c.contestant_category_name || '').toLowerCase().includes(q)
+      )
+    })
+    .slice()
+    .sort((a, b) => a.contestant_number - b.contestant_number)
+
+  const activeContestant = activeContestantId ? filteredContestants.find((c) => c.id === activeContestantId) : null
+
+  const openContestants = () => {
+    setShowContestants(true)
+    setContestantSearch('')
+    setSelectedContestantCategory('all')
+    setActiveContestantId(null)
+  }
 
   const updateTicketQuantity = (ticketCategoryId: number, nextQty: number) => {
     const tc = ticketCategories.find((x) => x.id === ticketCategoryId)
@@ -323,24 +381,220 @@ const EventDetailPage = () => {
             {(contestantsLoading || contestants.length > 0) && (
               <div>
                 <div className="flex items-center justify-between gap-4 mb-3">
-                  <h2 className="text-xl font-bold text-gray-900">Participants</h2>
-                  {!event.voting_enabled && (
-                    <span className="text-xs font-semibold text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
-                      Voting not open yet
-                    </span>
-                  )}
+                  <div className="flex items-center gap-3">
+                    <h2 className="text-xl font-bold text-gray-900">Contestants</h2>
+                    {!event.voting_enabled && (
+                      <span className="text-xs font-semibold text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
+                        Voting not open yet
+                      </span>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={openContestants}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-green-600 hover:bg-green-700 text-white text-sm font-semibold transition-colors"
+                  >
+                    View Contestants
+                    <ExternalLink className="w-4 h-4" />
+                  </button>
                 </div>
+
                 {contestantsLoading ? (
-                  <p className="text-sm text-gray-500">Loading participants...</p>
+                  <p className="text-sm text-gray-500">Loading contestants...</p>
                 ) : (
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    {contestants.map((c) => (
-                      <div key={c.id} className="border border-gray-200 rounded-xl p-4 bg-white">
+                  <div className="border border-gray-200 rounded-xl p-4 bg-white">
+                    <p className="text-sm text-gray-600">
+                      Browse all contestants and read their bio, even before voting starts.
+                    </p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {contestantCategories.length > 0 ? (
+                        contestantCategories.map((cat) => {
+                          const count = contestants.filter((c) => (c.contestant_category || null) === cat.id).length
+                          return (
+                            <span
+                              key={cat.id}
+                              className="text-xs font-semibold text-gray-700 bg-gray-100 px-3 py-1 rounded-full"
+                            >
+                              {cat.name} · {count}
+                            </span>
+                          )
+                        })
+                      ) : (
+                        <span className="text-xs font-semibold text-gray-700 bg-gray-100 px-3 py-1 rounded-full">
+                          {contestants.length} total
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {showContestants && (
+                  <div className="fixed inset-0 z-50">
+                    <button
+                      type="button"
+                      aria-label="Close contestants"
+                      onClick={() => setShowContestants(false)}
+                      className="absolute inset-0 bg-black/60"
+                    />
+                    <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center justify-center">
+                      <div className="w-full bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden max-h-[85vh]">
+                        <div className="px-5 py-4 border-b border-gray-200 flex items-center justify-between gap-4">
+                          <div className="min-w-0">
+                            <p className="text-xs text-gray-500">Contestants</p>
+                            <h3 className="text-lg font-bold text-gray-900 truncate">{event.title}</h3>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setShowContestants(false)}
+                            className="px-3 py-2 rounded-xl border border-gray-300 hover:bg-gray-50 text-sm font-semibold text-gray-700"
+                          >
+                            Close
+                          </button>
+                        </div>
+
+                        <div className="grid lg:grid-cols-5">
+                          <div className="lg:col-span-3 border-b lg:border-b-0 lg:border-r border-gray-200">
+                            <div className="p-4 space-y-3">
+                              <div className="flex flex-wrap gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => { setSelectedContestantCategory('all'); setActiveContestantId(null) }}
+                                  className={`text-xs font-semibold px-3 py-1 rounded-full border transition-colors ${
+                                    selectedContestantCategory === 'all'
+                                      ? 'bg-green-600 border-green-600 text-white'
+                                      : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                                  }`}
+                                >
+                                  All · {contestants.length}
+                                </button>
+                                {contestantCategories.map((cat) => {
+                                  const count = contestants.filter((c) => (c.contestant_category || null) === cat.id).length
+                                  return (
+                                    <button
+                                      key={cat.id}
+                                      type="button"
+                                      onClick={() => { setSelectedContestantCategory(cat.id); setActiveContestantId(null) }}
+                                      className={`text-xs font-semibold px-3 py-1 rounded-full border transition-colors ${
+                                        selectedContestantCategory === cat.id
+                                          ? 'bg-green-600 border-green-600 text-white'
+                                          : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                                      }`}
+                                    >
+                                      {cat.name} · {count}
+                                    </button>
+                                  )
+                                })}
+                                {contestants.some((c) => !c.contestant_category) && (
+                                  <button
+                                    type="button"
+                                    onClick={() => { setSelectedContestantCategory('uncategorized'); setActiveContestantId(null) }}
+                                    className={`text-xs font-semibold px-3 py-1 rounded-full border transition-colors ${
+                                      selectedContestantCategory === 'uncategorized'
+                                        ? 'bg-green-600 border-green-600 text-white'
+                                        : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                                    }`}
+                                  >
+                                    Uncategorized · {contestants.filter((c) => !c.contestant_category).length}
+                                  </button>
+                                )}
+                              </div>
+
+                              <div className="flex items-center gap-3">
+                                <input
+                                  value={contestantSearch}
+                                  onChange={(e) => setContestantSearch(e.target.value)}
+                                  placeholder="Search by name, number, category..."
+                                  className="w-full px-3 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white text-sm"
+                                />
+                              </div>
+                            </div>
+
+                            <div className="max-h-[52vh] overflow-auto">
+                              {filteredContestants.length === 0 ? (
+                                <div className="p-4 text-sm text-gray-500">No contestants found.</div>
+                              ) : (
+                                <div className="divide-y divide-gray-100">
+                                  {filteredContestants.map((c) => (
+                                    <button
+                                      key={c.id}
+                                      type="button"
+                                      onClick={() => setActiveContestantId(c.id)}
+                                      className={`w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors ${
+                                        activeContestantId === c.id ? 'bg-green-50' : 'bg-white'
+                                      }`}
+                                    >
+                                      <div className="flex items-center justify-between gap-3">
+                                        <div className="min-w-0">
+                                          <p className="font-semibold text-gray-900 truncate">
+                                            #{c.contestant_number} · {c.name}
+                                          </p>
+                                          <p className="text-xs text-gray-500 truncate">
+                                            {c.contestant_category_name || (c.contestant_category ? contestantCategoriesById.get(c.contestant_category)?.name : null) || 'Uncategorized'}
+                                          </p>
+                                        </div>
+                                        <span className="text-xs font-semibold text-green-700">View</span>
+                                      </div>
+                                    </button>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="lg:col-span-2">
+                            <div className="p-4">
+                              {!activeContestant ? (
+                                <div className="border border-dashed border-gray-300 rounded-xl p-4 text-sm text-gray-600">
+                                  Select a contestant to read their bio.
+                                </div>
+                              ) : (
+                                <div className="space-y-2">
+                                  <p className="text-xs text-gray-500">Contestant</p>
+                                  <h4 className="text-lg font-bold text-gray-900">
+                                    #{activeContestant.contestant_number} · {activeContestant.name}
+                                  </h4>
+                                  <p className="text-sm text-gray-600">
+                                    {activeContestant.contestant_category_name ||
+                                      (activeContestant.contestant_category
+                                        ? contestantCategoriesById.get(activeContestant.contestant_category)?.name
+                                        : null) ||
+                                      'Uncategorized'}
+                                  </p>
+                                  {activeContestant.bio ? (
+                                    <p className="text-sm text-gray-700 leading-relaxed mt-3 whitespace-pre-line">
+                                      {activeContestant.bio}
+                                    </p>
+                                  ) : (
+                                    <p className="text-sm text-gray-500 mt-3">Bio not provided yet.</p>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {Array.isArray(event.guest_speakers) && event.guest_speakers.length > 0 && (
+              <div>
+                <h2 className="text-xl font-bold text-gray-900 mb-3">
+                  {event.guest_speakers.length === 1 ? 'Guest Speaker' : 'Guest Speakers'}
+                </h2>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  {event.guest_speakers
+                    .slice()
+                    .sort((a: GuestSpeakerData, b: GuestSpeakerData) => (a.order || 0) - (b.order || 0))
+                    .map((s: GuestSpeakerData) => (
+                      <div key={s.id} className="border border-gray-200 rounded-xl p-4 bg-white">
                         <div className="flex items-start gap-3">
-                          {c.photo_url ? (
+                          {s.photo_url ? (
                             <img
-                              src={c.photo_url}
-                              alt={c.name}
+                              src={s.photo_url}
+                              alt={s.name}
                               className="w-12 h-12 rounded-xl object-cover flex-shrink-0"
                             />
                           ) : (
@@ -349,21 +603,14 @@ const EventDetailPage = () => {
                             </div>
                           )}
                           <div className="min-w-0 flex-1">
-                            <div className="flex items-center justify-between gap-3">
-                              <p className="font-semibold text-gray-900 truncate">{c.name}</p>
-                              <span className="text-xs font-bold text-green-700 bg-green-50 border border-green-200 px-2 py-0.5 rounded-full flex-shrink-0">
-                                #{c.contestant_number}
-                              </span>
-                            </div>
-                            {c.bio && (
-                              <p className="text-sm text-gray-600 mt-1 line-clamp-3">{c.bio}</p>
-                            )}
+                            <p className="font-semibold text-gray-900 truncate">{s.name}</p>
+                            {s.title && <p className="text-xs text-gray-500 mt-0.5">{s.title}</p>}
+                            {s.bio && <p className="text-sm text-gray-600 mt-1 line-clamp-3">{s.bio}</p>}
                           </div>
                         </div>
                       </div>
                     ))}
-                  </div>
-                )}
+                </div>
               </div>
             )}
 

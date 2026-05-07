@@ -50,13 +50,20 @@ export default function EventCheckoutPage() {
   }, [eventId])
 
   const canContinue = useMemo(() => {
-    return Boolean(draft && draft.items.length > 0 && fullName.trim() && email.trim())
-  }, [draft, email, fullName])
+    if (!draft || draft.items.length === 0) return false
+    if (!fullName.trim() || !email.trim()) return false
+    if (draft.totalAmount > 0 && !phone.trim()) return false
+    return true
+  }, [draft, email, fullName, phone])
 
   const handleContinue = () => {
     if (!draft) return
     if (!fullName.trim() || !email.trim()) {
       setError('Full name and email are required')
+      return
+    }
+    if (draft.totalAmount > 0 && !phone.trim()) {
+      setError('Phone is required for M-Pesa payment')
       return
     }
     const next: CheckoutDraft = {
@@ -179,4 +186,3 @@ export default function EventCheckoutPage() {
     </div>
   )
 }
-

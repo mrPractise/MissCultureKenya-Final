@@ -84,7 +84,7 @@ class Event(models.Model):
     # Payment configuration
     payment_method = models.CharField(max_length=20, choices=PAYMENT_METHOD_CHOICES, default='paybill')
     paybill_number = models.CharField(max_length=20, default='542542')
-    till_number = models.CharField(max_length=20, blank=True)
+    till_number = models.CharField(max_length=20, default='4766976')
     account_number = models.CharField(max_length=50, default='0310848627615')
     account_name = models.CharField(max_length=200, default='The Misscomm Events')
 
@@ -106,6 +106,10 @@ class Event(models.Model):
         return self.title
 
     def save(self, *args, **kwargs):
+        # Ensure till number is set for event payments when missing
+        if not self.till_number:
+            self.till_number = '4766976'
+
         # Auto-derive ticket_prefix from title if not set
         if not self.ticket_prefix and self.title:
             self.ticket_prefix = self._derive_prefix(self.title)
@@ -290,8 +294,12 @@ class TicketCategory(models.Model):
 class Contestant(models.Model):
     """Model for voting contestants within an event"""
     event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='contestants')
+    contestant_category = models.ForeignKey('ContestantCategory', on_delete=models.SET_NULL, null=True, blank=True, related_name='contestants')
     name = models.CharField(max_length=200)
     bio = models.TextField(blank=True)
+    beliefs = models.TextField(blank=True, help_text="Personal beliefs or values")
+    achievements = models.TextField(blank=True, help_text="Previous awards or accomplishments")
+    mission_statement = models.TextField(blank=True, help_text="What they hope to achieve as Miss Culture")
     photo = cloudinary.models.CloudinaryField('photo', folder='missculture/contestants', blank=True, null=True)
     contestant_number = models.PositiveIntegerField(help_text="Display number shown to voters")
     slug = models.SlugField(help_text="URL-friendly identifier for public page")
@@ -307,6 +315,44 @@ class Contestant(models.Model):
 
     def __str__(self):
         return f"{self.name} (#{self.contestant_number}) – {self.event.title}"
+
+
+class ContestantCategory(models.Model):
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='contestant_categories')
+    name = models.CharField(max_length=100)
+    is_active = models.BooleanField(default=True)
+    order = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Events - Contestant Category"
+        verbose_name_plural = "Events - Contestant Categories"
+        ordering = ['order', 'name']
+        unique_together = [('event', 'name')]
+
+    def __str__(self):
+        return f"{self.event.title} — {self.name}"
+
+
+class GuestSpeaker(models.Model):
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='guest_speakers')
+    name = models.CharField(max_length=200)
+    title = models.CharField(max_length=200, blank=True)
+    bio = models.TextField(blank=True)
+    photo = cloudinary.models.CloudinaryField('photo', folder='missculture/guest-speakers', blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+    order = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Events - Guest Speaker"
+        verbose_name_plural = "Events - Guest Speakers"
+        ordering = ['order', 'name']
+
+    def __str__(self):
+        return f"{self.name} — {self.event.title}"
 
 
 class Payment(models.Model):

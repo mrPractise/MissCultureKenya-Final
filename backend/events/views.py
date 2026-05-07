@@ -13,7 +13,7 @@ from django.db.models import Sum, F, Q
 
 from .models import (
     Event, EventInquiry, EventCategory, EventSettings,
-    TicketCategory, Contestant, Payment, Ticket, VoteTransaction, AuditLog
+    TicketCategory, Contestant, GuestSpeaker, Payment, Ticket, VoteTransaction, AuditLog
 )
 from .serializers import (
     EventSerializer, EventListSerializer, EventInquirySerializer,
@@ -23,9 +23,12 @@ from .serializers import (
     TicketSerializer, TicketDetailSerializer,
     VoteTransactionSerializer, AuditLogSerializer,
     LiveResultSerializer, VoteVerifySerializer,
-    STKPushRequestSerializer, STKPushResponseSerializer,
+    STKPushRequestSerializer, STKPushTicketRequestSerializer, STKPushResponseSerializer,
 )
-from .utils import generate_ticket_code, calculate_vote_count
+from .utils import (
+    generate_ticket_code, calculate_vote_count, 
+    send_telegram_message
+)
 from .daraja import initiate_stk_push, process_callback
 
 
@@ -366,6 +369,88 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
                 'payment_id': payment.id,
             }, status=status.HTTP_502_BAD_GATEWAY)
 
+    @action(detail=True, methods=['post'])
+    def initiate_ticket_payment(self, request, pk=None):
+        event = self.get_object()
+
+        serializer = STKPushTicketRequestSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        phone_number = serializer.validated_data['phone_number']
+        full_name = serializer.validated_data['full_name']
+        email = serializer.validated_data['email']
+        ticket_breakdown = serializer.validated_data['ticket_breakdown']
+
+        categories = TicketCategory.objects.filter(event=event, is_active=True, id__in=ticket_breakdown.keys())
+        categories_by_id = {c.id: c for c in categories}
+
+        if not categories_by_id:
+            return Response({'error': 'No valid ticket categories found for this event.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        total_qty = 0
+        total_amount = Decimal('0.00')
+        for category_id, qty in ticket_breakdown.items():
+            category = categories_by_id.get(int(category_id))
+            if not category:
+                return Response({'error': f'Invalid ticket category: {category_id}'}, status=status.HTTP_400_BAD_REQUEST)
+            if category.available and qty > int(category.available):
+                return Response({'error': f'Only {category.available} ticket(s) available for {category.name}.'}, status=status.HTTP_400_BAD_REQUEST)
+            total_qty += int(qty)
+            total_amount += (category.price * int(qty))
+
+        if total_amount <= 0:
+            return Response({'error': 'Selected ticket total is free. Use free registration instead.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        payment = Payment.objects.create(
+            event=event,
+            phone_number=phone_number,
+            amount=total_amount,
+            status='pending',
+            payment_type='ticket',
+            full_name=full_name,
+            email=email,
+            ticket_breakdown=ticket_breakdown,
+            ticket_quantity=total_qty,
+        )
+
+        callback_url = getattr(settings, 'MPESA_CALLBACK_URL', '')
+        if not callback_url:
+            host = request.get_host()
+            scheme = 'https' if request.is_secure() else 'http'
+            callback_url = f"{scheme}://{host}/api/mpesa-callback/"
+
+        stk_result = initiate_stk_push(
+            phone_number=phone_number,
+            amount=float(total_amount),
+            account_reference=f"TICKET{event.id}",
+            transaction_desc=f"Tickets for {event.title}",
+            callback_url=callback_url,
+        )
+
+        payment.checkout_request_id = stk_result.get('checkout_request_id') or ''
+        payment.merchant_request_id = stk_result.get('merchant_request_id') or ''
+        payment.stk_response = stk_result
+        payment.save()
+
+        if stk_result.get('success'):
+            return Response({
+                'success': True,
+                'checkout_request_id': payment.checkout_request_id,
+                'merchant_request_id': payment.merchant_request_id,
+                'message': 'STK Push sent to your phone. Please enter your M-Pesa PIN to complete payment.',
+                'payment_id': payment.id,
+                'ticket_count': total_qty,
+                'amount': str(total_amount),
+            })
+        payment.status = 'failed'
+        payment.save()
+        return Response({
+            'success': False,
+            'error': stk_result.get('error', 'Failed to initiate STK Push.'),
+            'payment_id': payment.id,
+        }, status=status.HTTP_502_BAD_GATEWAY)
+
     def _process_ticket_payment(self, payment, event):
         event_year = event.start_date.year
         ticket_breakdown = payment.ticket_breakdown or {}
@@ -554,10 +639,10 @@ class TicketCategoryViewSet(viewsets.ReadOnlyModelViewSet):
 # ── Contestant ViewSet ───────────────────────────────────────────────────────
 
 class ContestantViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Contestant.objects.filter(is_active=True).select_related('event')
+    queryset = Contestant.objects.filter(is_active=True).select_related('event', 'contestant_category')
     serializer_class = ContestantSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    filterset_fields = ['event', 'is_active']
+    filterset_fields = ['event', 'is_active', 'contestant_category']
     search_fields = ['name']
 
     def get_serializer_class(self):
@@ -826,45 +911,118 @@ def mpesa_callback(request):
     payment.save()
 
     if result.get('success'):
-        # Payment successful — update payment and create vote transaction
+        if payment.status == 'successful':
+            return Response({'status': 'success', 'message': 'Payment already processed'})
+
         payment.status = 'successful'
         payment.mpesa_code = result.get('mpesa_receipt_number') or payment.mpesa_code
+        payment.phone_number = result.get('phone_number') or payment.phone_number
         payment.save()
 
         event = payment.event
-        contestant = payment.contestant
+        processing = {}
 
-        if contestant:
-            vote_count = calculate_vote_count(payment.amount, event.vote_price)
+        if payment.payment_type == 'vote':
+            contestant = payment.contestant
+            if contestant and not payment.vote_transactions.exists():
+                vote_count = calculate_vote_count(payment.amount, event.vote_price)
+                if vote_count > 0:
+                    vote = VoteTransaction.objects.create(
+                        event=event,
+                        contestant=contestant,
+                        payment=payment,
+                        vote_count=vote_count,
+                        phone_number=payment.phone_number,
+                        mpesa_code=payment.mpesa_code or '',
+                        status='successful',
+                        ip_address=None,
+                    )
+                    processing = {'vote_id': vote.id, 'vote_count': vote_count, 'contestant': contestant.name}
+                    
+                    # Send Telegram notification
+                    telegram_msg = (
+                        f"🗳 <b>New Vote Confirmed!</b>\n\n"
+                        f"<b>Event:</b> {event.title}\n"
+                        f"<b>Contestant:</b> {contestant.name}\n"
+                        f"<b>Votes:</b> {vote_count}\n"
+                        f"<b>Amount:</b> KES {payment.amount}\n"
+                        f"<b>Phone:</b> {payment.phone_number}\n"
+                        f"<b>M-Pesa:</b> {payment.mpesa_code}"
+                    )
+                    send_telegram_message(telegram_msg)
+        elif payment.payment_type == 'ticket':
+            if not payment.tickets.exists():
+                ticket_category_ids = list((payment.ticket_breakdown or {}).keys())
+                categories = TicketCategory.objects.filter(event=event, id__in=ticket_category_ids)
+                categories_by_id = {c.id: c for c in categories}
 
-            if vote_count > 0:
-                VoteTransaction.objects.create(
-                    event=event,
-                    contestant=contestant,
-                    payment=payment,
-                    vote_count=vote_count,
-                    phone_number=result.get('phone_number') or payment.phone_number,
-                    mpesa_code=payment.mpesa_code or '',
-                    status='successful',
-                    ip_address=None,
+                issued = []
+                event_year = event.start_date.year
+                if payment.ticket_breakdown:
+                    for category_id, qty in payment.ticket_breakdown.items():
+                        category = categories_by_id.get(int(category_id))
+                        if not category:
+                            continue
+                        qty = max(1, int(qty))
+                        for _ in range(qty):
+                            code = generate_ticket_code(event.ticket_prefix, event_year)
+                            ticket = Ticket.objects.create(
+                                event=event,
+                                ticket_category=category,
+                                payment=payment,
+                                ticket_code=code,
+                                full_name=payment.full_name or payment.phone_number,
+                                email=payment.email or '',
+                                phone=payment.phone_number,
+                            )
+                            issued.append(ticket.ticket_code)
+                        category.available = max(0, int(category.available or 0) - qty)
+                        category.save(update_fields=['available'])
+                processing = {'ticket_codes': issued, 'ticket_count': len(issued)}
+
+                # Send Telegram notification
+                telegram_msg = (
+                    f"🎟 <b>Tickets Issued!</b>\n\n"
+                    f"<b>Event:</b> {event.title}\n"
+                    f"<b>Customer:</b> {payment.full_name}\n"
+                    f"<b>Amount:</b> KES {payment.amount}\n"
+                    f"<b>Tickets:</b> {len(issued)}\n"
+                    f"<b>Phone:</b> {payment.phone_number}\n"
+                    f"<b>M-Pesa:</b> {payment.mpesa_code}"
                 )
+                send_telegram_message(telegram_msg)
 
-                # Audit log
-                AuditLog.objects.create(
-                    action='payment_verified',
-                    actor='system',
-                    details=json.dumps({
-                        'payment_id': payment.id,
-                        'mpesa_code': payment.mpesa_code,
-                        'amount': str(payment.amount),
-                        'vote_count': vote_count,
-                        'contestant': contestant.name,
-                        'source': 'daraja_callback',
-                    }),
-                    event=event,
-                )
+                if payment.email and issued:
+                    send_mail(
+                        subject=f"Your Tickets — {event.title}",
+                        message=(
+                            f"Hello {payment.full_name or ''},\n\n"
+                            f"Your payment was received successfully.\n"
+                            f"Event: {event.title}\n"
+                            f"Tickets: {', '.join(issued)}\n\n"
+                            f"You can verify tickets here:\n"
+                            f"https://misscultureglobalkenya.com/events/{event.id}\n"
+                        ),
+                        from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', None),
+                        recipient_list=[payment.email],
+                        fail_silently=True,
+                    )
 
-        return Response({'status': 'success', 'message': 'Payment processed successfully'})
+        AuditLog.objects.create(
+            action='payment_verified',
+            actor='system',
+            details=json.dumps({
+                'payment_id': payment.id,
+                'mpesa_code': payment.mpesa_code,
+                'amount': str(payment.amount),
+                'payment_type': payment.payment_type,
+                'processing': processing,
+                'source': 'daraja_callback',
+            }),
+            event=event,
+        )
+
+        return Response({'status': 'success', 'message': 'Payment processed successfully', 'processing': processing})
     else:
         # Payment failed or cancelled
         payment.status = 'failed'

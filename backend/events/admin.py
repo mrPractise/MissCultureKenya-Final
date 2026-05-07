@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.utils import timezone
 from .models import (
     Event, EventInquiry, EventCategory, EventSettings,
-    TicketCategory, Contestant, Payment, Ticket, VoteTransaction, AuditLog
+    TicketCategory, Contestant, ContestantCategory, GuestSpeaker, Payment, Ticket, VoteTransaction, AuditLog
 )
 from .utils import generate_ticket_code, calculate_vote_count
 
@@ -19,9 +19,21 @@ class TicketCategoryInline(admin.TabularInline):
 class ContestantInline(admin.TabularInline):
     model = Contestant
     extra = 1
-    fields = ['contestant_number', 'name', 'slug', 'photo', 'is_active']
+    fields = ['contestant_number', 'name', 'contestant_category', 'slug', 'photo', 'is_active']
     prepopulated_fields = {'slug': ('name',)}
     ordering = ['contestant_number']
+
+class ContestantCategoryInline(admin.TabularInline):
+    model = ContestantCategory
+    extra = 1
+    fields = ['name', 'is_active', 'order']
+    ordering = ['order', 'name']
+
+class GuestSpeakerInline(admin.TabularInline):
+    model = GuestSpeaker
+    extra = 1
+    fields = ['name', 'title', 'photo', 'is_active', 'order']
+    ordering = ['order', 'name']
 
 
 # ── Event Admin ──────────────────────────────────────────────────────────────
@@ -36,7 +48,7 @@ class EventAdmin(admin.ModelAdmin):
     readonly_fields = ['created_at', 'updated_at', 'ticket_prefix']
     date_hierarchy = 'start_date'
     filter_horizontal = ['gallery']
-    inlines = [TicketCategoryInline, ContestantInline]
+    inlines = [TicketCategoryInline, ContestantCategoryInline, ContestantInline, GuestSpeakerInline]
 
     fieldsets = (
         ('Event Details', {
@@ -159,13 +171,35 @@ class TicketCategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Contestant)
 class ContestantAdmin(admin.ModelAdmin):
-    list_display = ['contestant_number', 'name', 'event', 'is_active', 'created_at']
-    list_filter = ['is_active', 'event', 'created_at']
+    list_display = ['contestant_number', 'name', 'contestant_category', 'event', 'is_active', 'created_at']
+    list_filter = ['is_active', 'event', 'contestant_category', 'created_at']
     list_editable = ['is_active']
     search_fields = ['name', 'event__title']
     prepopulated_fields = {'slug': ('name',)}
     readonly_fields = ['created_at', 'updated_at']
     ordering = ['event', 'contestant_number']
+
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('event', 'contestant_category', 'name', 'slug', 'contestant_number', 'is_active')
+        }),
+        ('Profile Details', {
+            'fields': ('photo', 'bio', 'beliefs', 'mission_statement', 'achievements')
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+
+@admin.register(ContestantCategory)
+class ContestantCategoryAdmin(admin.ModelAdmin):
+    list_display = ['name', 'event', 'is_active', 'order', 'created_at']
+    list_filter = ['event', 'is_active']
+    list_editable = ['is_active', 'order']
+    search_fields = ['name', 'event__title']
+    ordering = ['event', 'order', 'name']
 
     def save_model(self, request, obj, form, change):
         if change:

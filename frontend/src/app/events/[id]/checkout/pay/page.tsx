@@ -35,9 +35,10 @@ export default function EventCheckoutPayPage() {
   const [loading, setLoading] = useState(true)
 
   const [copiedField, setCopiedField] = useState<string | null>(null)
-  const [mpesaCode, setMpesaCode] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const [stkSent, setStkSent] = useState(false)
+  const [checkoutId, setCheckoutId] = useState('')
 
   useEffect(() => {
     if (!eventId || !Number.isFinite(eventId)) return
@@ -99,14 +100,14 @@ export default function EventCheckoutPayPage() {
     setTimeout(() => setCopiedField(null), 1500)
   }
 
-  const handleSubmit = async () => {
+  const handleSendStk = async () => {
     if (!draft) return
-    if (!mpesaCode.trim()) {
-      setError('M-Pesa code is required after payment')
-      return
-    }
     if (!draft.full_name || !draft.email) {
       setError('Missing buyer details. Go back to checkout.')
+      return
+    }
+    if (!draft.phone) {
+      setError('Phone is required for M-Pesa STK push. Go back to checkout.')
       return
     }
     const ticket_breakdown: Record<string, number> = {}
@@ -115,23 +116,23 @@ export default function EventCheckoutPayPage() {
     setSubmitting(true)
     setError('')
     try {
-      const payment = await apiClient.createPayment({
-        event: draft.eventId,
-        phone_number: draft.phone || '',
-        mpesa_code: mpesaCode.trim().toUpperCase(),
-        amount: draft.totalAmount,
-        status: 'pending',
-        payment_type: 'ticket',
-        ticket_breakdown,
-        ticket_quantity: draft.totalTickets,
+      const result = await apiClient.initiateTicketPayment(draft.eventId, {
+        phone_number: draft.phone,
         full_name: draft.full_name,
         email: draft.email,
+        ticket_breakdown,
       })
-      sessionStorage.setItem(storageKey(eventId), JSON.stringify({ ...draft, mpesa_code: mpesaCode.trim().toUpperCase(), payment_id: payment?.id }))
-      router.push(`/events/${eventId}/checkout/success`)
+      if (result?.success) {
+        setStkSent(true)
+        setCheckoutId(result.checkout_request_id || '')
+        sessionStorage.setItem(storageKey(eventId), JSON.stringify({ ...draft, payment_id: result?.payment_id, checkout_request_id: result?.checkout_request_id }))
+        router.push(`/events/${eventId}/checkout/success`)
+      } else {
+        setError(result?.error || 'Failed to initiate STK Push.')
+      }
     } catch (err: any) {
       const apiErr = err as ApiError
-      setError(apiErr?.message || 'Failed to submit payment')
+      setError(apiErr?.message || 'Failed to initiate payment')
     } finally {
       setSubmitting(false)
     }
@@ -188,16 +189,17 @@ export default function EventCheckoutPayPage() {
             <div className="bg-green-50 border border-green-200 rounded-xl p-4">
               <h2 className="font-semibold text-green-900 flex items-center gap-2">
                 <Smartphone className="w-5 h-5" />
-                M-Pesa Paybill Instructions
+                Pay with M-Pesa (STK Push)
               </h2>
-              <ol className="mt-3 text-sm text-green-800 space-y-2 list-decimal list-inside">
-                <li>Go to M-Pesa on your phone</li>
-                <li>Select Lipa na M-Pesa</li>
-                <li>Select Paybill</li>
-                <li>Enter the Paybill and Account details below</li>
-                <li>Enter amount: <span className="font-bold text-gray-900">{draft.totalAmount === 0 ? '0' : draft.totalAmount.toLocaleString()}</span></li>
-                <li>Confirm and enter your M-Pesa PIN</li>
-              </ol>
+              <p className="mt-2 text-sm text-green-800">
+                Tap the button below and an M-Pesa prompt will be sent to your phone. Enter your PIN to complete payment.
+              </p>
+              {draft.phone && (
+                <p className="mt-2 text-xs text-green-700">
+                  Phone: <span className="font-semibold">{draft.phone}</span>
+                  {checkoutId ? <span className="text-green-600"> · Ref: {checkoutId.slice(-8)}</span> : null}
+                </p>
+              )}
             </div>
 
             <div className="bg-white border-2 border-gray-200 rounded-xl overflow-hidden">
@@ -236,20 +238,6 @@ export default function EventCheckoutPayPage() {
               </div>
             </div>
 
-            <div className="bg-white border border-gray-200 rounded-xl p-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">M-Pesa Code *</label>
-              <input
-                type="text"
-                value={mpesaCode}
-                onChange={(e) => { setMpesaCode(e.target.value); setError('') }}
-                placeholder="e.g. QWE12ABC3D"
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white"
-              />
-              <p className="mt-2 text-xs text-gray-500">
-                Enter the transaction code from your M-Pesa message after paying.
-              </p>
-            </div>
-
             {error && (
               <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-sm text-red-700">
                 {error}
@@ -266,12 +254,12 @@ export default function EventCheckoutPayPage() {
             </Link>
             <button
               type="button"
-              onClick={handleSubmit}
+              onClick={handleSendStk}
               disabled={submitting || loading}
               className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl font-semibold text-sm bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white transition-colors"
             >
               {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-              Submit Payment
+              {stkSent ? 'STK Sent' : 'Send M-Pesa Prompt'}
             </button>
           </div>
         </div>
@@ -279,4 +267,3 @@ export default function EventCheckoutPayPage() {
     </div>
   )
 }
-

@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import { Calendar, MapPin, Clock, Users, ExternalLink, ArrowRight, Camera, Heart, Sparkles, Handshake, Quote, Ticket } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import EventDetailsModal from '@/components/EventDetailsModal'
+import { useRouter } from 'next/navigation'
 import ContactModal from '@/components/ContactModal'
 import apiClient from '@/lib/api'
 import { useSiteSettings } from '@/lib/useSiteSettings'
@@ -49,8 +49,7 @@ const TESTIMONIALS = [
 ]
 
 const EventsPage = () => {
-  const [selectedEvent, setSelectedEvent] = useState<any>(null)
-  const [isEventModalOpen, setIsEventModalOpen] = useState(false)
+  const router = useRouter()
   const [isContactModalOpen, setIsContactModalOpen] = useState(false)
   const [upcomingEvents, setUpcomingEvents] = useState<any[]>([])
   const [pastEvents, setPastEvents] = useState<any[]>([])
@@ -121,8 +120,7 @@ const EventsPage = () => {
     : displayUpcomingEvents.filter((e: any) => e.category === activeCategory)
 
   const handleEventClick = (event: any) => {
-    setSelectedEvent(event)
-    setIsEventModalOpen(true)
+    router.push(`/events/${event.id}`)
   }
 
   const formatDate = (dateStr: string) => {
@@ -484,11 +482,6 @@ const EventsPage = () => {
       </div>
 
       {/* Modals */}
-      <EventDetailsModal
-        isOpen={isEventModalOpen}
-        onClose={() => setIsEventModalOpen(false)}
-        event={selectedEvent}
-      />
       <ContactModal
         isOpen={isContactModalOpen}
         onClose={() => setIsContactModalOpen(false)}

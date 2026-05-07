@@ -66,6 +66,14 @@ export default function PrivacyPolicy() {
               electronic storage is 100% secure.
             </p>
             
+            <h2 className="text-xl font-bold text-gray-900 mt-8 mb-4">Payment Data</h2>
+            <p className="text-gray-600 mb-4">
+              When you purchase tickets or vote, your payment is processed securely through M-Pesa 
+              STK Push via our payment partners. We do not store your M-Pesa PIN or full credit card 
+              details. We only store transaction references to verify your purchase and issue 
+              tickets or count votes.
+            </p>
+
             <h2 className="text-xl font-bold text-gray-900 mt-8 mb-4">Changes to This Policy</h2>
             <p className="text-gray-600 mb-4">
               We may update this Privacy Policy from time to time. We will notify you of any changes 
