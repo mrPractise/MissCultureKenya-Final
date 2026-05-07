@@ -116,9 +116,8 @@ const EventDetailsModal = ({ isOpen, onClose, event }: EventDetailsModalProps) =
       
       // Use price_value if available, otherwise parse price string
       const priceValue = ticket.price_value 
-        ? parseFloat(ticket.price_value) 
-        : (ticket.price === 'Free' ? 0 : parseFloat(ticket.price.replace(/[^\d.]/g, '')))
-      
+          ? Number(ticket.price_value)
+          : (ticket.price === 'Free' ? 0 : parseFloat(ticket.price.replace(/[^\d.]/g, '')))
       return total + (priceValue * quantity)
     }, 0)
   }
