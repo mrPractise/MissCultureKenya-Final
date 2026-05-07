@@ -28,7 +28,7 @@ export default function TwitterImage() {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 980 }}>
             <div style={{ fontSize: 58, fontWeight: 900, lineHeight: 1.06, letterSpacing: -1 }}>
-              Beauty of Purpose, Power of Heritage
+              Kenya Culture and Heritage
             </div>
             <div style={{ fontSize: 22, opacity: 0.92 }}>
               Celebrate Kenya’s culture through pageants, community work, and cultural diplomacy.

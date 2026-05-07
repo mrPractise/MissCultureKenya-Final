@@ -29,7 +29,7 @@ const VotingCTA = () => {
               Your Vote Shapes <span className="text-red-600">Our Culture</span>
             </h2>
             <p className="text-lg text-gray-600 leading-relaxed mb-8 max-w-lg">
-              Support talented individuals and groups showcasing Kenya&apos;s diverse cultural heritage. Every vote celebrates the beauty of purpose and the power of heritage.
+              Support talented individuals and groups showcasing Kenya&apos;s diverse cultural heritage. Every vote celebrates culture and community.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link

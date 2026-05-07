@@ -46,16 +46,21 @@ const Navigation = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-14 sm:h-16">
             {/* Logo */}
-            <Link href="/" className="flex items-center group py-1" aria-label="Miss Culture Global Kenya home">
-              <div className="relative h-12 w-28 sm:h-14 sm:w-32 transition-transform duration-300 group-hover:scale-105">
+            <Link href="/" className="flex flex-row items-center group py-1 gap-2" aria-label="Miss Culture Global Kenya home">
+              <div className="relative h-14 w-36 sm:h-16 sm:w-44 transition-transform duration-300 group-hover:scale-105">
                 <Image
                   src="/official-logo.png"
                   alt="Miss Culture Global Kenya logo"
                   fill
                   className="object-contain"
-                  sizes="(max-width: 640px) 120px, 140px"
+                  sizes="(max-width: 640px) 144px, 176px"
                   priority
                 />
+              </div>
+              <div>
+                <h1 className="text-[10px] sm:text-xs md:text-sm font-bold text-gray-900 tracking-[0.18em] uppercase leading-tight group-hover:text-red-600 transition-colors duration-300">
+                  Miss Culture Global Kenya
+                </h1>
               </div>
             </Link>
 

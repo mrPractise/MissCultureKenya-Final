@@ -20,8 +20,8 @@ interface Contestant {
   contestant_number: number
   slug: string
   vote_count: number | null
-  event_title: string
-  event_slug: string
+  event_title?: string
+  event_slug?: string
 }
 
 interface VotingEvent {

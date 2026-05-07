@@ -11,10 +11,10 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   metadataBase: new URL('https://misscultureglobalkenya.com'),
   title: {
-    default: 'Miss Culture Global Kenya | Beauty of Purpose, Power of Heritage',
+    default: 'Miss Culture Global Kenya',
     template: '%s | Miss Culture Global Kenya'
   },
-  description: 'Miss Culture Global Kenya is a cultural preservation and youth empowerment movement — showcasing Kenya’s heritage through pageants, community programs, cultural diplomacy, and global partnerships.',
+  description: 'Miss Culture Global Kenya is a cultural preservation and youth empowerment movement — showcasing Kenya’s heritage through pageants, community programs, and global partnerships.',
   keywords: [
     'Miss Culture Global Kenya',
     'Kenya Heritage',
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: 'Miss Culture Global Kenya | Beauty of Purpose, Power of Heritage',
+    title: 'Miss Culture Global Kenya',
     description: 'A cultural preservation and youth empowerment movement — pageants, community programs, cultural diplomacy, and global partnerships.',
     url: 'https://misscultureglobalkenya.com',
     siteName: 'Miss Culture Global Kenya',
@@ -60,7 +60,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Miss Culture Global Kenya',
-    description: 'Beauty of Purpose, Power of Heritage.',
+    description: 'Kenya culture, heritage, and events brought to a global audience.',
     images: ['/twitter-image'],
   },
   alternates: {
@@ -93,7 +93,7 @@ export default function RootLayout({
                   '@type': 'ImageObject',
                   'url': 'https://misscultureglobalkenya.com/official-logo.png'
                 },
-                'description': 'Miss Culture Global Kenya is a cultural preservation and youth empowerment movement — showcasing Kenya’s heritage through pageants, community programs, cultural diplomacy, and global partnerships.',
+                'description': 'Miss Culture Global Kenya is a cultural preservation and youth empowerment movement — showcasing Kenya’s heritage through pageants, community programs, and global partnerships.',
                 'address': {
                   '@type': 'PostalAddress',
                   'addressLocality': 'Nairobi',

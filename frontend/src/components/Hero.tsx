@@ -53,11 +53,23 @@ const Hero = () => {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="max-w-2xl lg:max-w-xl xl:max-w-2xl text-center lg:text-left"
         >
-          {/* Franchise Badge */}
+          {/* Welcome Badge */}
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.1 }}
+            className="mb-5 flex justify-center lg:justify-start"
+          >
+            <span className="px-4 py-1.5 rounded-full border border-white/20 bg-white/5 backdrop-blur-sm text-sm font-medium tracking-wider uppercase text-red-400">
+              Welcome to Miss Culture Global Kenya
+            </span>
+          </motion.div>
+
+          {/* Franchise Badge */}
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
             className="mb-5 flex justify-center lg:justify-start"
           >
             <a
@@ -72,24 +84,13 @@ const Hero = () => {
             </a>
           </motion.div>
 
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 1, delay: 0.2 }}
-            className="mb-6 inline-block"
-          >
-            <span className="px-4 py-1.5 rounded-full border border-white/20 bg-white/5 backdrop-blur-sm text-sm font-medium tracking-wider uppercase text-red-400">
-              Welcome to Miss Culture Global Kenya
-            </span>
-          </motion.div>
-
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-bold mb-6 sm:mb-8 leading-tight drop-shadow-2xl tracking-tight text-white">
             Embodying the Spirit of
             <span className="block text-red-600 mt-2 pb-2 filter drop-shadow-[0_0_20px_rgba(220,38,38,0.3)]">Kenya</span>
           </h1>
 
           <p className="text-base sm:text-lg md:text-xl lg:text-xl xl:text-2xl mb-8 sm:mb-10 text-gray-200 max-w-3xl lg:mx-0 mx-auto px-2 sm:px-0 drop-shadow-lg font-light leading-relaxed">
-            Celebrating <span className="text-white font-medium">Global Culture</span> through The Beauty of Purpose and The Power of Heritage
+            Celebrating <span className="text-white font-medium">Global Culture</span> and the timeless richness of Kenyan traditions
           </p>
 
           {/* Buttons removed as requested */}

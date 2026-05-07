@@ -2,6 +2,8 @@
 
 A modern, inspiring, and culturally vibrant digital platform for Miss Culture Global Kenya — the official home of Susan, Kenya's cultural ambassador to the world.
 
+- description: 'Miss Culture Global Kenya is a cultural preservation and youth empowerment movement — showcasing Kenya's heritage through pageants, community programs, and global partnerships.',
+
 ## 🌟 Project Overview
 
 This platform seamlessly blends elegant design, storytelling, and high performance, built with Next.js for the frontend and Django for the backend. The project includes:
@@ -15,7 +17,7 @@ This platform seamlessly blends elegant design, storytelling, and high performan
 
 ### Main Website
 - **Hero Section**: Cinematic, full-screen presentation with cultural imagery
-- **Our Kenya**: Interactive exploration of Kenya's regions and communities
+- **Our Kenya**: Exploration of Kenya's regions and communities
 - **Our Culture**: Showcase of languages, traditions, and heritage
 - **Global Stage**: Kenya's achievements and international presence
 - **The Ambassador**: Susan's personal journey and mission

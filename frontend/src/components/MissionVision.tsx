@@ -25,9 +25,6 @@ const MissionVision = () => {
             <p className="text-gray-600 leading-relaxed mb-4">
               To identify, mentor, and empower visionary young women who will safeguard Kenyan cultural identity, promote responsible tourism, and foster cross-cultural partnerships that create tangible impact in local communities.
             </p>
-            <p className="text-gray-500 leading-relaxed text-sm italic">
-              &ldquo;By blending &lsquo;The Beauty of Purpose&rsquo; with &lsquo;The Power of Heritage,&rsquo; we create a stage where culture drives sustainable development and global unity.&rdquo;
-            </p>
           </motion.div>
 
           {/* Vision */}

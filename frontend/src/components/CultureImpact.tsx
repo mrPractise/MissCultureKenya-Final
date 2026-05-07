@@ -43,7 +43,7 @@ const CultureImpact = () => {
             Culture with <span className="text-red-600">Impact</span>
           </h2>
           <p className="text-gray-600 max-w-2xl mx-auto text-lg font-light">
-            Three pillars that define how culture drives sustainable development and global unity.
+            Three pillars that explain how culture supports growth, connection, and community.
           </p>
         </motion.div>
 

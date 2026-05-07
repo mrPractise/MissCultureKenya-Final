@@ -50,8 +50,8 @@ export default function OpenGraphImage() {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 18, maxWidth: 980 }}>
             <div style={{ fontSize: 64, fontWeight: 900, lineHeight: 1.05, letterSpacing: -1 }}>
-              Beauty of Purpose.
-              <span style={{ display: 'block' }}>Power of Heritage.</span>
+              Kenya Culture.
+              <span style={{ display: 'block' }}>Global Heritage.</span>
             </div>
             <div style={{ fontSize: 22, lineHeight: 1.4, opacity: 0.92 }}>
               A cultural preservation and youth empowerment movement — pageants, community programs,

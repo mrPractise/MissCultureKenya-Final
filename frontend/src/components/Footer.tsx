@@ -67,7 +67,7 @@ const Footer = () => {
                 </div>
               </div>
               <p className="text-gray-400 mb-6 max-w-md text-sm sm:text-base leading-relaxed">
-                Embodying the Beauty of Purpose and the Power of Heritage — transforming cultural heritage into a global asset for socio-economic empowerment and international diplomacy.
+                Celebrating Kenya’s culture and heritage through storytelling, events, and community partnerships.
               </p>
 
               {/* Franchise Link */}

@@ -140,11 +140,8 @@ const AboutPage = () => {
               viewport={{ once: true }}
             >
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">Our <span className="text-red-600">Mission</span></h2>
-              <p className="text-lg text-gray-600 leading-relaxed mb-4">
-                To identify, mentor, and empower visionary young women who will safeguard Kenyan cultural identity, promote responsible tourism, and foster cross-cultural partnerships that create tangible impact in local communities.
-              </p>
               <p className="text-lg text-gray-600 leading-relaxed mb-8">
-                By blending &ldquo;The Beauty of Purpose&rdquo; with &ldquo;The Power of Heritage,&rdquo; we create a stage where culture drives sustainable development and global unity.
+                To identify, mentor, and empower visionary young women who will safeguard Kenyan cultural identity, promote responsible tourism, and foster cross-cultural partnerships that create tangible impact in local communities.
               </p>
               <div className="flex items-center space-x-4">
                 <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-green-600">
@@ -247,7 +244,7 @@ const AboutPage = () => {
           >
             <h2 className="text-4xl font-bold text-gray-900 mb-6">Culture with <span className="text-red-600">Impact</span></h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto font-light">
-              Three pillars that define how culture drives sustainable development and global unity.
+              Our core pillars that define our commitment to cultural preservation and community empowerment.
             </p>
           </motion.div>
 
