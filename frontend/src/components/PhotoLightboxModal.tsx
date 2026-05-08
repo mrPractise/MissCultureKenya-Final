@@ -15,6 +15,7 @@ interface Photo {
   description?: string
   event?: string
   about?: string
+  caption?: string
 }
 
 interface PhotoLightboxModalProps {
