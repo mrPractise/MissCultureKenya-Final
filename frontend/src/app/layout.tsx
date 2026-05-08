@@ -11,10 +11,10 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   metadataBase: new URL('https://misscultureglobalkenya.com'),
   title: {
-    default: 'Miss Culture Global Kenya',
+    default: 'Miss Culture Global Kenya | Official Website',
     template: '%s | Miss Culture Global Kenya'
   },
-  description: 'Miss Culture Global Kenya is a cultural preservation and youth empowerment movement — showcasing Kenya’s heritage through pageants, community programs, and global partnerships.',
+  description: 'Miss Culture Global Kenya is a movement showcasing Kenya’s heritage through pageants, community programs, and global partnerships.',
   keywords: [
     'Miss Culture Global Kenya',
     'Kenya Heritage',
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'Miss Culture Global Kenya',
-    description: 'A cultural preservation and youth empowerment movement — pageants, community programs, cultural diplomacy, and global partnerships.',
+    description: 'Official digital platform for Miss Culture Global Kenya.',
     url: 'https://misscultureglobalkenya.com',
     siteName: 'Miss Culture Global Kenya',
     images: [
