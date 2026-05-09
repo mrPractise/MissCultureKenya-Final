@@ -15,7 +15,7 @@ if (BASE.endsWith("/admin")) {
 
 const client = axios.create({
   baseURL: BASE,
-  timeout: 10000,
+  timeout: 30000,  // 30 seconds - allows for email operations
 })
 
 interface ApiError {
