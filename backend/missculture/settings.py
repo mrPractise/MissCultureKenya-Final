@@ -28,7 +28,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY', default=None)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default=False, cast=bool)
+DEBUG = config('DEBUG', default=True, cast=bool)
 
 if not SECRET_KEY:
     if DEBUG:
@@ -99,13 +99,23 @@ WSGI_APPLICATION = 'missculture.wsgi.application'
 DATABASE_URL = config('DATABASE_URL', default=None)
 
 if DATABASE_URL:
-    DATABASES = {
-        'default': dj_database_url.parse(
-            DATABASE_URL,
-            conn_max_age=600,
-            conn_health_checks=True,
-        )
-    }
+    parsed_db = dj_database_url.parse(
+        DATABASE_URL,
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
+    if not parsed_db.get('ENGINE'):
+        if DEBUG:
+            parsed_db = dj_database_url.parse(
+                f'sqlite:///{BASE_DIR / "db.sqlite3"}',
+                conn_max_age=600,
+                conn_health_checks=True,
+            )
+        else:
+            raise ImproperlyConfigured(
+                'DATABASE_URL must include a supported scheme (e.g. postgres://, postgresql://, mysql://, sqlite:///).'
+            )
+    DATABASES = {'default': parsed_db}
 else:
     if DEBUG:
         DATABASES = {
