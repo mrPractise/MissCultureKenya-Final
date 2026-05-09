@@ -28,7 +28,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY', default=None)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default=True, cast=bool)
+DEBUG_RAW = config('DEBUG', default=None)
+if DEBUG_RAW is None:
+    on_railway = any(
+        os.environ.get(key)
+        for key in (
+            'RAILWAY_ENVIRONMENT',
+            'RAILWAY_PROJECT_ID',
+            'RAILWAY_SERVICE_ID',
+            'RAILWAY_DEPLOYMENT_ID',
+        )
+    )
+    has_database_url = bool(os.environ.get('DATABASE_URL'))
+    DEBUG = not (on_railway or has_database_url)
+else:
+    DEBUG = str(DEBUG_RAW).strip().lower() in ('1', 'true', 'yes', 'on')
 
 if not SECRET_KEY:
     if DEBUG:
