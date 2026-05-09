@@ -15,6 +15,7 @@ import os
 from decouple import config
 import cloudinary
 import dj_database_url
+from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -24,10 +25,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY', default='django-insecure-^9(da2f#=@&b2*+()5%ztu*wmff9l0j#a!=4@1^966yt46n2x2')
+SECRET_KEY = config('SECRET_KEY', default=None)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default=True, cast=bool)
+DEBUG = config('DEBUG', default=False, cast=bool)
+
+if not SECRET_KEY:
+    if DEBUG:
+        SECRET_KEY = 'django-insecure-^9(da2f#=@&b2*+()5%ztu*wmff9l0j#a!=4@1^966yt46n2x2'
+    else:
+        raise ImproperlyConfigured('SECRET_KEY environment variable is required when DEBUG=False')
 
 # Get allowed hosts from environment variable or use defaults
 ALLOWED_HOSTS_STR = config('ALLOWED_HOSTS', default='localhost,127.0.0.1')
@@ -89,13 +96,27 @@ WSGI_APPLICATION = 'missculture.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': dj_database_url.config(
-        default=f'sqlite:///{BASE_DIR / "db.sqlite3"}',
-        conn_max_age=600,
-        conn_health_checks=True,
-    )
-}
+DATABASE_URL = config('DATABASE_URL', default=None)
+
+if DATABASE_URL:
+    DATABASES = {
+        'default': dj_database_url.parse(
+            DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
+    }
+else:
+    if DEBUG:
+        DATABASES = {
+            'default': dj_database_url.parse(
+                f'sqlite:///{BASE_DIR / "db.sqlite3"}',
+                conn_max_age=600,
+                conn_health_checks=True,
+            )
+        }
+    else:
+        raise ImproperlyConfigured('DATABASE_URL environment variable is required when DEBUG=False')
 
 
 # Password validation
@@ -132,7 +153,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -170,8 +191,14 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # Static files
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# WhiteNoise configuration for serving static files
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STORAGES = {
+    'default': {
+        'BACKEND': 'cloudinary_storage.storage.MediaCloudinaryStorage',
+    },
+    'staticfiles': {
+        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+    },
+}
 
 # REST Framework settings
 REST_FRAMEWORK = {
@@ -216,9 +243,6 @@ MPESA_SHORTCODE = config('MPESA_SHORTCODE', default='174379')  # Sandbox test sh
 MPESA_PASSKEY = config('MPESA_PASSKEY', default='bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919')
 MPESA_ENVIRONMENT = config('MPESA_ENVIRONMENT', default='sandbox')  # 'sandbox' or 'production'
 MPESA_CALLBACK_URL = config('MPESA_CALLBACK_URL', default='')
-
-# Override default file storage to use Cloudinary for media
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # Tag-based folder prefixes for organized uploads
 CLOUDINARY_UPLOAD_FOLDERS = {
