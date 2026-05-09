@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'django_filters',
     'cloudinary_storage',
     'cloudinary',
+    'missculture',
     'main',
     'gallery',
     'events',
