@@ -9,6 +9,7 @@ type FooterLink = { name: string; href: string; highlight?: boolean }
 
 const Footer = () => {
   const currentYear = new Date().getFullYear()
+  const logoSrc = process.env.NEXT_PUBLIC_LOGO_URL
 
   const footerLinks: { about: FooterLink[]; explore: FooterLink[]; connect: FooterLink[] } = {
     about: [
@@ -57,13 +58,15 @@ const Footer = () => {
             >
               <div className="mb-6">
                 <div className="inline-flex rounded-2xl bg-white/95 p-2 shadow-lg ring-1 ring-white/20">
-                  <Image
-                    src="/official-logo.png"
-                    alt="Miss Culture Global Kenya logo"
-                    width={180}
-                    height={180}
-                    className="h-auto w-[120px] sm:w-[140px]"
-                  />
+                  {logoSrc ? (
+                    <Image
+                      src={logoSrc}
+                      alt="Miss Culture Global Kenya logo"
+                      width={180}
+                      height={180}
+                      className="h-auto w-[120px] sm:w-[140px]"
+                    />
+                  ) : null}
                 </div>
               </div>
               <p className="text-gray-400 mb-6 max-w-md text-sm sm:text-base leading-relaxed">

@@ -9,7 +9,7 @@ const Hero = () => {
   const ref = useRef(null)
   const settings = useSiteSettings()
   
-  const heroImage = settings.home_hero_image_url || '/hero-bg.png'
+  const heroImage = settings.home_hero_image_url || process.env.NEXT_PUBLIC_HERO_IMAGE_URL || ''
   const heroVideo = settings.home_hero_video_url || 'https://www.youtube.com/embed/NgqljvNDPA8'
 
   const { scrollYProgress } = useScroll({
