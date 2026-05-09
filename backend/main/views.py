@@ -211,13 +211,13 @@ def contact_message(request):
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[settings.ADMIN_EMAIL],
             html_message=html_body,
-            fail_silently=False,
+            fail_silently=True,  # Don't block response on email failure
         )
     except Exception as e:
-        return Response(
-            {'error': f'Failed to send email: {str(e)}'},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        )
+        # Log error but don't fail the request - user experience is priority
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f'Failed to send admin email: {str(e)}')
 
     # Send auto-reply to the sender
     auto_subject = "Thank you for contacting Miss Culture Global Kenya"
