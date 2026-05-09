@@ -142,6 +142,10 @@ else:
     else:
         raise ImproperlyConfigured('DATABASE_URL environment variable is required when DEBUG=False')
 
+if DATABASES.get('default', {}).get('ENGINE') == 'django.db.backends.postgresql':
+    DATABASES['default'].setdefault('OPTIONS', {})
+    DATABASES['default']['OPTIONS'].setdefault('connect_timeout', 10)
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
