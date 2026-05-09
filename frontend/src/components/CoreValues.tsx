@@ -1,35 +1,42 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Heart, Globe, Award, Target } from 'lucide-react'
+import { Zap, Shield, Heart, Sparkles, Award } from 'lucide-react'
 
 const CoreValues = () => {
   const values = [
     {
-      title: 'Cultural Preservation & Innovation',
-      description: 'Documenting and promoting diverse Kenyan traditions while integrating them into the modern creative economy — fashion, arts, and digital media.',
+      title: '1. Empowerment',
+      description: 'We are committed to equipping young women and youth with the confidence, skills, and opportunities needed to lead and succeed.',
+      icon: Zap,
+      color: 'text-yellow-600',
+      bgColor: 'bg-yellow-50'
+    },
+    {
+      title: '2. Leadership & Integrity',
+      description: 'We nurture ethical, responsible, and visionary leaders who positively influence society.',
+      icon: Shield,
+      color: 'text-blue-600',
+      bgColor: 'bg-blue-50'
+    },
+    {
+      title: '3. Cultural Pride & Diversity',
+      description: 'We celebrate and promote Kenya\'s rich cultural heritage while embracing diversity and inclusion.',
       icon: Heart,
       color: 'text-red-600',
       bgColor: 'bg-red-50'
     },
     {
-      title: 'Global Ambassadorship',
-      description: 'Equipping titleholders with the diplomacy and communication skills necessary to represent Kenya on international stages and attract foreign investment.',
-      icon: Globe,
-      color: 'text-green-600',
-      bgColor: 'bg-green-50'
+      title: '4. Professionalism & Etiquette',
+      description: 'We uphold high standards of conduct, grooming, communication, and personal branding.',
+      icon: Sparkles,
+      color: 'text-purple-600',
+      bgColor: 'bg-purple-50'
     },
     {
-      title: 'Youth & Female Leadership',
-      description: 'Providing a rigorous mentorship ecosystem focusing on entrepreneurship, public speaking, and community project management.',
+      title: '5. Excellence',
+      description: 'We strive for quality, innovation, and continuous improvement in all our programs and partnerships.',
       icon: Award,
-      color: 'text-gray-900',
-      bgColor: 'bg-gray-100'
-    },
-    {
-      title: 'Sustainable Tourism Advocacy',
-      description: 'Partnering with stakeholders in the travel industry to highlight "Hidden Gems" of Kenya, promoting eco-tourism and community-based travel.',
-      icon: Target,
       color: 'text-green-600',
       bgColor: 'bg-green-50'
     }

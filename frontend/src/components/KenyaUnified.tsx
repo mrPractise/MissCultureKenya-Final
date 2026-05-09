@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import {
   MapPin, Users, Landmark, Music, Palette, ChevronDown,
-  Volume2, Camera, BookOpen, Sparkles, ArrowRight, Heart,
+  Volume2, Camera, BookOpen, Sparkles, ArrowRight, Crown, Heart,
   Globe, Calendar, ChevronRight, Play, Headphones
 } from 'lucide-react'
 import Link from 'next/link'
@@ -524,7 +524,7 @@ const KenyaUnified = () => {
                 step: '05',
                 title: 'The Ambassador',
                 desc: "Susan Abong'o represents more than a pageant title. She represents the bridge between these 44 communities and the global community — a living testament that culture is power.",
-                icon: Heart,
+                icon: Crown,
               },
             ].map((item, idx) => (
               <motion.div
@@ -655,7 +655,7 @@ const KenyaUnified = () => {
               {[
                 { title: 'Traditional Attire', desc: 'From the colourful Maasai shukas to the elegant Kikoy wraps — each piece tells a story of identity and belonging.', icon: Palette, color: 'rose' },
                 { title: 'Music & Dance', desc: 'Rhythmic beats and graceful movements that celebrate life, community, and the spirits of ancestors who dance before us.', icon: Music, color: 'amber' },
-                { title: 'Ceremonies', desc: 'Sacred rituals marking important life moments — birth, initiation, marriage, and passage — that strengthen community bonds across generations.', icon: BookOpen, color: 'emerald' },
+                { title: 'Ceremonies', desc: 'Sacred rituals marking important life moments — birth, initiation, marriage, and passage — that strengthen community bonds across generations.', icon: Calendar, color: 'emerald' },
               ].map((el, idx) => (
                 <motion.div
                   key={el.title}

@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Users, Globe, Heart, MapPin } from 'lucide-react'
+import { Users, Globe, Palette, MapPin } from 'lucide-react'
 
 const ImpactStats = () => {
   const stats = [
@@ -9,7 +9,7 @@ const ImpactStats = () => {
       number: '500+',
       label: 'Artisans Supported',
       description: 'Sustainable income through cultural crafts',
-      icon: Heart
+      icon: Palette
     },
     {
       number: '1,000+',

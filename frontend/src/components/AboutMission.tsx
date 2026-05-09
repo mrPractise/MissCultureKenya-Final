@@ -36,8 +36,13 @@ const AboutMission = () => {
             About Our Mission
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Miss Culture Global Kenya represents the beautiful tapestry of Kenya's diverse cultures, 
-            promoting unity, heritage, and global understanding through cultural exchange and community engagement.
+            Miss Culture Global Kenya is a Cultural Diplomacy Platform. We identify and nurture young Kenyan 
+            women to become global ambassadors who represent the soul of our nation—our culture, our diversity, 
+            and our untapped economic potential.
+          </p>
+          <p className="text-lg text-gray-500 max-w-2xl mx-auto mt-4">
+            By blending &ldquo;The Beauty of Purpose&rdquo; with &ldquo;The Power of Culture,&rdquo; 
+            we create a stage where culture drives sustainable development and global unity.
           </p>
         </motion.div>
 

@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Heart, Globe, Award, Target, BookOpen, ExternalLink, Sparkles, Handshake, Dumbbell, ChevronRight, Users, Shield, Lightbulb, Landmark } from 'lucide-react'
+import { Zap, Shield, Heart, Sparkles, Award, BookOpen, ExternalLink, Handshake, GraduationCap, ChevronRight, Users, Lightbulb, Landmark, Target, Globe, TrendingUp } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useSiteSettings } from '@/lib/useSiteSettings'
@@ -20,12 +20,11 @@ const AboutPage = () => {
   ]
 
   const values = [
-    { title: 'Cultural Preservation & Innovation', description: 'Documenting and promoting diverse Kenyan traditions while integrating them into the modern creative economy — fashion, arts, and digital media.', icon: Heart },
-    { title: 'Global Ambassadorship', description: 'Equipping titleholders with the diplomacy and communication skills necessary to represent Kenya on international stages and attract foreign investment.', icon: Globe },
-    { title: 'Youth & Female Leadership', description: 'Providing a rigorous mentorship ecosystem focusing on entrepreneurship, public speaking, and community project management.', icon: Award },
-    { title: 'Sustainable Tourism Advocacy', description: 'Partnering with stakeholders in the travel industry to highlight "Hidden Gems" of Kenya, promoting eco-tourism and community-based travel.', icon: Target },
-    { title: 'Community Impact', description: 'Direct, measurable impact in 100+ communities through grassroots programs, artisan markets, and school outreach across Kenya.', icon: Users },
-    { title: 'Integrity & Transparency', description: 'Every shilling accounted for, every program measured, every decision guided by our mission — because trust is built through action, not words.', icon: Shield }
+    { title: '1. Empowerment', description: 'We are committed to equipping young women and youth with the confidence, skills, and opportunities needed to lead and succeed.', icon: Zap },
+    { title: '2. Leadership & Integrity', description: 'We nurture ethical, responsible, and visionary leaders who positively influence society.', icon: Shield },
+    { title: '3. Cultural Pride & Diversity', description: 'We celebrate and promote Kenya\'s rich cultural heritage while embracing diversity and inclusion.', icon: Heart },
+    { title: '4. Professionalism & Etiquette', description: 'We uphold high standards of conduct, grooming, communication, and personal branding.', icon: Sparkles },
+    { title: '5. Excellence', description: 'We strive for quality, innovation, and continuous improvement in all our programs and partnerships.', icon: Award }
   ]
 
   const currentLeadership = [
@@ -252,7 +251,7 @@ const AboutPage = () => {
             {[
               { title: 'Heritage & Fashion', description: 'Showcasing the evolution of Kenyan textiles and craftsmanship — where tradition meets the modern creative economy.', icon: Sparkles },
               { title: 'Diplomacy & Peace', description: 'Using culture as a tool for national cohesion and international relations — building bridges across borders.', icon: Handshake },
-              { title: 'Economic Empowerment', description: 'Supporting the "Made in Kenya" movement through brand endorsements and entrepreneurial training.', icon: Dumbbell },
+              { title: 'Economic Empowerment', description: 'Supporting the "Made in Kenya" movement through brand endorsements and entrepreneurial training.', icon: TrendingUp },
             ].map((pillar, index) => (
               <motion.div
                 key={pillar.title}

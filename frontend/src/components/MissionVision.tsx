@@ -25,6 +25,9 @@ const MissionVision = () => {
             <p className="text-gray-600 leading-relaxed mb-4">
               To identify, mentor, and empower visionary young women who will safeguard Kenyan cultural identity, promote responsible tourism, and foster cross-cultural partnerships that create tangible impact in local communities.
             </p>
+            <p className="text-gray-500 text-sm italic mt-4 border-t border-gray-200 pt-4">
+              &ldquo;The Beauty of Purpose&rdquo; blended with &ldquo;The Power of Culture&rdquo;
+            </p>
           </motion.div>
 
           {/* Vision */}
@@ -46,7 +49,7 @@ const MissionVision = () => {
                 <h2 className="text-2xl sm:text-3xl font-bold">Our Vision</h2>
               </div>
               <p className="text-green-100 leading-relaxed text-lg font-light">
-                To be Africa&apos;s premier leadership platform that transforms cultural heritage into a global asset for socio-economic empowerment and international diplomacy.
+                To be Kenya&apos;s premier leadership platform that transforms culture into a global asset for social-economic empowerment and international diplomacy through Miss Culture Global PTY Ethical values.
               </p>
             </div>
           </motion.div>
