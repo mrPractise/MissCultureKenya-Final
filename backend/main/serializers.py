@@ -217,6 +217,7 @@ class SiteSettingsSerializer(serializers.ModelSerializer):
     # Logo URLs
     logo_kenya_url = serializers.SerializerMethodField()
     logo_global_url = serializers.SerializerMethodField()
+    mpesa_logo_url = serializers.SerializerMethodField()
 
     privacy_hero_image_url = serializers.SerializerMethodField()
 
@@ -272,6 +273,9 @@ class SiteSettingsSerializer(serializers.ModelSerializer):
     def get_logo_global_url(self, obj):
         return _cloudinary_url(obj.logo_global)
 
+    def get_mpesa_logo_url(self, obj):
+        return _cloudinary_url(obj.mpesa_logo)
+
     class Meta:
         model = SiteSettings
         fields = [
@@ -290,7 +294,7 @@ class SiteSettingsSerializer(serializers.ModelSerializer):
             'contact_hero_image_url', 'faq_hero_image_url',
             'about_hero_image_url', 'about_mission_image_url',
             'about_leader_1_image_url', 'about_leader_2_image_url', 'about_leader_3_image_url',
-            'logo_kenya_url', 'logo_global_url',
+            'logo_kenya_url', 'logo_global_url', 'mpesa_logo_url',
             'leader_1_name', 'leader_1_title', 'leader_1_bio',
             'leader_2_name', 'leader_2_title', 'leader_2_bio',
             'leader_3_name', 'leader_3_title', 'leader_3_bio',

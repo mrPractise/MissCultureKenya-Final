@@ -97,8 +97,9 @@ class SiteSettingsAdmin(admin.ModelAdmin):
             'fields': (
                 'logo_kenya',
                 'logo_global',
+                'mpesa_logo',
             ),
-            'description': 'Upload logos for Miss Culture Global Kenya (local) and Miss Culture Global (parent organization)'
+            'description': 'Upload logos for Miss Culture Global Kenya, Miss Culture Global, and M-Pesa payment branding'
         }),
         ('Home Page', {
             'fields': (

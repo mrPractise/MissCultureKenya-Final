@@ -223,6 +223,8 @@ class SiteSettings(models.Model):
         help_text='Logo for Miss Culture Global Kenya (local franchise)')
     logo_global = cloudinary.models.CloudinaryField('logo_global', folder='missculture/logos', blank=True, null=True,
         help_text='Logo for Miss Culture Global (parent organization)')
+    mpesa_logo = cloudinary.models.CloudinaryField('mpesa_logo', folder='missculture/logos', blank=True, null=True,
+        help_text='M-Pesa logo for payment sections')
 
     # ── Home tab ──
     home_hero_image = cloudinary.models.CloudinaryField('home_hero', folder='missculture/site/home', blank=True, null=True)
