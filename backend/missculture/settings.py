@@ -145,6 +145,11 @@ else:
 if DATABASES.get('default', {}).get('ENGINE') == 'django.db.backends.postgresql':
     DATABASES['default'].setdefault('OPTIONS', {})
     DATABASES['default']['OPTIONS'].setdefault('connect_timeout', 10)
+    # Connection pool settings for high traffic (500+ concurrent users)
+    DATABASES['default']['OPTIONS']['options'] = '-c statement_timeout=30000'  # 30s query timeout
+    # Max connections - Railway PostgreSQL typically allows 20-100 connections
+    # With 3 gunicorn workers × 4 threads = 12 potential concurrent connections
+    # Plus connection pooling via CONN_MAX_AGE=600 keeps connections warm
 
 
 # Password validation
@@ -234,7 +239,16 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.AllowAny',
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 20
+    'PAGE_SIZE': 20,
+    # Rate limiting for high traffic protection
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle'
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '100/minute',  # 100 requests per minute for anonymous users
+        'user': '1000/minute',  # 1000 requests per minute for authenticated users
+    }
 }
 
 # Email Configuration (Zoho Mail)
