@@ -3,16 +3,29 @@ from .models import PhotoCollection, Photo, Video, GallerySettings
 import cloudinary
 
 
-def _cloudinary_url(field_value, resource_type='image'):
-    """Build a full Cloudinary URL from a CloudinaryField value."""
+def _cloudinary_url(field_value, resource_type='image', width=None, height=None, crop=None):
+    """Build an optimized Cloudinary URL with auto-format and auto-quality."""
     if not field_value:
         return None
     url = str(field_value)
-    # If it's already a full URL, return as-is
     if url.startswith(('http://', 'https://')):
         return url
-    # Build the Cloudinary CDN URL
-    return cloudinary.CloudinaryResource(url, default_resource_type=resource_type).build_url()
+    
+    # Build transformation parameters with optimization
+    transformation = [
+        {'fetch_format': 'auto', 'quality': 'auto'},  # f_auto, q_auto
+    ]
+    
+    if width:
+        transformation[0]['width'] = width
+    if height:
+        transformation[0]['height'] = height
+    if crop:
+        transformation[0]['crop'] = crop
+    
+    return cloudinary.CloudinaryResource(
+        url, default_resource_type=resource_type
+    ).build_url(transformation=transformation)
 
 
 class PhotoCollectionSerializer(serializers.ModelSerializer):
@@ -29,18 +42,41 @@ class PhotoCollectionSerializer(serializers.ModelSerializer):
 class PhotoSerializer(serializers.ModelSerializer):
     image_url = serializers.SerializerMethodField()
     thumbnail_url = serializers.SerializerMethodField()
+    small_thumbnail_url = serializers.SerializerMethodField()
 
     def get_image_url(self, obj):
         return _cloudinary_url(obj.image)
 
     def get_thumbnail_url(self, obj):
-        if obj.thumbnail:
-            return _cloudinary_url(obj.thumbnail)
-        # Auto-generate a Cloudinary thumbnail transform from the main image
+        # Generate optimized thumbnail with f_auto, q_auto
         if obj.image:
             return cloudinary.CloudinaryResource(
                 str(obj.image), default_resource_type='image'
-            ).build_url(transformation=[{'width': 400, 'height': 300, 'crop': 'fill'}])
+            ).build_url(
+                transformation=[{
+                    'width': 400, 
+                    'height': 300, 
+                    'crop': 'fill',
+                    'fetch_format': 'auto',
+                    'quality': 'auto'
+                }]
+            )
+        return None
+    
+    def get_small_thumbnail_url(self, obj):
+        """Generate a small 200x150 thumbnail for grid layouts."""
+        if obj.image:
+            return cloudinary.CloudinaryResource(
+                str(obj.image), default_resource_type='image'
+            ).build_url(
+                transformation=[{
+                    'width': 200, 
+                    'height': 150, 
+                    'crop': 'fill',
+                    'fetch_format': 'auto',
+                    'quality': 'auto'
+                }]
+            )
         return None
 
     class Meta:
@@ -63,14 +99,19 @@ class VideoSerializer(serializers.ModelSerializer):
         return _cloudinary_url(obj.video_file, resource_type='video')
 
     def get_thumbnail_url(self, obj):
-        if obj.thumbnail:
-            return _cloudinary_url(obj.thumbnail)
-        # Auto-generate a thumbnail from the video using Cloudinary
+        # Auto-generate an optimized thumbnail from the video
         if obj.video_file:
             return cloudinary.CloudinaryResource(
                 str(obj.video_file), default_resource_type='video'
             ).build_url(
-                transformation=[{'width': 400, 'height': 300, 'crop': 'fill', 'start_offset': '2'}],
+                transformation=[{
+                    'width': 400, 
+                    'height': 300, 
+                    'crop': 'fill', 
+                    'start_offset': '2',
+                    'fetch_format': 'auto',
+                    'quality': 'auto'
+                }],
                 resource_type='video'
             )
         return None

@@ -6,14 +6,29 @@ from .models import (
 )
 
 
-def _cloudinary_url(field_value, resource_type='image'):
-    """Build a full Cloudinary URL from a CloudinaryField value."""
+def _cloudinary_url(field_value, resource_type='image', width=None, height=None, crop=None):
+    """Build an optimized Cloudinary URL with auto-format and auto-quality."""
     if not field_value:
         return None
     url = str(field_value)
     if url.startswith(('http://', 'https://')):
         return url
-    return cloudinary.CloudinaryResource(url, default_resource_type=resource_type).build_url()
+    
+    # Build transformation parameters
+    transformation = [
+        {'fetch_format': 'auto', 'quality': 'auto'},  # f_auto, q_auto for optimization
+    ]
+    
+    if width:
+        transformation[0]['width'] = width
+    if height:
+        transformation[0]['height'] = height
+    if crop:
+        transformation[0]['crop'] = crop
+    
+    return cloudinary.CloudinaryResource(
+        url, default_resource_type=resource_type
+    ).build_url(transformation=transformation)
 
 
 class KenyaGalleryPhotoSerializer(serializers.ModelSerializer):
