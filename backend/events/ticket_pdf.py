@@ -9,7 +9,7 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch, mm
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
 from reportlab.lib.enums import TA_CENTER, TA_LEFT
-from reportlab.graphics.barcode.qr import QRCodeWidget
+from reportlab.graphics.barcode.qr import QrCodeWidget
 from reportlab.graphics.shapes import Drawing
 
 
@@ -146,7 +146,7 @@ def generate_ticket_pdf(ticket, event):
     
     # QR Code
     qr_data = f"MCK:{ticket.ticket_code}:{ticket.id}"
-    qr = QRCodeWidget(qr_data)
+    qr = QrCodeWidget(qr_data)
     bounds = qr.getBounds()
     width = bounds[2] - bounds[0]
     height = bounds[3] - bounds[1]
