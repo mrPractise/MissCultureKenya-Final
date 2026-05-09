@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import { Handshake, Heart, ArrowRight, Globe, Users, Award } from 'lucide-react'
 import Link from 'next/link'
+import MpesaLogo from '@/components/MpesaLogo'
 
 const SupportBlocks = () => {
   return (
@@ -88,8 +89,11 @@ const SupportBlocks = () => {
             <div className="absolute top-0 right-0 w-64 h-64 bg-green-200/50 rounded-full blur-3xl" />
 
             <div className="relative z-10">
-              <div className="w-14 h-14 bg-green-600 rounded-2xl flex items-center justify-center mb-6">
-                <Heart className="w-7 h-7 text-white" />
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-14 h-14 bg-green-600 rounded-2xl flex items-center justify-center">
+                  <Heart className="w-7 h-7 text-white" />
+                </div>
+                <MpesaLogo size="sm" />
               </div>
               <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
                 Make a Contribution

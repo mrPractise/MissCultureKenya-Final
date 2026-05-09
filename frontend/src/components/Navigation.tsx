@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import apiClient from '@/lib/api'
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
@@ -10,9 +11,10 @@ import { motion, AnimatePresence } from 'framer-motion'
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [settings, setSettings] = useState<{ site_name?: string; tagline?: string; logo_kenya_url?: string; logo_global_url?: string } | null>(null)
   const pathname = usePathname()
   const shouldUseSolidNav = true // Always use solid nav as per user request to avoid overlap
-  const logoSrc = process.env.NEXT_PUBLIC_LOGO_URL
+  const logoSrc = settings?.logo_kenya_url || settings?.logo_global_url || process.env.NEXT_PUBLIC_LOGO_URL
 
   useEffect(() => {
     const handleScroll = () => {
@@ -20,6 +22,18 @@ const Navigation = () => {
     }
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  useEffect(() => {
+    async function loadSettings() {
+      try {
+        const data = await apiClient.getSiteSettings()
+        setSettings(data)
+      } catch {
+        // Ignore errors, use defaults
+      }
+    }
+    loadSettings()
   }, [])
 
   const navItems = [

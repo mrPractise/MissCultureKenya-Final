@@ -4,12 +4,28 @@ import { motion } from 'framer-motion'
 import Image from 'next/image'
 import { Mail, Phone, MapPin, Instagram, Facebook, ExternalLink, Star } from 'lucide-react'
 import TikTokIcon from '@/components/TikTokIcon'
+import { useState, useEffect } from 'react'
+import apiClient from '@/lib/api'
 
 type FooterLink = { name: string; href: string; highlight?: boolean }
 
 const Footer = () => {
   const currentYear = new Date().getFullYear()
-  const logoSrc = process.env.NEXT_PUBLIC_LOGO_URL
+  const [logoSrc, setLogoSrc] = useState<string | null>(process.env.NEXT_PUBLIC_LOGO_URL || null)
+
+  useEffect(() => {
+    async function loadSettings() {
+      try {
+        const data = await apiClient.getSiteSettings()
+        // Use Kenya logo for footer (local franchise), fallback to global logo
+        const logo = data?.logo_kenya_url || data?.logo_global_url
+        if (logo) setLogoSrc(logo)
+      } catch {
+        // Ignore errors, use env default
+      }
+    }
+    loadSettings()
+  }, [])
 
   const footerLinks: { about: FooterLink[]; explore: FooterLink[]; connect: FooterLink[] } = {
     about: [

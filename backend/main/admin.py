@@ -93,10 +93,17 @@ class SiteSettingsAdmin(admin.ModelAdmin):
     readonly_fields = ['created_at', 'updated_at']
 
     fieldsets = (
+        ('Logos', {
+            'fields': (
+                'logo_kenya',
+                'logo_global',
+            ),
+            'description': 'Upload logos for Miss Culture Global Kenya (local) and Miss Culture Global (parent organization)'
+        }),
         ('Home Page', {
             'fields': (
-                'home_hero_image', 'home_hero_video_url', 
-                'home_upcoming_event_image', 'home_kenya_highlight_image', 
+                'home_hero_image', 'home_hero_video_url',
+                'home_upcoming_event_image', 'home_kenya_highlight_image',
                 'home_ambassador_highlight_image'
             )
         }),

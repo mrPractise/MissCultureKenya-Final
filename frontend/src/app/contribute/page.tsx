@@ -5,6 +5,7 @@ import { Smartphone, Check, Palette, GraduationCap, Globe2, Home, Building2, Cop
 import { useState } from 'react'
 import Link from 'next/link'
 import { useSiteSettings } from '@/lib/useSiteSettings'
+import MpesaLogo from '@/components/MpesaLogo'
 
 const impactAreas = [
   {
@@ -156,7 +157,10 @@ const ContributePage = () => {
             <div className="absolute top-0 left-0 w-full h-2 bg-green-600" />
 
             <div className="text-center mb-8">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Make a Contribution</h2>
+              <div className="flex items-center justify-center gap-3 mb-4">
+                <h2 className="text-3xl md:text-4xl font-bold text-gray-900">Make a Contribution</h2>
+                <MpesaLogo size="md" />
+              </div>
               <p className="text-gray-600 max-w-2xl mx-auto">Secure, fast, and every shilling goes directly to our programs.</p>
             </div>
 

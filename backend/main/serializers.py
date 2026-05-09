@@ -213,7 +213,11 @@ class SiteSettingsSerializer(serializers.ModelSerializer):
     committee_6_name = serializers.CharField(allow_blank=True, required=False)
     committee_6_role = serializers.CharField(allow_blank=True, required=False)
     committee_6_bio = serializers.CharField(allow_blank=True, required=False)
-    
+
+    # Logo URLs
+    logo_kenya_url = serializers.SerializerMethodField()
+    logo_global_url = serializers.SerializerMethodField()
+
     privacy_hero_image_url = serializers.SerializerMethodField()
 
     def _hero_url(self, obj, field_name):
@@ -261,6 +265,13 @@ class SiteSettingsSerializer(serializers.ModelSerializer):
     
     def get_privacy_hero_image_url(self, obj): return self._hero_url(obj, 'privacy_hero_image')
 
+    # Logo URL methods
+    def get_logo_kenya_url(self, obj):
+        return _cloudinary_url(obj.logo_kenya)
+
+    def get_logo_global_url(self, obj):
+        return _cloudinary_url(obj.logo_global)
+
     class Meta:
         model = SiteSettings
         fields = [
@@ -279,6 +290,7 @@ class SiteSettingsSerializer(serializers.ModelSerializer):
             'contact_hero_image_url', 'faq_hero_image_url',
             'about_hero_image_url', 'about_mission_image_url',
             'about_leader_1_image_url', 'about_leader_2_image_url', 'about_leader_3_image_url',
+            'logo_kenya_url', 'logo_global_url',
             'leader_1_name', 'leader_1_title', 'leader_1_bio',
             'leader_2_name', 'leader_2_title', 'leader_2_bio',
             'leader_3_name', 'leader_3_title', 'leader_3_bio',

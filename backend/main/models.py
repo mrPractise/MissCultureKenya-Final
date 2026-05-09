@@ -218,6 +218,12 @@ class SiteSettings(models.Model):
     committee_6_role = models.CharField(max_length=200, blank=True, default='')
     committee_6_bio = models.TextField(blank=True, default='')
 
+    # ── Logos ──
+    logo_kenya = cloudinary.models.CloudinaryField('logo_kenya', folder='missculture/logos', blank=True, null=True,
+        help_text='Logo for Miss Culture Global Kenya (local franchise)')
+    logo_global = cloudinary.models.CloudinaryField('logo_global', folder='missculture/logos', blank=True, null=True,
+        help_text='Logo for Miss Culture Global (parent organization)')
+
     # ── Home tab ──
     home_hero_image = cloudinary.models.CloudinaryField('home_hero', folder='missculture/site/home', blank=True, null=True)
     home_hero_video_url = models.URLField('home_hero_video_url', blank=True, null=True)
