@@ -34,9 +34,7 @@ class Event(models.Model):
     ]
 
     PAYMENT_METHOD_CHOICES = [
-        ('paybill', 'Paybill'),
         ('till_number', 'Till Number'),
-        ('both', 'Both'),
     ]
 
     title = models.CharField(max_length=200)
@@ -82,7 +80,7 @@ class Event(models.Model):
     ticket_prefix = models.CharField(max_length=5, blank=True, help_text="Auto-derived from event title. 2-3 char prefix for ticket codes (e.g. FOS)")
 
     # Payment configuration
-    payment_method = models.CharField(max_length=20, choices=PAYMENT_METHOD_CHOICES, default='paybill')
+    payment_method = models.CharField(max_length=20, choices=PAYMENT_METHOD_CHOICES, default='till_number')
     paybill_number = models.CharField(max_length=20, default='542542')
     till_number = models.CharField(max_length=20, default='4766976')
     account_number = models.CharField(max_length=50, default='0310848627615')
@@ -141,14 +139,8 @@ class Event(models.Model):
 
     @property
     def is_voting_active(self):
-        if not self.voting_enabled:
-            return False
-        now = timezone.now()
-        if self.voting_start and now < self.voting_start:
-            return False
-        if self.voting_end and now > self.voting_end:
-            return False
-        return self.event_status == 'voting_open'
+        # Simplified: voting is active when enabled and status is voting_open
+        return self.voting_enabled and self.event_status == 'voting_open'
 
     @property
     def duration_display(self):
