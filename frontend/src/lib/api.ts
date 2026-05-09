@@ -1,6 +1,13 @@
 import axios from 'axios'
 
-const BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'
+if (
+  process.env.NODE_ENV === "production" &&
+  !process.env.NEXT_PUBLIC_API_BASE_URL
+) {
+  throw new Error("NEXT_PUBLIC_API_BASE_URL is not configured");
+}
+
+const BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
 const client = axios.create({
   baseURL: BASE,
