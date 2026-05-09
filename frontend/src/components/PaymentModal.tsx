@@ -1,7 +1,8 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Smartphone, X, CheckCircle, ArrowLeft, AlertCircle, Loader2, User, Mail, Ticket as TicketIcon } from 'lucide-react'
+import { Smartphone, X, CheckCircle, ArrowLeft, AlertCircle, Loader2, User, Mail, Ticket as TicketIcon, Wallet } from 'lucide-react'
+import MpesaLogo from '@/components/MpesaLogo'
 import { useState, useEffect, useRef } from 'react'
 import apiClient from '@/lib/api'
 import type { ApiError } from '@/lib/api'
@@ -279,15 +280,17 @@ const PaymentModal = ({ isOpen, onClose, event, ticketQuantities, totalPrice, to
 
               {/* Payment Method */}
               <div className="bg-green-50 border-2 border-green-200 rounded-xl p-4">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Smartphone className="w-5 h-5 text-white" />
+                <div className="flex items-center space-x-4">
+                  <MpesaLogo size="md" />
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-gray-900">M-Pesa Till Number</h4>
+                    <p className="text-sm font-bold text-green-700">4766976</p>
+                    <p className="text-xs text-gray-500">The Misscomm Events</p>
                   </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-900">M-Pesa STK Push</h4>
-                    <p className="text-xs text-gray-500">An M-Pesa prompt will be sent to your phone</p>
+                  <div className="text-right">
+                    <p className="text-xs text-gray-500">STK Push</p>
+                    <CheckCircle className="w-5 h-5 text-green-600 inline-block" />
                   </div>
-                  <CheckCircle className="w-5 h-5 text-green-600 ml-auto flex-shrink-0" />
                 </div>
               </div>
 
@@ -419,7 +422,7 @@ const PaymentModal = ({ isOpen, onClose, event, ticketQuantities, totalPrice, to
                   </>
                 ) : (
                   <>
-                    <Smartphone className="w-4 h-4" />
+                    <MpesaLogo size="sm" />
                     Pay KSh {totalPrice.toLocaleString()} with M-Pesa
                   </>
                 )}

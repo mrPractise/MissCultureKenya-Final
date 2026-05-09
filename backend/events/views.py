@@ -27,8 +27,9 @@ from .serializers import (
 )
 from .utils import (
     generate_ticket_code, calculate_vote_count, 
-    send_telegram_message
+    send_telegram_message, send_ticket_email
 )
+from .ticket_pdf import generate_ticket_pdf
 from .daraja import initiate_stk_push, process_callback
 
 
@@ -455,6 +456,34 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
         event_year = event.start_date.year
         ticket_breakdown = payment.ticket_breakdown or {}
         tickets = []
+        emails_sent = []
+
+        def create_and_email_ticket(ticket_category=None):
+            ticket_code = generate_ticket_code(event.ticket_prefix, event_year)
+            ticket = Ticket.objects.create(
+                event=event,
+                ticket_category=ticket_category,
+                payment=payment,
+                ticket_code=ticket_code,
+                full_name=payment.full_name or payment.phone_number,
+                email=payment.email or '',
+                phone=payment.phone_number,
+            )
+            
+            # Generate PDF and send email
+            if ticket.email:
+                try:
+                    pdf_buffer = generate_ticket_pdf(ticket, event)
+                    email_sent = send_ticket_email(ticket, event, pdf_buffer)
+                    if email_sent:
+                        emails_sent.append(ticket.ticket_code)
+                except Exception as e:
+                    # Log error but don't fail ticket creation
+                    import logging
+                    logger = logging.getLogger(__name__)
+                    logger.error(f"Failed to send ticket email for {ticket.ticket_code}: {e}")
+            
+            return ticket
 
         if ticket_breakdown:
             for category_id, qty in ticket_breakdown.items():
@@ -465,17 +494,8 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
 
                 qty = max(1, int(qty))
                 for _ in range(qty):
-                    ticket_code = generate_ticket_code(event.ticket_prefix, event_year)
-                    ticket = Ticket.objects.create(
-                        event=event,
-                        ticket_category=ticket_category,
-                        payment=payment,
-                        ticket_code=ticket_code,
-                        full_name=payment.full_name or payment.phone_number,
-                        email=payment.email or '',
-                        phone=payment.phone_number,
-                    )
-                    tickets.append({'ticket_id': ticket.id, 'ticket_code': ticket.ticket_code, 'ticket_category': ticket_category.id})
+                    ticket = create_and_email_ticket(ticket_category)
+                    tickets.append({'ticket_id': ticket.id, 'ticket_code': ticket.ticket_code, 'ticket_category': ticket_category.id, 'email_sent': ticket.ticket_code in emails_sent})
 
                 ticket_category.available = max(0, int(ticket_category.available or 0) - qty)
                 ticket_category.save(update_fields=['available'])
@@ -488,23 +508,31 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
             quantity = max(1, quantity)
 
             for _ in range(quantity):
-                ticket_code = generate_ticket_code(event.ticket_prefix, event_year)
-                ticket = Ticket.objects.create(
-                    event=event,
-                    ticket_category=ticket_category,
-                    payment=payment,
-                    ticket_code=ticket_code,
-                    full_name=payment.full_name or payment.phone_number,
-                    email=payment.email or '',
-                    phone=payment.phone_number,
-                )
-                tickets.append({'ticket_id': ticket.id, 'ticket_code': ticket.ticket_code, 'ticket_category': ticket_category.id if ticket_category else None})
+                ticket = create_and_email_ticket(ticket_category)
+                tickets.append({'ticket_id': ticket.id, 'ticket_code': ticket.ticket_code, 'ticket_category': ticket_category.id if ticket_category else None, 'email_sent': ticket.ticket_code in emails_sent})
 
             if ticket_category:
                 ticket_category.available = max(0, int(ticket_category.available or 0) - quantity)
                 ticket_category.save(update_fields=['available'])
 
-        return {'tickets': tickets, 'ticket_count': len(tickets)}
+        # Send Telegram notification about ticket sales
+        if tickets:
+            try:
+                message = f"""🎫 <b>New Ticket Purchase</b>
+
+Event: {event.title}
+Buyer: {payment.full_name}
+Phone: {payment.phone_number}
+Tickets: {len(tickets)}
+Amount: KES {payment.amount}
+
+Ticket Codes: {', '.join([t['ticket_code'] for t in tickets])}
+Emails Sent: {len(emails_sent)}/{len(tickets)}"""
+                send_telegram_message(message)
+            except:
+                pass
+
+        return {'tickets': tickets, 'ticket_count': len(tickets), 'emails_sent': len(emails_sent)}
 
     def _process_vote_payment(self, payment, event, request):
         """Calculate and create vote transactions after successful payment."""

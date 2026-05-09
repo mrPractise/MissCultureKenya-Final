@@ -22,6 +22,10 @@ class AmbassadorAdmin(admin.ModelAdmin):
     search_fields = ['name', 'title']
     readonly_fields = ['created_at', 'updated_at']
 
+    def has_add_permission(self, request):
+        # Only allow one ambassador in the system
+        return not Ambassador.objects.exists()
+
 
 @admin.register(CulturalCommunity)
 class CulturalCommunityAdmin(admin.ModelAdmin):

@@ -81,3 +81,69 @@ def send_telegram_message(message):
     except Exception as e:
         print(f"Telegram notification error: {e}")
         return False
+
+
+def send_ticket_email(ticket, event, pdf_buffer):
+    """
+    Send ticket PDF to attendee via email.
+    
+    Args:
+        ticket: Ticket model instance
+        event: Event model instance
+        pdf_buffer: BytesIO buffer containing PDF
+    
+    Returns:
+        bool: True if email sent successfully
+    """
+    from django.core.mail import EmailMessage
+    
+    if not ticket.email:
+        return False
+    
+    subject = f"Your Ticket for {event.title} - Miss Culture Global Kenya"
+    
+    body = f"""
+Dear {ticket.full_name},
+
+Thank you for your purchase! Your ticket has been confirmed for:
+
+EVENT: {event.title}
+DATE: {event.start_date.strftime('%A, %B %d, %Y')}
+TIME: {event.start_date.strftime('%I:%M %p')}
+VENUE: {event.venue_name}
+LOCATION: {event.city}, {event.country}
+TICKET CODE: {ticket.ticket_code}
+
+Please find your ticket PDF attached. Present the QR code at the entrance for check-in.
+
+Important Notes:
+- This ticket is non-transferable and non-refundable
+- Please arrive at least 30 minutes before the event starts
+- Bring a valid ID matching the name on this ticket
+
+For inquiries, contact us at info@misscultureglobalkenya.com
+
+Best regards,
+Miss Culture Global Kenya Team
+"""
+    
+    try:
+        email = EmailMessage(
+            subject=subject,
+            body=body,
+            from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', 'info@misscultureglobalkenya.com'),
+            to=[ticket.email],
+        )
+        
+        # Attach PDF
+        email.attach(
+            filename=f"ticket_{ticket.ticket_code}.pdf",
+            content=pdf_buffer.getvalue(),
+            mimetype='application/pdf'
+        )
+        
+        email.send(fail_silently=False)
+        return True
+    except Exception as e:
+        print(f"Ticket email error: {e}")
+        return False

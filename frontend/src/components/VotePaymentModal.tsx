@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Check, Phone, AlertCircle, Loader2, Smartphone, CheckCircle } from 'lucide-react'
+import MpesaLogo from '@/components/MpesaLogo'
 import apiClient from '@/lib/api'
 import type { ApiError } from '@/lib/api'
 
@@ -194,6 +195,13 @@ const VotePaymentModal = ({ isOpen, onClose, event, contestant }: VotePaymentMod
               <div className="space-y-4">
                 {/* Vote Price Info */}
                 <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+                  <div className="flex items-center gap-3 mb-2">
+                    <MpesaLogo size="sm" />
+                    <div>
+                      <p className="text-sm font-bold text-green-800">M-Pesa Till: 4766976</p>
+                      <p className="text-xs text-green-600">The Misscomm Events</p>
+                    </div>
+                  </div>
                   <p className="text-sm text-green-800 font-medium">
                     1 vote = KES {votePrice.toLocaleString()}
                   </p>
@@ -296,8 +304,8 @@ const VotePaymentModal = ({ isOpen, onClose, event, contestant }: VotePaymentMod
                     </>
                   ) : (
                     <>
-                      <Smartphone className="w-4 h-4" />
-                      Pay with M-Pesa
+                      <MpesaLogo size="sm" />
+                      Pay KES {amountNum.toLocaleString()} with M-Pesa
                     </>
                   )}
                 </button>
