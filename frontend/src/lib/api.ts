@@ -7,7 +7,11 @@ if (
   throw new Error("NEXT_PUBLIC_API_BASE_URL is not configured");
 }
 
-const BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
+const rawBase = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"
+let BASE = rawBase.replace(/\/+$/, "")
+if (BASE.endsWith("/admin")) {
+  BASE = BASE.slice(0, -"/admin".length)
+}
 
 const client = axios.create({
   baseURL: BASE,
