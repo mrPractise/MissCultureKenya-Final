@@ -34,16 +34,4 @@ class Migration(migrations.Migration):
                 verbose_name='logo_global'
             ),
         ),
-        migrations.AddField(
-            model_name='sitesettings',
-            name='mpesa_logo',
-            field=cloudinary.models.CloudinaryField(
-                blank=True,
-                folder='missculture/logos',
-                help_text='M-Pesa logo for payment sections',
-                max_length=255,
-                null=True,
-                verbose_name='mpesa_logo'
-            ),
-        ),
     ]
