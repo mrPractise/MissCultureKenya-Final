@@ -190,7 +190,7 @@ const PartnershipPage = () => {
                     className="rounded-2xl bg-white/10 backdrop-blur-md border border-white/10 p-6 hover:bg-white/20 transition-all duration-300 group cursor-pointer text-center"
                     title={sponsor.since || sponsor.description}
                   >
-                    <div className="mb-4 h-28 flex items-center justify-center bg-white rounded-xl p-3 group-hover:scale-105 transition-transform duration-300 shadow-lg">
+                    <div className="mb-4 h-28 flex items-center justify-center bg-white rounded-xl p-1 group-hover:scale-105 transition-transform duration-300 shadow-lg">
                       {sponsor.logo ? (
                         <img src={sponsor.logo} alt={sponsor.name} className="max-h-full max-w-full w-auto object-contain" />
                       ) : (

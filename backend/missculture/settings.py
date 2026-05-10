@@ -251,8 +251,7 @@ REST_FRAMEWORK = {
     }
 }
 
-# Email Configuration - Using Resend API
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # Fallback for local dev
+# Email Configuration - Using Resend API only
 RESEND_API_KEY = config('RESEND_API_KEY', default='')
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='onboarding@resend.dev')
 ADMIN_EMAIL = config('ADMIN_EMAIL', default='info@misscultureglobalkenya.com')
