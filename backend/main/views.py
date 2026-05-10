@@ -1,3 +1,5 @@
+import logging
+
 from rest_framework import viewsets, filters, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -18,6 +20,8 @@ from .serializers import (
     PartnerSerializer, SocialMediaPostSerializer, DiscoverKenyaSerializer,
     SiteSettingsSerializer, TeamMemberSerializer
 )
+
+logger = logging.getLogger(__name__)
 
 
 class AmbassadorViewSet(viewsets.ReadOnlyModelViewSet):
@@ -204,6 +208,12 @@ def contact_message(request):
         f"---\nSent via Miss Culture Global Kenya website"
     )
 
+    if not getattr(settings, 'RESEND_API_KEY', ''):
+        return Response(
+            {'error': 'Email service is not configured.'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
     # Send admin notification via Resend
     try:
         resend.api_key = settings.RESEND_API_KEY
@@ -213,12 +223,14 @@ def contact_message(request):
             'subject': email_subject,
             'html': html_body,
             'text': plain_body,
+            'reply_to': email,
         })
     except Exception as e:
-        # Log error but don't fail the request - user experience is priority
-        import logging
-        logger = logging.getLogger(__name__)
-        logger.error(f'Failed to send admin email via Resend: {str(e)}')
+        logger.exception('Failed to send admin email via Resend')
+        return Response(
+            {'error': 'Failed to send message. Please try again later.'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
 
     # Send auto-reply to the sender
     auto_subject = "Thank you for contacting Miss Culture Global Kenya"
@@ -254,9 +266,7 @@ def contact_message(request):
             'text': auto_plain,
         })
     except Exception as e:
-        import logging
-        logger = logging.getLogger(__name__)
-        logger.error(f'Failed to send auto-reply via Resend: {str(e)}')
+        logger.exception('Failed to send auto-reply via Resend')
 
 
     return Response(
