@@ -30,6 +30,7 @@ env.bak/
 venv.bak/
 backend/venv/
 
+
 # Django
 *.log
 local_settings.py
