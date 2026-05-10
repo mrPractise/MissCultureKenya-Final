@@ -112,25 +112,25 @@ const Ambassador = () => {
     {
       step: '02',
       title: 'Why She Stepped Forward',
-      desc: "Susan did not seek the ambassador role for recognition. She stepped forward because she saw a generation at risk of losing its identity. Growing up between rural traditions and urban modernity, she experienced first-hand the tension between preserving heritage and embracing progress — and chose to prove they are not opposites. Her motivation is specific: no young Kenyan should have to leave who they are at the door to succeed globally.",
+      desc: "Susan stepped forward to bridge tradition and modern life. She believes young Kenyans can embrace both their heritage and their ambitions.",
       icon: User,
     },
     {
       step: '03',
       title: 'What She Stands For',
-      desc: "Youth empowerment. Heritage preservation. Cultural diplomacy. Susan's work is rooted in the Ubuntu philosophy — \"I am because we are.\" She champions community solidarity, intercultural dialogue, and the recognition of African culture as a profound contribution to global civilisation. Her causes are not abstract: she has created sustainable income for 500+ artisans and inspired 5,000+ young Kenyans to become cultural advocates.",
+      desc: "Susan promotes youth programs, preserves cultural heritage, and creates opportunities for artisans. She believes in the power of community and cultural pride.",
       icon: Heart,
     },
     {
       step: '04',
       title: 'Where She Has Gone',
-      desc: "From UNESCO headquarters in Paris to community centres in Kibera, from the African Union summits to grassroots youth forums — Susan has carried Kenya's story across five continents. Her diplomatic engagements, cultural exchanges, and conference appearances have reached audiences numbering in the millions, building bridges between Kenya and the world through shared humanity.",
+      desc: "Susan has represented Kenya at international events and community gatherings across multiple countries. She shares Kenya's story wherever she goes.",
       icon: Globe,
     },
     {
       step: '05',
       title: 'What Happens Next',
-      desc: "Susan's journey is far from over. She is actively expanding her youth empowerment programmes, deepening partnerships with international cultural organisations, and preparing the next generation of cultural ambassadors. Her vision: a world where diversity is celebrated as humanity's greatest asset, and where young Kenyans feel empowered to embrace their heritage with pride. The story continues — and you can be part of it.",
+      desc: "Susan continues her work in youth empowerment and cultural partnerships. She invites everyone to join this journey of cultural pride and community growth.",
       icon: ArrowRight,
     },
   ]
@@ -139,7 +139,7 @@ const Ambassador = () => {
     {
       title: 'Her Identity',
       quote: "I am not just an ambassador. I am a mirror held up to Kenya — showing the world what we truly are.",
-      desc: "What does the ambassador role mean to her personally? Not a title — a responsibility. Susan carries the weight of 44 communities in every appearance, every speech, every moment on the global stage.",
+      desc: "Susan represents Kenya with pride and dedication. Her work connects communities and shares our culture with the world.",
       icon: User,
       color: 'green',
     },
@@ -153,14 +153,14 @@ const Ambassador = () => {
     {
       title: 'Her Call to Youth',
       quote: "To every young Kenyan woman watching — your culture is your power. You do not have to leave who you are at the door to succeed globally.",
-      desc: "Susan speaks directly to young women who feel they must choose between their heritage and their ambitions. Her message: the two are not in conflict. Your culture is your competitive advantage.",
+      desc: "Susan encourages young women to embrace their cultural identity as a strength in pursuing their goals.",
       icon: Sparkles,
       color: 'yellow',
     },
     {
       title: 'Her Invitation',
       quote: "Follow her journey, attend her events, and vote for the next generation of ambassadors who will carry this torch forward.",
-      desc: "This is not a spectator mission. Susan invites every Kenyan — and every friend of Kenya — to participate. Follow, attend, support, and help grow the movement.",
+      desc: "Susan welcomes everyone to follow her journey, attend events, and support the cultural movement.",
       icon: Heart,
       color: 'green',
     },

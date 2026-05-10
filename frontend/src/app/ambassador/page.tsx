@@ -10,7 +10,7 @@ export default function AmbassadorPage() {
     <div className="min-h-screen">
       <PageHeader
         title="Susan — Kenya's Voice on the World Stage"
-        subtitle="Miss Culture Global Kenya Ambassador · Cultural diplomat · Youth champion — She does not just wear the crown, she carries an entire nation's story."
+        subtitle="Miss Culture Global Kenya Ambassador · Cultural diplomat · Youth champion"
         backgroundImage={settings.ambassador_hero_image_url || undefined}
       />
       <Ambassador />

@@ -296,3 +296,43 @@ def check_email_connection(request):
             'error': str(e),
             'api_key_configured': bool(settings.RESEND_API_KEY),
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+from django.http import FileResponse
+from .pdf_generator import generate_test_pdf, generate_multi_page_pdf
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def generate_test_pdf_view(request):
+    """
+    Generate a PDF with random statements for testing content
+    
+    Query params:
+    - type: home, ambassador, events, partnership, about, all (default: all)
+    - pages: number of pages for multi-page PDF (default: 5)
+    """
+    page_type = request.query_params.get('type', 'all')
+    num_pages = int(request.query_params.get('pages', 5))
+    multi_page = request.query_params.get('multi', 'false').lower() == 'true'
+    
+    try:
+        if multi_page:
+            pdf_buffer = generate_multi_page_pdf(num_pages=num_pages)
+            filename = f"test_multi_page_{num_pages}pages.pdf"
+        else:
+            pdf_buffer = generate_test_pdf(page_type=page_type)
+            filename = f"test_{page_type}_content.pdf"
+        
+        return FileResponse(
+            pdf_buffer,
+            as_attachment=True,
+            filename=filename,
+            content_type='application/pdf'
+        )
+    except Exception as e:
+        logger.exception("PDF generation failed")
+        return Response(
+            {'error': f'PDF generation failed: {str(e)}'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
