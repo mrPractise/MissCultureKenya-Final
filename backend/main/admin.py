@@ -200,6 +200,19 @@ class HomePageSettingsAdmin(admin.ModelAdmin):
     def has_add_permission(self, request):
         return not HomePageSettings.objects.exists()
 
+    def changeform_view(self, request, object_id=None, form_url="", extra_context=None):
+        try:
+            return super().changeform_view(
+                request, object_id=object_id, form_url=form_url, extra_context=extra_context
+            )
+        except cloudinary.exceptions.AuthorizationRequired as e:
+            self.message_user(
+                request,
+                f"Cloudinary upload failed: {e}. Check CLOUDINARY credentials on Railway.",
+                level=messages.ERROR,
+            )
+            return HttpResponseRedirect(request.path)
+
 
 @admin.register(KenyaPageSettings)
 class KenyaPageSettingsAdmin(admin.ModelAdmin):
@@ -228,6 +241,19 @@ class KenyaPageSettingsAdmin(admin.ModelAdmin):
     
     def has_add_permission(self, request):
         return not KenyaPageSettings.objects.exists()
+
+    def changeform_view(self, request, object_id=None, form_url="", extra_context=None):
+        try:
+            return super().changeform_view(
+                request, object_id=object_id, form_url=form_url, extra_context=extra_context
+            )
+        except cloudinary.exceptions.AuthorizationRequired as e:
+            self.message_user(
+                request,
+                f"Cloudinary upload failed: {e}. Check CLOUDINARY credentials on Railway.",
+                level=messages.ERROR,
+            )
+            return HttpResponseRedirect(request.path)
 
 
 @admin.register(AmbassadorPageSettings)
@@ -263,6 +289,19 @@ class AmbassadorPageSettingsAdmin(admin.ModelAdmin):
     def has_add_permission(self, request):
         return not AmbassadorPageSettings.objects.exists()
 
+    def changeform_view(self, request, object_id=None, form_url="", extra_context=None):
+        try:
+            return super().changeform_view(
+                request, object_id=object_id, form_url=form_url, extra_context=extra_context
+            )
+        except cloudinary.exceptions.AuthorizationRequired as e:
+            self.message_user(
+                request,
+                f"Cloudinary upload failed: {e}. Check CLOUDINARY credentials on Railway.",
+                level=messages.ERROR,
+            )
+            return HttpResponseRedirect(request.path)
+
 
 @admin.register(EventsPageSettings)
 class EventsPageSettingsAdmin(admin.ModelAdmin):
@@ -281,6 +320,19 @@ class EventsPageSettingsAdmin(admin.ModelAdmin):
     
     def has_add_permission(self, request):
         return not EventsPageSettings.objects.exists()
+
+    def changeform_view(self, request, object_id=None, form_url="", extra_context=None):
+        try:
+            return super().changeform_view(
+                request, object_id=object_id, form_url=form_url, extra_context=extra_context
+            )
+        except cloudinary.exceptions.AuthorizationRequired as e:
+            self.message_user(
+                request,
+                f"Cloudinary upload failed: {e}. Check CLOUDINARY credentials on Railway.",
+                level=messages.ERROR,
+            )
+            return HttpResponseRedirect(request.path)
 
 
 @admin.register(GalleryPageSettings)
@@ -301,6 +353,19 @@ class GalleryPageSettingsAdmin(admin.ModelAdmin):
     def has_add_permission(self, request):
         return not GalleryPageSettings.objects.exists()
 
+    def changeform_view(self, request, object_id=None, form_url="", extra_context=None):
+        try:
+            return super().changeform_view(
+                request, object_id=object_id, form_url=form_url, extra_context=extra_context
+            )
+        except cloudinary.exceptions.AuthorizationRequired as e:
+            self.message_user(
+                request,
+                f"Cloudinary upload failed: {e}. Check CLOUDINARY credentials on Railway.",
+                level=messages.ERROR,
+            )
+            return HttpResponseRedirect(request.path)
+
 
 @admin.register(PartnershipPageSettings)
 class PartnershipPageSettingsAdmin(admin.ModelAdmin):
@@ -319,6 +384,19 @@ class PartnershipPageSettingsAdmin(admin.ModelAdmin):
     
     def has_add_permission(self, request):
         return not PartnershipPageSettings.objects.exists()
+
+    def changeform_view(self, request, object_id=None, form_url="", extra_context=None):
+        try:
+            return super().changeform_view(
+                request, object_id=object_id, form_url=form_url, extra_context=extra_context
+            )
+        except cloudinary.exceptions.AuthorizationRequired as e:
+            self.message_user(
+                request,
+                f"Cloudinary upload failed: {e}. Check CLOUDINARY credentials on Railway.",
+                level=messages.ERROR,
+            )
+            return HttpResponseRedirect(request.path)
 
 
 @admin.register(AboutPageSettings)
@@ -345,3 +423,16 @@ class AboutPageSettingsAdmin(admin.ModelAdmin):
     
     def has_add_permission(self, request):
         return not AboutPageSettings.objects.exists()
+
+    def changeform_view(self, request, object_id=None, form_url="", extra_context=None):
+        try:
+            return super().changeform_view(
+                request, object_id=object_id, form_url=form_url, extra_context=extra_context
+            )
+        except cloudinary.exceptions.AuthorizationRequired as e:
+            self.message_user(
+                request,
+                f"Cloudinary upload failed: {e}. Check CLOUDINARY credentials on Railway.",
+                level=messages.ERROR,
+            )
+            return HttpResponseRedirect(request.path)
