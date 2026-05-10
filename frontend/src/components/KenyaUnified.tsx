@@ -359,7 +359,7 @@ const KenyaUnified = () => {
                   </div>
                   <div className="p-5">
                     <h4 className="font-bold text-gray-900 text-lg">{community.name}</h4>
-                    <p className="mt-2 text-sm text-gray-600 leading-relaxed">{community.description}</p>
+                    <p className="mt-2 text-sm text-gray-600 leading-relaxed line-clamp-2">{community.description}</p>
                     {gallery.length > 0 && (
                       <button
                         onClick={(e) => { e.stopPropagation(); setExpandedCommunity(isExpanded ? null : community.id) }}
@@ -373,7 +373,7 @@ const KenyaUnified = () => {
                   {isExpanded && gallery.length > 0 && (
                     <div className="px-5 pb-5">
                       <div className="grid grid-cols-3 gap-2">
-                        {gallery.map((src, gi) => (
+                        {gallery.slice(0, 3).map((src, gi) => (
                           <div key={gi} className="rounded-lg overflow-hidden">
                             <img src={src} alt={`${community.name} ${gi + 1}`} className="w-full h-20 object-cover" />
                           </div>
@@ -456,7 +456,7 @@ const KenyaUnified = () => {
                       className="bg-white p-4"
                     >
                       <div className="grid grid-cols-3 gap-2">
-                        {gallery.map((src, gi) => (
+                        {gallery.slice(0, 3).map((src, gi) => (
                           <div key={gi} className="rounded-lg overflow-hidden">
                             <img src={src} alt={`${region.name} ${gi + 1}`} className="w-full h-24 object-cover" />
                           </div>
