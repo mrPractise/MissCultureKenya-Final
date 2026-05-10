@@ -219,7 +219,7 @@ def contact_message(request):
         logger = logging.getLogger(__name__)
         logger.error(f'Failed to send admin email: {str(e)}')
         return Response(
-            {'error': 'We are currently experiencing issues with our email system. Please try again later or contact us directly.'},
+            {'error': f'Email error: {str(e)}. Please contact us directly.'},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
