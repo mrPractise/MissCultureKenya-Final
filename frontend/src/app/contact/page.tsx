@@ -80,6 +80,7 @@ const ContactPage = () => {
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle')
+  const [errorMessage, setErrorMessage] = useState('')
 
   return (
     <div className="min-h-screen bg-white">
@@ -204,8 +205,9 @@ const ContactPage = () => {
                   })
                   setSubmitStatus('success')
                   setContactForm({ firstName: '', lastName: '', email: '', phone: '', subject: '', message: '' })
-                } catch {
+                } catch (err: any) {
                   setSubmitStatus('error')
+                  setErrorMessage(err?.message || 'Failed to send message.')
                 } finally {
                   setIsSubmitting(false)
                 }
@@ -255,7 +257,8 @@ const ContactPage = () => {
                 )}
                 {submitStatus === 'error' && (
                   <div className="bg-red-50 border border-red-200 rounded-xl p-4">
-                    <p className="text-red-700 font-medium text-sm">Failed to send message. Please try again or email us directly at info@misscultureglobalkenya.org</p>
+                    <p className="text-red-700 font-medium text-sm">{errorMessage || 'Failed to send message.'}</p>
+                    <p className="text-red-600 text-xs mt-1">If the problem persists, email us directly at info@misscultureglobalkenya.org</p>
                   </div>
                 )}
 
