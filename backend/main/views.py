@@ -265,3 +265,25 @@ def contact_message(request):
         {'success': 'Your message has been sent successfully. We will get back to you soon!'},
         status=status.HTTP_200_OK,
     )
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def check_email_connection(request):
+    import socket
+    
+    hosts = ['smtp.zoho.com', 'smtp.gmail.com']
+    ports = [587, 465]
+    results = {}
+    
+    for host in hosts:
+        host_results = {}
+        for port in ports:
+            try:
+                s = socket.create_connection((host, port), timeout=5)
+                host_results[port] = "Connected"
+                s.close()
+            except Exception as e:
+                host_results[port] = f"Failed: {str(e)}"
+        results[host] = host_results
+        
+    return Response(results)

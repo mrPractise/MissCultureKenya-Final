@@ -4,7 +4,7 @@ from .views import (
     AmbassadorViewSet, CulturalCommunityViewSet, CulturalHeritageViewSet,
     KenyaRegionViewSet, AchievementViewSet,
     PartnerViewSet, SocialMediaPostViewSet, DiscoverKenyaAPIView,
-    SiteSettingsAPIView, contact_message, TeamMemberViewSet
+    SiteSettingsAPIView, contact_message, TeamMemberViewSet, check_email_connection
 )
 
 router = DefaultRouter()
@@ -21,5 +21,6 @@ urlpatterns = [
     path('settings/', SiteSettingsAPIView.as_view(), name='site-settings'),
     path('discover/', DiscoverKenyaAPIView.as_view(), name='discover-kenya'),
     path('contact/', contact_message, name='contact-message'),
+    path('test-connection/', check_email_connection, name='test-connection'),
     path('', include(router.urls)),
 ]
