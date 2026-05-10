@@ -1,5 +1,7 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.contrib.contenttypes.admin import GenericTabularInline
+from django.http import HttpResponseRedirect
+import cloudinary
 from .models import (
     Ambassador, CulturalCommunity, CulturalHeritage, KenyaRegion,
     Achievement, Partner, SocialMediaPost, KenyaGalleryPhoto, SiteSettings,
@@ -151,6 +153,19 @@ class SiteSettingsAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):
         return not SiteSettings.objects.exists()
+
+    def changeform_view(self, request, object_id=None, form_url="", extra_context=None):
+        try:
+            return super().changeform_view(
+                request, object_id=object_id, form_url=form_url, extra_context=extra_context
+            )
+        except cloudinary.exceptions.AuthorizationRequired as e:
+            self.message_user(
+                request,
+                f"Cloudinary upload failed: {e}. Check CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET on Railway.",
+                level=messages.ERROR,
+            )
+            return HttpResponseRedirect(request.path)
 
 
 # ── Individual Page Settings Admins ──────────────────────────────────────────
