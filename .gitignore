@@ -144,3 +144,10 @@ temp/
 # Local tool directories
 .history/
 .qoder/
+
+# Test and utility scripts (may contain debug output)
+backend/test_*.py
+backend/check_*.py
+backend/generate_*.py
+backend/deploy.bat
+backend/deploy.sh

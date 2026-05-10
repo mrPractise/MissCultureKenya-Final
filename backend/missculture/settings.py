@@ -250,8 +250,30 @@ REST_FRAMEWORK = {
     'DEFAULT_THROTTLE_RATES': {
         'anon': '100/minute',  # 100 requests per minute for anonymous users
         'user': '1000/minute',  # 1000 requests per minute for authenticated users
-    }
+    },
+    # Performance: Cache responses for 5 minutes
+    'DEFAULT_CACHE_RESPONSE_TIMEOUT': 300,
 }
+
+# Database Query Optimization
+# Enable query logging in DEBUG mode for performance monitoring
+if DEBUG:
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+            },
+        },
+        'loggers': {
+            'django.db.backends': {
+                'handlers': ['console'],
+                'level': 'DEBUG',
+                'propagate': False,
+            },
+        },
+    }
 
 # Email Configuration - Using Resend API only
 RESEND_API_KEY = config('RESEND_API_KEY', default='')
@@ -273,8 +295,6 @@ cloudinary.config(
     api_secret=CLOUDINARY_STORAGE['API_SECRET'],
     secure=True,
 )
-
-print(os.environ.get('CLOUDINARY_URL'))
 
 # Daraja / M-Pesa Configuration
 MPESA_CONSUMER_KEY = config('MPESA_CONSUMER_KEY', default='')

@@ -20,7 +20,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.http import JsonResponse
 from .error_handlers import (
-    health_check, debug_info, admin_debug_info,
+    health_check, debug_info, admin_debug_info, db_performance_check,
     error_404, error_500, error_403, error_400
 )
 
@@ -34,6 +34,7 @@ urlpatterns = [
     path('api/health/', health_check, name='api-health-check'),
     path('api/debug/', debug_info, name='debug-info'),
     path('api/admin-debug/', admin_debug_info, name='admin-debug'),
+    path('api/db-performance/', db_performance_check, name='db-performance'),
     
     # Main application URLs
     path('admin/', admin.site.urls),

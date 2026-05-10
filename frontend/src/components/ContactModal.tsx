@@ -78,9 +78,21 @@ const ContactModal = ({ isOpen, onClose, type = 'general' }: ContactModalProps) 
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target
+    
+    // Phone field: only allow digits, spaces, and + - ( )
+    if (name === 'phone') {
+      const sanitizedValue = value.replace(/[^0-9+\-\s()]/g, '')
+      setFormData({
+        ...formData,
+        [name]: sanitizedValue
+      })
+      return
+    }
+    
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [name]: value
     })
   }
 
@@ -173,9 +185,12 @@ const ContactModal = ({ isOpen, onClose, type = 'general' }: ContactModalProps) 
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
+                  pattern="[0-9+\-\s()]*"
+                  inputMode="numeric"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   placeholder="+254 721 706983"
                 />
+                <p className="text-xs text-gray-500 mt-1">Numbers only (e.g., +254 721 706983)</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">

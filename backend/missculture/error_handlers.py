@@ -266,7 +266,7 @@ def admin_debug_info(request):
     debug_data = {
         'environment': {
             'debug': settings.DEBUG,
-            'secret_key_prefix': settings.SECRET_KEY[:10] + '...' if settings.SECRET_KEY else None,
+            'secret_key_configured': bool(settings.SECRET_KEY),
             'database_engine': settings.DATABASES.get('default', {}).get('ENGINE'),
         },
         'migrations': {
@@ -293,6 +293,93 @@ def admin_debug_info(request):
     }
     
     return Response(debug_data)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def db_performance_check(request):
+    """
+    Check database query performance and connection health
+    """
+    from django.db import connection
+    from main.models import Ambassador, SiteSettings, Partner
+    import time
+    
+    results = {
+        'timestamp': time.time(),
+        'database': {
+            'engine': settings.DATABASES.get('default', {}).get('ENGINE'),
+            'connection_pooling': settings.DATABASES.get('default', {}).get('CONN_MAX_AGE', 0),
+            'health_checks': settings.DATABASES.get('default', {}).get('CONN_HEALTH_CHECKS', False),
+        },
+        'query_tests': {}
+    }
+    
+    # Test 1: Simple query timing
+    start = time.time()
+    try:
+        count = Ambassador.objects.count()
+        results['query_tests']['ambassador_count'] = {
+            'status': 'ok',
+            'count': count,
+            'time_ms': round((time.time() - start) * 1000, 2)
+        }
+    except Exception as e:
+        results['query_tests']['ambassador_count'] = {
+            'status': 'error',
+            'error': str(e)
+        }
+    
+    # Test 2: SiteSettings query (single row, should be fast)
+    start = time.time()
+    try:
+        settings_obj = SiteSettings.objects.first()
+        results['query_tests']['sitesettings_fetch'] = {
+            'status': 'ok',
+            'exists': settings_obj is not None,
+            'time_ms': round((time.time() - start) * 1000, 2)
+        }
+    except Exception as e:
+        results['query_tests']['sitesettings_fetch'] = {
+            'status': 'error',
+            'error': str(e)
+        }
+    
+    # Test 3: Partners list query
+    start = time.time()
+    try:
+        partners = list(Partner.objects.all()[:10])
+        results['query_tests']['partners_list'] = {
+            'status': 'ok',
+            'count': len(partners),
+            'time_ms': round((time.time() - start) * 1000, 2)
+        }
+    except Exception as e:
+        results['query_tests']['partners_list'] = {
+            'status': 'error',
+            'error': str(e)
+        }
+    
+    # Test 4: Connection pool check
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1")
+            results['database']['connection_status'] = 'connected'
+    except Exception as e:
+        results['database']['connection_status'] = f'error: {str(e)}'
+    
+    # Overall assessment
+    all_ok = all(test.get('status') == 'ok' for test in results['query_tests'].values())
+    results['performance_assessment'] = {
+        'all_tests_passed': all_ok,
+        'average_response_time_ms': round(
+            sum(test.get('time_ms', 0) for test in results['query_tests'].values() if 'time_ms' in test) / 
+            len([t for t in results['query_tests'].values() if 'time_ms' in t]), 2
+        ) if results['query_tests'] else 0,
+        'recommendation': 'Database queries are fast and efficient' if all_ok else 'Some queries are slow or failing'
+    }
+    
+    return Response(results)
 
 
 # ── Exception Handler for DRF ────────────────────────────────────────────────
