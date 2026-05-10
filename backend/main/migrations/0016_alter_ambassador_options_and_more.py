@@ -4,6 +4,27 @@ import cloudinary.models
 from django.db import migrations, models
 
 
+def safe_remove_columns(apps, schema_editor):
+    """Safely remove columns that may or may not exist in production"""
+    if schema_editor.connection.vendor == 'postgresql':
+        columns_to_remove = [
+            'home_ambassador_highlight_image',
+            'home_kenya_highlight_image',
+            'home_upcoming_event_image',
+            'kenya_artisan_1_image',
+            'kenya_artisan_2_image',
+            'kenya_artisan_3_image',
+            'kenya_artisan_4_image',
+        ]
+        for col in columns_to_remove:
+            schema_editor.execute(
+                f'ALTER TABLE main_sitesettings DROP COLUMN IF EXISTS "{col}";'
+            )
+    else:
+        # SQLite doesn't support DROP COLUMN IF EXISTS easily, skip
+        pass
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -15,34 +36,7 @@ class Migration(migrations.Migration):
             name='ambassador',
             options={'ordering': ['-created_at'], 'verbose_name': 'Ambassador', 'verbose_name_plural': 'Ambassador'},
         ),
-        migrations.RemoveField(
-            model_name='sitesettings',
-            name='home_ambassador_highlight_image',
-        ),
-        migrations.RemoveField(
-            model_name='sitesettings',
-            name='home_kenya_highlight_image',
-        ),
-        migrations.RemoveField(
-            model_name='sitesettings',
-            name='home_upcoming_event_image',
-        ),
-        migrations.RemoveField(
-            model_name='sitesettings',
-            name='kenya_artisan_1_image',
-        ),
-        migrations.RemoveField(
-            model_name='sitesettings',
-            name='kenya_artisan_2_image',
-        ),
-        migrations.RemoveField(
-            model_name='sitesettings',
-            name='kenya_artisan_3_image',
-        ),
-        migrations.RemoveField(
-            model_name='sitesettings',
-            name='kenya_artisan_4_image',
-        ),
+        migrations.RunPython(safe_remove_columns, migrations.RunPython.noop),
         migrations.AlterField(
             model_name='ambassadorpagesettings',
             name='profile_image',
