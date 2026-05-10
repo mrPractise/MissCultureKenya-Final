@@ -67,11 +67,11 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       <Hero />
-      <ImpactStats />
       <MissionVision />
       <CultureImpact />
       <CoreValues />
       <AmbassadorSpotlight />
+      <ImpactStats />
       <SupportBlocks />
       <FollowCTA />
       
