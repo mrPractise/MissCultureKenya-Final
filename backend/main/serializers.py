@@ -187,6 +187,7 @@ class HomePageSettingsSerializer(serializers.ModelSerializer):
             'welcome_title', 'welcome_subtitle',
             'kenya_highlight_image', 'kenya_highlight_image_url', 'kenya_highlight_enabled',
             'ambassador_highlight_image', 'ambassador_highlight_image_url', 'ambassador_highlight_enabled',
+            'upcoming_event_enabled', 'recent_event_enabled',
             'created_at', 'updated_at'
         ]
     

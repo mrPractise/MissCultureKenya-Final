@@ -287,6 +287,10 @@ class HomePageSettings(models.Model):
         help_text='Image for Ambassador highlight card on homepage')
     ambassador_highlight_enabled = models.BooleanField(default=True, help_text='Show Ambassador spotlight section on homepage')
     
+    # Events Section toggles
+    upcoming_event_enabled = models.BooleanField(default=True, help_text='Show upcoming events section on homepage')
+    recent_event_enabled = models.BooleanField(default=True, help_text='Show recent events section on homepage')
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
