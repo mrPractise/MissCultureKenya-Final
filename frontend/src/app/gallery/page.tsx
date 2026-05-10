@@ -88,13 +88,13 @@ const GalleryPage = () => {
         const videosData = Array.isArray(videosResponse) ? videosResponse : (videosResponse.results || [])
         setVideos(videosData)
 
-        const allCollections = ['All', ...new Set(photosData.map((p: any) => p.category || 'Uncategorized').filter(Boolean))]
+        const uniqueCategories: string[] = [...new Set(photosData.map((p: any) => p.category || 'Uncategorized').filter(Boolean))] as string[]
+        const allCollections: string[] = ['All', ...uniqueCategories]
         setCollections(allCollections)
         // Extract years from photos and videos dates
-        const allYears = ['All', ...new Set([
-          ...photosData.map((p: any) => p.date ? new Date(p.date).getFullYear().toString() : null),
-          ...videosData.map((v: any) => v.date ? new Date(v.date).getFullYear().toString() : null)
-        ].filter(Boolean))].sort((a, b) => b.localeCompare(a)) // Recent first
+        const photoYears: string[] = photosData.map((p: any) => p.date ? new Date(p.date).getFullYear().toString() : null).filter((y: string | null): y is string => y !== null)
+        const videoYears: string[] = videosData.map((v: any) => v.date ? new Date(v.date).getFullYear().toString() : null).filter((y: string | null): y is string => y !== null)
+        const allYears: string[] = ['All', ...new Set([...photoYears, ...videoYears])].sort((a, b) => b.localeCompare(a)) // Recent first
         setYears(allYears)
       } catch (err) {
         console.error('Error fetching gallery data:', err)
@@ -276,8 +276,10 @@ const GalleryPage = () => {
                 <div className={`w-10 h-10 rounded-xl ${selectedCollection === collection ? 'bg-white/20' : 'bg-red-600'} flex items-center justify-center mb-4`}>
                   <Camera className={`w-5 h-5 ${selectedCollection === collection ? 'text-white' : 'text-red-600'}`} />
                 </div>
-                <h3 className="text-lg font-bold mb-2">{collection}</h3>
-                <p className={`text-sm leading-relaxed ${selectedCollection === cat.title ? 'text-white/80' : 'text-gray-600'}`}>{cat.description}</p>
+                <h3 className="text-lg font-bold mb-2">{collection === 'All' ? 'All Collections' : collection.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</h3>
+                <p className={`text-sm leading-relaxed ${selectedCollection === collection ? 'text-white/80' : 'text-gray-600'}`}>
+                  {collection === 'All' ? 'View all photos and videos' : `Browse ${collection.replace(/-/g, ' ')} moments`}
+                </p>
               </motion.button>
             ))}
           </div>
@@ -317,10 +319,54 @@ const GalleryPage = () => {
                   <div className="text-center w-full py-8">
                     <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"></div>
                     <p className="mt-2 text-gray-600 text-sm">Loading collections...</p>
-            </div>
-          )}
+                  </div>
+                ) : error ? (
+                  <div className="text-center w-full py-8">
+                    <p className="text-red-600 text-sm">{error}</p>
+                  </div>
+                ) : (
+                  collections.map((collection) => (
+                    <button
+                      key={collection}
+                      onClick={() => { setSelectedCollection(collection); setSelectedYear('All'); }}
+                      className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 text-sm sm:text-base transform hover:-translate-y-1 ${
+                        selectedCollection === collection
+                          ? 'bg-red-600 text-white shadow-lg'
+                          : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-100'
+                      }`}
+                    >
+                      {collection === 'All' ? 'All' : collection.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                    </button>
+                  ))
+                )}
+              </motion.div>
 
-          {/* Photo Gallery */}
+              {/* Year Filter - Only show when a collection is selected */}
+              {selectedCollection !== 'All' && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.1 }}
+                  className="flex flex-wrap justify-center gap-2 mb-8 px-4"
+                >
+                  <span className="text-sm text-gray-500 self-center mr-2">Year:</span>
+                  {years.map((year) => (
+                    <button
+                      key={year}
+                      onClick={() => setSelectedYear(year)}
+                      className={`px-4 py-2 rounded-full font-medium transition-all duration-300 text-sm ${
+                        selectedYear === year
+                          ? 'bg-green-600 text-white shadow-md'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      }`}
+                    >
+                      {year}
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+
+              {/* Photo Gallery */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
