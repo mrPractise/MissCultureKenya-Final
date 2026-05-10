@@ -278,9 +278,15 @@ def check_email_connection(request):
     for host in hosts:
         host_results = {}
         for port in ports:
+            # Try IPv4 specifically
             try:
-                s = socket.create_connection((host, port), timeout=5)
-                host_results[port] = "Connected"
+                # Get IPv4 address
+                ip = socket.gethostbyname(host)
+                host_results[f"{port}_ipv4_addr"] = ip
+                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                s.settimeout(5)
+                s.connect((ip, port))
+                host_results[port] = "Connected (IPv4)"
                 s.close()
             except Exception as e:
                 host_results[port] = f"Failed: {str(e)}"
