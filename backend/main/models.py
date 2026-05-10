@@ -18,6 +18,7 @@ class Ambassador(models.Model):
     class Meta:
         verbose_name = "Ambassador"
         verbose_name_plural = "Ambassador"
+        ordering = ['-created_at']
 
     def __str__(self):
         return self.name
