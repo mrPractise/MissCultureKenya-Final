@@ -274,6 +274,8 @@ cloudinary.config(
     secure=True,
 )
 
+print(os.environ.get('CLOUDINARY_URL'))
+
 # Daraja / M-Pesa Configuration
 MPESA_CONSUMER_KEY = config('MPESA_CONSUMER_KEY', default='')
 MPESA_CONSUMER_SECRET = config('MPESA_CONSUMER_SECRET', default='')
