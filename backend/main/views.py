@@ -211,13 +211,17 @@ def contact_message(request):
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[settings.ADMIN_EMAIL],
             html_message=html_body,
-            fail_silently=True,  # Don't block response on email failure
+            fail_silently=False,  # Throw exception on failure
         )
     except Exception as e:
-        # Log error but don't fail the request - user experience is priority
+        # Log error and inform the user
         import logging
         logger = logging.getLogger(__name__)
         logger.error(f'Failed to send admin email: {str(e)}')
+        return Response(
+            {'error': 'We are currently experiencing issues with our email system. Please try again later or contact us directly.'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
 
     # Send auto-reply to the sender
     auto_subject = "Thank you for contacting Miss Culture Global Kenya"
@@ -249,10 +253,13 @@ def contact_message(request):
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[email],
             html_message=auto_html,
-            fail_silently=True,
+            fail_silently=False,
         )
-    except Exception:
-        pass  # Non-critical; don't fail the request
+    except Exception as e:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f'Failed to send auto-reply email: {str(e)}')
+
 
     return Response(
         {'success': 'Your message has been sent successfully. We will get back to you soon!'},
