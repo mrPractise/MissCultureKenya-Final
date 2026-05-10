@@ -271,16 +271,6 @@ class HomePageSettings(models.Model):
     """Home page specific settings - hero, highlights, and feature toggles"""
     # Hero Section
     hero_image = cloudinary.models.CloudinaryField('hero', folder='missculture/pages/home', blank=True, null=True)
-    hero_video_url = models.URLField('hero_video_url', blank=True, null=True, help_text='YouTube embed URL for hero background')
-    
-    # Welcome Section
-    welcome_title = models.CharField(max_length=200, default='Welcome to Miss Culture Global Kenya')
-    welcome_subtitle = models.TextField(blank=True, default='')
-    
-    # Kenya Highlight Card (shown on homepage)
-    kenya_highlight_image = cloudinary.models.CloudinaryField('kenya_highlight', folder='missculture/pages/home/highlights', blank=True, null=True,
-        help_text='Image for Kenya highlight card on homepage')
-    kenya_highlight_enabled = models.BooleanField(default=True, help_text='Show Kenya highlight section on homepage')
     
     # Ambassador Highlight Card (shown on homepage)
     ambassador_highlight_image = cloudinary.models.CloudinaryField('ambassador_highlight', folder='missculture/pages/home/highlights', blank=True, null=True,

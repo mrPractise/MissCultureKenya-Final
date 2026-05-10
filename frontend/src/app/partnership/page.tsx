@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import ContactModal from '@/components/ContactModal'
 import apiClient from '@/lib/api'
-import { useSiteSettings } from '@/lib/useSiteSettings'
+import { usePartnershipPageSettings } from '@/lib/usePageSettings'
 
 const valuePropositions = [
   {
@@ -39,7 +39,7 @@ const PartnershipPage = () => {
   const [sponsors, setSponsors] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [isContactModalOpen, setIsContactModalOpen] = useState(false)
-  const settings = useSiteSettings()
+  const { settings } = usePartnershipPageSettings()
 
   useEffect(() => {
     const fetchPartners = async () => {
@@ -77,7 +77,7 @@ const PartnershipPage = () => {
             <div className="absolute inset-0 bg-black/60 z-10" />
             <div
               className="w-full h-full bg-cover bg-center"
-              style={settings.partnership_hero_image_url ? { backgroundImage: `url(${settings.partnership_hero_image_url})` } : undefined}
+              style={settings.hero_image_url ? { backgroundImage: `url(${settings.hero_image_url})` } : undefined}
             />
           </motion.div>
         </div>

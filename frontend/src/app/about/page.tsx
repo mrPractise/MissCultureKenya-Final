@@ -4,11 +4,11 @@ import { motion } from 'framer-motion'
 import { Zap, Shield, Heart, Sparkles, Award, BookOpen, ExternalLink, Handshake, GraduationCap, ChevronRight, Users, Lightbulb, Landmark, Target, Globe, TrendingUp } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { useSiteSettings } from '@/lib/useSiteSettings'
+import { useAboutPageSettings } from '@/lib/usePageSettings'
 import apiClient from '@/lib/api'
 
 const AboutPage = () => {
-  const settings = useSiteSettings()
+  const { settings, loading } = useAboutPageSettings()
 
   const historyMilestones = [
     { year: '2015', title: 'Foundation', description: 'Miss Culture Global Kenya was established with a vision to celebrate and preserve Kenya\'s rich cultural heritage.' },

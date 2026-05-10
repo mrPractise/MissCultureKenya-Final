@@ -6,13 +6,10 @@ import apiClient from './api'
 // Types for each page settings
 interface HomePageSettings {
   hero_image_url: string | null
-  hero_video_url: string | null
-  welcome_title: string
-  welcome_subtitle: string
-  kenya_highlight_image_url: string | null
-  kenya_highlight_enabled: boolean
   ambassador_highlight_image_url: string | null
   ambassador_highlight_enabled: boolean
+  upcoming_event_enabled: boolean
+  recent_event_enabled: boolean
 }
 
 interface KenyaPageSettings {
@@ -41,17 +38,57 @@ interface GalleryPageSettings {
   page_subtitle: string
 }
 
+interface AboutPageSettings {
+  hero_image_url: string | null
+  mission_image_url: string | null
+  page_title: string
+  page_subtitle: string
+  leader_1_name: string
+  leader_1_title: string
+  leader_1_bio: string
+  leader_1_image_url: string | null
+  leader_2_name: string
+  leader_2_title: string
+  leader_2_bio: string
+  leader_2_image_url: string | null
+  leader_3_name: string
+  leader_3_title: string
+  leader_3_bio: string
+  leader_3_image_url: string | null
+  committee_1_name: string
+  committee_1_role: string
+  committee_1_bio: string
+  committee_2_name: string
+  committee_2_role: string
+  committee_2_bio: string
+  committee_3_name: string
+  committee_3_role: string
+  committee_3_bio: string
+  committee_4_name: string
+  committee_4_role: string
+  committee_4_bio: string
+  committee_5_name: string
+  committee_5_role: string
+  committee_5_bio: string
+  committee_6_name: string
+  committee_6_role: string
+  committee_6_bio: string
+}
+
+interface PartnershipPageSettings {
+  hero_image_url: string | null
+  page_title: string
+  page_subtitle: string
+}
+
 // Hook for Home Page Settings
 export function useHomePageSettings() {
   const [settings, setSettings] = useState<HomePageSettings>({
     hero_image_url: null,
-    hero_video_url: null,
-    welcome_title: 'Welcome to Miss Culture Global Kenya',
-    welcome_subtitle: '',
-    kenya_highlight_image_url: null,
-    kenya_highlight_enabled: true,
     ambassador_highlight_image_url: null,
     ambassador_highlight_enabled: true,
+    upcoming_event_enabled: true,
+    recent_event_enabled: true,
   })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -173,6 +210,91 @@ export function useGalleryPageSettings() {
         setSettings(prev => ({ ...prev, ...data }))
       } catch (err: any) {
         setError(err.message || 'Failed to load gallery page settings')
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadSettings()
+  }, [])
+
+  return { settings, loading, error }
+}
+
+// Hook for About Page Settings
+export function useAboutPageSettings() {
+  const [settings, setSettings] = useState<AboutPageSettings>({
+    hero_image_url: null,
+    mission_image_url: null,
+    page_title: 'About Us',
+    page_subtitle: "We Are the Keepers of Kenya's Story",
+    leader_1_name: 'Susan Abongo',
+    leader_1_title: 'Miss Culture Global Kenya',
+    leader_1_bio: 'A passionate cultural ambassador with over 5 years of experience promoting Kenyan heritage.',
+    leader_1_image_url: null,
+    leader_2_name: 'Pacific Awuor Oriato',
+    leader_2_title: 'Director of Operations',
+    leader_2_bio: 'Oversees all operational aspects of the organization with a focus on community engagement.',
+    leader_2_image_url: null,
+    leader_3_name: 'Grace Njeri',
+    leader_3_title: 'Community Outreach Coordinator',
+    leader_3_bio: 'Leads community engagement initiatives and works directly with local artisans.',
+    leader_3_image_url: null,
+    committee_1_name: 'Robert Ochieng',
+    committee_1_role: 'Event Coordinator',
+    committee_1_bio: 'Specializes in organizing cultural events and festivals across Kenya.',
+    committee_2_name: 'Mary Atieno',
+    committee_2_role: 'Marketing Director',
+    committee_2_bio: 'Leads digital marketing and brand awareness campaigns.',
+    committee_3_name: 'David Kimani',
+    committee_3_role: 'Finance Manager',
+    committee_3_bio: 'Manages budgeting and financial reporting for all programs.',
+    committee_4_name: 'Sarah Akinyi',
+    committee_4_role: 'Volunteer Coordinator',
+    committee_4_bio: 'Recruits and manages volunteers for all initiatives.',
+    committee_5_name: 'Peter Kamau',
+    committee_5_role: 'International Relations',
+    committee_5_bio: 'Handles partnerships with international cultural organizations.',
+    committee_6_name: 'Esther Muthoni',
+    committee_6_role: 'Youth Programs Lead',
+    committee_6_bio: 'Develops and implements youth engagement programs.',
+  })
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    async function loadSettings() {
+      try {
+        const data = await apiClient.getAboutPageSettings()
+        setSettings(prev => ({ ...prev, ...data }))
+      } catch (err: any) {
+        setError(err.message || 'Failed to load about page settings')
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadSettings()
+  }, [])
+
+  return { settings, loading, error }
+}
+
+// Hook for Partnership Page Settings
+export function usePartnershipPageSettings() {
+  const [settings, setSettings] = useState<PartnershipPageSettings>({
+    hero_image_url: null,
+    page_title: 'Partner with Heritage',
+    page_subtitle: "Align your brand with Kenya's cultural diplomacy movement.",
+  })
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    async function loadSettings() {
+      try {
+        const data = await apiClient.getPartnershipPageSettings()
+        setSettings(prev => ({ ...prev, ...data }))
+      } catch (err: any) {
+        setError(err.message || 'Failed to load partnership page settings')
       } finally {
         setLoading(false)
       }

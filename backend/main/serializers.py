@@ -177,15 +177,12 @@ class DiscoverKenyaSerializer(serializers.Serializer):
 
 class HomePageSettingsSerializer(serializers.ModelSerializer):
     hero_image_url = serializers.SerializerMethodField()
-    kenya_highlight_image_url = serializers.SerializerMethodField()
     ambassador_highlight_image_url = serializers.SerializerMethodField()
     
     class Meta:
         model = HomePageSettings
         fields = [
-            'hero_image', 'hero_image_url', 'hero_video_url',
-            'welcome_title', 'welcome_subtitle',
-            'kenya_highlight_image', 'kenya_highlight_image_url', 'kenya_highlight_enabled',
+            'hero_image', 'hero_image_url',
             'ambassador_highlight_image', 'ambassador_highlight_image_url', 'ambassador_highlight_enabled',
             'upcoming_event_enabled', 'recent_event_enabled',
             'created_at', 'updated_at'
@@ -193,9 +190,6 @@ class HomePageSettingsSerializer(serializers.ModelSerializer):
     
     def get_hero_image_url(self, obj):
         return _cloudinary_url(obj.hero_image)
-    
-    def get_kenya_highlight_image_url(self, obj):
-        return _cloudinary_url(obj.kenya_highlight_image)
     
     def get_ambassador_highlight_image_url(self, obj):
         return _cloudinary_url(obj.ambassador_highlight_image)
