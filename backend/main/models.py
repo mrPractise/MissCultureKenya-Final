@@ -296,6 +296,157 @@ class SiteSettings(models.Model):
     def __str__(self):
         return "Site Settings"
 
+
+# ── Individual Page Settings Models ──────────────────────────────────────────
+
+class HomePageSettings(models.Model):
+    """Home page specific settings"""
+    hero_image = cloudinary.models.CloudinaryField('hero', folder='missculture/pages/home', blank=True, null=True)
+    hero_video_url = models.URLField('hero_video_url', blank=True, null=True, help_text='YouTube embed URL for hero background')
+    welcome_title = models.CharField(max_length=200, default='Welcome to Miss Culture Global Kenya')
+    welcome_subtitle = models.TextField(blank=True, default='')
+    
+    # Feature sections
+    upcoming_event_enabled = models.BooleanField(default=True)
+    kenya_highlight_enabled = models.BooleanField(default=True)
+    ambassador_highlight_enabled = models.BooleanField(default=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = "Home Page Settings"
+        verbose_name_plural = "Home Page Settings"
+    
+    def __str__(self):
+        return "Home Page Settings"
+
+
+class KenyaPageSettings(models.Model):
+    """Kenya page specific settings"""
+    hero_image = cloudinary.models.CloudinaryField('hero', folder='missculture/pages/kenya', blank=True, null=True)
+    page_title = models.CharField(max_length=200, default='Kenya')
+    page_subtitle = models.TextField(blank=True, default='Our homeland, our culture, our global stage.')
+    
+    # Content toggles
+    show_cultural_facts = models.BooleanField(default=True)
+    show_regions = models.BooleanField(default=True)
+    show_communities = models.BooleanField(default=True)
+    show_heritage = models.BooleanField(default=True)
+    show_achievements = models.BooleanField(default=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = "Kenya Page Settings"
+        verbose_name_plural = "Kenya Page Settings"
+    
+    def __str__(self):
+        return "Kenya Page Settings"
+
+
+class AmbassadorPageSettings(models.Model):
+    """Ambassador page specific settings"""
+    hero_image = cloudinary.models.CloudinaryField('hero', folder='missculture/pages/ambassador', blank=True, null=True)
+    profile_image = cloudinary.models.CloudinaryField('profile', folder='missculture/pages/ambassador', blank=True, null=True)
+    video_url = models.URLField('video_url', blank=True, null=True, help_text='Featured video URL')
+    
+    page_title = models.CharField(max_length=200, default="Susan — Kenya's Voice on the World Stage")
+    page_subtitle = models.TextField(blank=True, default='Miss Culture Global Kenya Ambassador · Cultural diplomat · Youth champion')
+    
+    # Content sections
+    show_story_arc = models.BooleanField(default=True)
+    show_impact_stats = models.BooleanField(default=True)
+    show_core_messages = models.BooleanField(default=True)
+    show_gallery = models.BooleanField(default=True)
+    show_videos = models.BooleanField(default=True)
+    show_contact_cta = models.BooleanField(default=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = "Ambassador Page Settings"
+        verbose_name_plural = "Ambassador Page Settings"
+    
+    def __str__(self):
+        return "Ambassador Page Settings"
+
+
+class EventsPageSettings(models.Model):
+    """Events page specific settings"""
+    hero_image = cloudinary.models.CloudinaryField('hero', folder='missculture/pages/events', blank=True, null=True)
+    page_title = models.CharField(max_length=200, default='Events')
+    page_subtitle = models.TextField(blank=True, default='Upcoming events and past highlights')
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = "Events Page Settings"
+        verbose_name_plural = "Events Page Settings"
+    
+    def __str__(self):
+        return "Events Page Settings"
+
+
+class GalleryPageSettings(models.Model):
+    """Gallery page specific settings"""
+    hero_image = cloudinary.models.CloudinaryField('hero', folder='missculture/pages/gallery', blank=True, null=True)
+    page_title = models.CharField(max_length=200, default='Gallery')
+    page_subtitle = models.TextField(blank=True, default='Photos and videos from our journey')
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = "Gallery Page Settings"
+        verbose_name_plural = "Gallery Page Settings"
+    
+    def __str__(self):
+        return "Gallery Page Settings"
+
+
+class PartnershipPageSettings(models.Model):
+    """Partnership page specific settings"""
+    hero_image = cloudinary.models.CloudinaryField('hero', folder='missculture/pages/partnership', blank=True, null=True)
+    page_title = models.CharField(max_length=200, default='Partnership')
+    page_subtitle = models.TextField(blank=True, default='Partner with us to make a difference')
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = "Partnership Page Settings"
+        verbose_name_plural = "Partnership Page Settings"
+    
+    def __str__(self):
+        return "Partnership Page Settings"
+
+
+class AboutPageSettings(models.Model):
+    """About page specific settings"""
+    hero_image = cloudinary.models.CloudinaryField('hero', folder='missculture/pages/about', blank=True, null=True)
+    mission_image = cloudinary.models.CloudinaryField('mission', folder='missculture/pages/about', blank=True, null=True)
+    
+    page_title = models.CharField(max_length=200, default='About Us')
+    page_subtitle = models.TextField(blank=True, default='Our story, mission, and values')
+    
+    leader_1_image = cloudinary.models.CloudinaryField('leader_1', folder='missculture/pages/about/leaders', blank=True, null=True)
+    leader_2_image = cloudinary.models.CloudinaryField('leader_2', folder='missculture/pages/about/leaders', blank=True, null=True)
+    leader_3_image = cloudinary.models.CloudinaryField('leader_3', folder='missculture/pages/about/leaders', blank=True, null=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = "About Page Settings"
+        verbose_name_plural = "About Page Settings"
+    
+    def __str__(self):
+        return "About Page Settings"
+
     def save(self, *args, **kwargs):
         if not self.pk and SiteSettings.objects.exists():
             return

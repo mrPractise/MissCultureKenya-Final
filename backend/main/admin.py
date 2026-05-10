@@ -2,7 +2,9 @@ from django.contrib import admin
 from django.contrib.contenttypes.admin import GenericTabularInline
 from .models import (
     Ambassador, CulturalCommunity, CulturalHeritage, KenyaRegion,
-    Achievement, Partner, SocialMediaPost, KenyaGalleryPhoto, SiteSettings
+    Achievement, Partner, SocialMediaPost, KenyaGalleryPhoto, SiteSettings,
+    HomePageSettings, KenyaPageSettings, AmbassadorPageSettings,
+    EventsPageSettings, GalleryPageSettings, PartnershipPageSettings, AboutPageSettings
 )
 
 
@@ -104,15 +106,11 @@ class SiteSettingsAdmin(admin.ModelAdmin):
         ('Home Page', {
             'fields': (
                 'home_hero_image', 'home_hero_video_url',
-                'home_upcoming_event_image', 'home_kenya_highlight_image',
-                'home_ambassador_highlight_image'
             )
         }),
         ('Kenya Page', {
             'fields': (
-                'kenya_hero_image', 
-                'kenya_artisan_1_image', 'kenya_artisan_2_image', 
-                'kenya_artisan_3_image', 'kenya_artisan_4_image'
+                'kenya_hero_image',
             )
         }),
         ('Ambassador Page', {
@@ -153,3 +151,182 @@ class SiteSettingsAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):
         return not SiteSettings.objects.exists()
+
+
+# ── Individual Page Settings Admins ──────────────────────────────────────────
+
+@admin.register(HomePageSettings)
+class HomePageSettingsAdmin(admin.ModelAdmin):
+    """Home page settings — hero, features, content toggles"""
+    readonly_fields = ['created_at', 'updated_at']
+    
+    fieldsets = (
+        ('Hero Section', {
+            'fields': ('hero_image', 'hero_video_url'),
+            'description': 'Upload hero image or provide YouTube video URL'
+        }),
+        ('Welcome Message', {
+            'fields': ('welcome_title', 'welcome_subtitle')
+        }),
+        ('Feature Sections', {
+            'fields': (
+                'upcoming_event_enabled',
+                'kenya_highlight_enabled',
+                'ambassador_highlight_enabled'
+            ),
+            'description': 'Toggle which sections appear on the home page'
+        }),
+        ('Metadata', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def has_add_permission(self, request):
+        return not HomePageSettings.objects.exists()
+
+
+@admin.register(KenyaPageSettings)
+class KenyaPageSettingsAdmin(admin.ModelAdmin):
+    """Kenya page settings — hero, content toggles"""
+    readonly_fields = ['created_at', 'updated_at']
+    
+    fieldsets = (
+        ('Hero Section', {
+            'fields': ('hero_image', 'page_title', 'page_subtitle')
+        }),
+        ('Content Sections', {
+            'fields': (
+                'show_cultural_facts',
+                'show_regions',
+                'show_communities',
+                'show_heritage',
+                'show_achievements'
+            ),
+            'description': 'Toggle which sections appear on the Kenya page'
+        }),
+        ('Metadata', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def has_add_permission(self, request):
+        return not KenyaPageSettings.objects.exists()
+
+
+@admin.register(AmbassadorPageSettings)
+class AmbassadorPageSettingsAdmin(admin.ModelAdmin):
+    """Ambassador page settings — hero, profile, content toggles"""
+    readonly_fields = ['created_at', 'updated_at']
+    
+    fieldsets = (
+        ('Hero Section', {
+            'fields': ('hero_image', 'page_title', 'page_subtitle')
+        }),
+        ('Profile Media', {
+            'fields': ('profile_image', 'video_url'),
+            'description': 'Profile image and featured video for the ambassador'
+        }),
+        ('Content Sections', {
+            'fields': (
+                'show_story_arc',
+                'show_impact_stats',
+                'show_core_messages',
+                'show_gallery',
+                'show_videos',
+                'show_contact_cta'
+            ),
+            'description': 'Toggle which sections appear on the Ambassador page'
+        }),
+        ('Metadata', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def has_add_permission(self, request):
+        return not AmbassadorPageSettings.objects.exists()
+
+
+@admin.register(EventsPageSettings)
+class EventsPageSettingsAdmin(admin.ModelAdmin):
+    """Events page settings"""
+    readonly_fields = ['created_at', 'updated_at']
+    
+    fieldsets = (
+        ('Hero Section', {
+            'fields': ('hero_image', 'page_title', 'page_subtitle')
+        }),
+        ('Metadata', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def has_add_permission(self, request):
+        return not EventsPageSettings.objects.exists()
+
+
+@admin.register(GalleryPageSettings)
+class GalleryPageSettingsAdmin(admin.ModelAdmin):
+    """Gallery page settings"""
+    readonly_fields = ['created_at', 'updated_at']
+    
+    fieldsets = (
+        ('Hero Section', {
+            'fields': ('hero_image', 'page_title', 'page_subtitle')
+        }),
+        ('Metadata', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def has_add_permission(self, request):
+        return not GalleryPageSettings.objects.exists()
+
+
+@admin.register(PartnershipPageSettings)
+class PartnershipPageSettingsAdmin(admin.ModelAdmin):
+    """Partnership page settings"""
+    readonly_fields = ['created_at', 'updated_at']
+    
+    fieldsets = (
+        ('Hero Section', {
+            'fields': ('hero_image', 'page_title', 'page_subtitle')
+        }),
+        ('Metadata', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def has_add_permission(self, request):
+        return not PartnershipPageSettings.objects.exists()
+
+
+@admin.register(AboutPageSettings)
+class AboutPageSettingsAdmin(admin.ModelAdmin):
+    """About page settings — hero, mission, leaders"""
+    readonly_fields = ['created_at', 'updated_at']
+    
+    fieldsets = (
+        ('Hero Section', {
+            'fields': ('hero_image', 'page_title', 'page_subtitle')
+        }),
+        ('Mission Section', {
+            'fields': ('mission_image',)
+        }),
+        ('Leaders', {
+            'fields': ('leader_1_image', 'leader_2_image', 'leader_3_image'),
+            'description': 'Images for leadership team members'
+        }),
+        ('Metadata', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def has_add_permission(self, request):
+        return not AboutPageSettings.objects.exists()

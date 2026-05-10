@@ -12,13 +12,18 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from .models import (
     Ambassador, CulturalCommunity, CulturalHeritage, KenyaRegion,
-    Achievement, Partner, SocialMediaPost, SiteSettings, TeamMember
+    Achievement, Partner, SocialMediaPost, SiteSettings, TeamMember,
+    HomePageSettings, KenyaPageSettings, AmbassadorPageSettings,
+    EventsPageSettings, GalleryPageSettings, PartnershipPageSettings, AboutPageSettings
 )
 from .serializers import (
     AmbassadorSerializer, CulturalCommunitySerializer, CulturalHeritageSerializer,
     KenyaRegionSerializer, AchievementSerializer,
     PartnerSerializer, SocialMediaPostSerializer, DiscoverKenyaSerializer,
-    SiteSettingsSerializer, TeamMemberSerializer
+    SiteSettingsSerializer, TeamMemberSerializer,
+    HomePageSettingsSerializer, KenyaPageSettingsSerializer, AmbassadorPageSettingsSerializer,
+    EventsPageSettingsSerializer, GalleryPageSettingsSerializer, PartnershipPageSettingsSerializer,
+    AboutPageSettingsSerializer
 )
 
 logger = logging.getLogger(__name__)
@@ -296,6 +301,85 @@ def check_email_connection(request):
             'error': str(e),
             'api_key_configured': bool(settings.RESEND_API_KEY),
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# ── Page Settings API Endpoints ─────────────────────────────────────────────
+
+class HomePageSettingsAPIView(APIView):
+    permission_classes = [AllowAny]
+    
+    def get(self, request):
+        settings = HomePageSettings.objects.first()
+        if not settings:
+            settings = HomePageSettings.objects.create()
+        serializer = HomePageSettingsSerializer(settings)
+        return Response(serializer.data)
+
+
+class KenyaPageSettingsAPIView(APIView):
+    permission_classes = [AllowAny]
+    
+    def get(self, request):
+        settings = KenyaPageSettings.objects.first()
+        if not settings:
+            settings = KenyaPageSettings.objects.create()
+        serializer = KenyaPageSettingsSerializer(settings)
+        return Response(serializer.data)
+
+
+class AmbassadorPageSettingsAPIView(APIView):
+    permission_classes = [AllowAny]
+    
+    def get(self, request):
+        settings = AmbassadorPageSettings.objects.first()
+        if not settings:
+            settings = AmbassadorPageSettings.objects.create()
+        serializer = AmbassadorPageSettingsSerializer(settings)
+        return Response(serializer.data)
+
+
+class EventsPageSettingsAPIView(APIView):
+    permission_classes = [AllowAny]
+    
+    def get(self, request):
+        settings = EventsPageSettings.objects.first()
+        if not settings:
+            settings = EventsPageSettings.objects.create()
+        serializer = EventsPageSettingsSerializer(settings)
+        return Response(serializer.data)
+
+
+class GalleryPageSettingsAPIView(APIView):
+    permission_classes = [AllowAny]
+    
+    def get(self, request):
+        settings = GalleryPageSettings.objects.first()
+        if not settings:
+            settings = GalleryPageSettings.objects.create()
+        serializer = GalleryPageSettingsSerializer(settings)
+        return Response(serializer.data)
+
+
+class PartnershipPageSettingsAPIView(APIView):
+    permission_classes = [AllowAny]
+    
+    def get(self, request):
+        settings = PartnershipPageSettings.objects.first()
+        if not settings:
+            settings = PartnershipPageSettings.objects.create()
+        serializer = PartnershipPageSettingsSerializer(settings)
+        return Response(serializer.data)
+
+
+class AboutPageSettingsAPIView(APIView):
+    permission_classes = [AllowAny]
+    
+    def get(self, request):
+        settings = AboutPageSettings.objects.first()
+        if not settings:
+            settings = AboutPageSettings.objects.create()
+        serializer = AboutPageSettingsSerializer(settings)
+        return Response(serializer.data)
 
 
 from django.http import FileResponse

@@ -2,7 +2,9 @@ from rest_framework import serializers
 import cloudinary
 from .models import (
     Ambassador, CulturalCommunity, CulturalHeritage, KenyaRegion,
-    Achievement, Partner, SocialMediaPost, KenyaGalleryPhoto, SiteSettings, TeamMember
+    Achievement, Partner, SocialMediaPost, KenyaGalleryPhoto, SiteSettings, TeamMember,
+    HomePageSettings, KenyaPageSettings, AmbassadorPageSettings,
+    EventsPageSettings, GalleryPageSettings, PartnershipPageSettings, AboutPageSettings
 )
 
 
@@ -143,15 +145,8 @@ class SiteSettingsSerializer(serializers.ModelSerializer):
     """Serializer for site-wide hero images per navbar tab"""
     home_hero_image_url = serializers.SerializerMethodField()
     home_hero_video_url = serializers.URLField(allow_blank=True, allow_null=True, required=False)
-    home_upcoming_event_image_url = serializers.SerializerMethodField()
-    home_kenya_highlight_image_url = serializers.SerializerMethodField()
-    home_ambassador_highlight_image_url = serializers.SerializerMethodField()
     
     kenya_hero_image_url = serializers.SerializerMethodField()
-    kenya_artisan_1_image_url = serializers.SerializerMethodField()
-    kenya_artisan_2_image_url = serializers.SerializerMethodField()
-    kenya_artisan_3_image_url = serializers.SerializerMethodField()
-    kenya_artisan_4_image_url = serializers.SerializerMethodField()
     
     ambassador_hero_image_url = serializers.SerializerMethodField()
     ambassador_profile_image_url = serializers.SerializerMethodField()
@@ -225,15 +220,8 @@ class SiteSettingsSerializer(serializers.ModelSerializer):
         return _cloudinary_url(getattr(obj, field_name, None))
 
     def get_home_hero_image_url(self, obj): return self._hero_url(obj, 'home_hero_image')
-    def get_home_upcoming_event_image_url(self, obj): return self._hero_url(obj, 'home_upcoming_event_image')
-    def get_home_kenya_highlight_image_url(self, obj): return self._hero_url(obj, 'home_kenya_highlight_image')
-    def get_home_ambassador_highlight_image_url(self, obj): return self._hero_url(obj, 'home_ambassador_highlight_image')
     
     def get_kenya_hero_image_url(self, obj): return self._hero_url(obj, 'kenya_hero_image')
-    def get_kenya_artisan_1_image_url(self, obj): return self._hero_url(obj, 'kenya_artisan_1_image')
-    def get_kenya_artisan_2_image_url(self, obj): return self._hero_url(obj, 'kenya_artisan_2_image')
-    def get_kenya_artisan_3_image_url(self, obj): return self._hero_url(obj, 'kenya_artisan_3_image')
-    def get_kenya_artisan_4_image_url(self, obj): return self._hero_url(obj, 'kenya_artisan_4_image')
     
     def get_ambassador_hero_image_url(self, obj): return self._hero_url(obj, 'ambassador_hero_image')
     def get_ambassador_profile_image_url(self, obj): return self._hero_url(obj, 'ambassador_profile_image')
@@ -279,10 +267,8 @@ class SiteSettingsSerializer(serializers.ModelSerializer):
     class Meta:
         model = SiteSettings
         fields = [
-            'home_hero_image_url', 'home_hero_video_url', 'home_upcoming_event_image_url',
-            'home_kenya_highlight_image_url', 'home_ambassador_highlight_image_url',
-            'kenya_hero_image_url', 'kenya_artisan_1_image_url', 'kenya_artisan_2_image_url',
-            'kenya_artisan_3_image_url', 'kenya_artisan_4_image_url',
+            'home_hero_image_url', 'home_hero_video_url',
+            'kenya_hero_image_url',
             'ambassador_hero_image_url', 'ambassador_profile_image_url', 'ambassador_video_url',
             'events_hero_image_url', 'gallery_hero_image_url',
             'voting_hero_image_url', 'voting_event_1_image_url', 'voting_event_2_image_url',
@@ -313,3 +299,125 @@ class DiscoverKenyaSerializer(serializers.Serializer):
     communities = CulturalCommunitySerializer(many=True)
     heritage = CulturalHeritageSerializer(many=True)
     achievements = AchievementSerializer(many=True)
+
+
+# ── Individual Page Settings Serializers ────────────────────────────────────
+
+class HomePageSettingsSerializer(serializers.ModelSerializer):
+    hero_image_url = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = HomePageSettings
+        fields = [
+            'hero_image', 'hero_image_url', 'hero_video_url',
+            'welcome_title', 'welcome_subtitle',
+            'upcoming_event_enabled', 'kenya_highlight_enabled', 'ambassador_highlight_enabled',
+            'created_at', 'updated_at'
+        ]
+    
+    def get_hero_image_url(self, obj):
+        return _cloudinary_url(obj.hero_image)
+
+
+class KenyaPageSettingsSerializer(serializers.ModelSerializer):
+    hero_image_url = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = KenyaPageSettings
+        fields = [
+            'hero_image', 'hero_image_url', 'page_title', 'page_subtitle',
+            'show_cultural_facts', 'show_regions', 'show_communities',
+            'show_heritage', 'show_achievements',
+            'created_at', 'updated_at'
+        ]
+    
+    def get_hero_image_url(self, obj):
+        return _cloudinary_url(obj.hero_image)
+
+
+class AmbassadorPageSettingsSerializer(serializers.ModelSerializer):
+    hero_image_url = serializers.SerializerMethodField()
+    profile_image_url = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = AmbassadorPageSettings
+        fields = [
+            'hero_image', 'hero_image_url', 'profile_image', 'profile_image_url',
+            'video_url', 'page_title', 'page_subtitle',
+            'show_story_arc', 'show_impact_stats', 'show_core_messages',
+            'show_gallery', 'show_videos', 'show_contact_cta',
+            'created_at', 'updated_at'
+        ]
+    
+    def get_hero_image_url(self, obj):
+        return _cloudinary_url(obj.hero_image)
+    
+    def get_profile_image_url(self, obj):
+        return _cloudinary_url(obj.profile_image)
+
+
+class EventsPageSettingsSerializer(serializers.ModelSerializer):
+    hero_image_url = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = EventsPageSettings
+        fields = ['hero_image', 'hero_image_url', 'page_title', 'page_subtitle', 'created_at', 'updated_at']
+    
+    def get_hero_image_url(self, obj):
+        return _cloudinary_url(obj.hero_image)
+
+
+class GalleryPageSettingsSerializer(serializers.ModelSerializer):
+    hero_image_url = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = GalleryPageSettings
+        fields = ['hero_image', 'hero_image_url', 'page_title', 'page_subtitle', 'created_at', 'updated_at']
+    
+    def get_hero_image_url(self, obj):
+        return _cloudinary_url(obj.hero_image)
+
+
+class PartnershipPageSettingsSerializer(serializers.ModelSerializer):
+    hero_image_url = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = PartnershipPageSettings
+        fields = ['hero_image', 'hero_image_url', 'page_title', 'page_subtitle', 'created_at', 'updated_at']
+    
+    def get_hero_image_url(self, obj):
+        return _cloudinary_url(obj.hero_image)
+
+
+class AboutPageSettingsSerializer(serializers.ModelSerializer):
+    hero_image_url = serializers.SerializerMethodField()
+    mission_image_url = serializers.SerializerMethodField()
+    leader_1_image_url = serializers.SerializerMethodField()
+    leader_2_image_url = serializers.SerializerMethodField()
+    leader_3_image_url = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = AboutPageSettings
+        fields = [
+            'hero_image', 'hero_image_url', 'page_title', 'page_subtitle',
+            'mission_image', 'mission_image_url',
+            'leader_1_image', 'leader_1_image_url',
+            'leader_2_image', 'leader_2_image_url',
+            'leader_3_image', 'leader_3_image_url',
+            'created_at', 'updated_at'
+        ]
+    
+    def get_hero_image_url(self, obj):
+        return _cloudinary_url(obj.hero_image)
+    
+    def get_mission_image_url(self, obj):
+        return _cloudinary_url(obj.mission_image)
+    
+    def get_leader_1_image_url(self, obj):
+        return _cloudinary_url(obj.leader_1_image)
+    
+    def get_leader_2_image_url(self, obj):
+        return _cloudinary_url(obj.leader_2_image)
+    
+    def get_leader_3_image_url(self, obj):
+        return _cloudinary_url(obj.leader_3_image)
