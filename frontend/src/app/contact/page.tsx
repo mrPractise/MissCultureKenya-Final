@@ -258,7 +258,7 @@ const ContactPage = () => {
                 {submitStatus === 'error' && (
                   <div className="bg-red-50 border border-red-200 rounded-xl p-4">
                     <p className="text-red-700 font-medium text-sm">{errorMessage || 'Failed to send message.'}</p>
-                    <p className="text-red-600 text-xs mt-1">If the problem persists, email us directly at info@misscultureglobalkenya.org</p>
+                    <p className="text-red-600 text-xs mt-1">If the problem persists, email us directly at info@misscultureglobalkenya.com</p>
                   </div>
                 )}
 
