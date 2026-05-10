@@ -14,7 +14,8 @@ from .models import (
     Ambassador, CulturalCommunity, CulturalHeritage, KenyaRegion,
     Achievement, Partner, SocialMediaPost, SiteSettings, TeamMember,
     HomePageSettings, KenyaPageSettings, AmbassadorPageSettings,
-    EventsPageSettings, GalleryPageSettings, PartnershipPageSettings, AboutPageSettings
+    EventsPageSettings, GalleryPageSettings, PartnershipPageSettings, AboutPageSettings,
+    VotingPageSettings, ContactPageSettings, FAQPageSettings
 )
 from .serializers import (
     AmbassadorSerializer, CulturalCommunitySerializer, CulturalHeritageSerializer,
@@ -23,7 +24,8 @@ from .serializers import (
     SiteSettingsSerializer, TeamMemberSerializer,
     HomePageSettingsSerializer, KenyaPageSettingsSerializer, AmbassadorPageSettingsSerializer,
     EventsPageSettingsSerializer, GalleryPageSettingsSerializer, PartnershipPageSettingsSerializer,
-    AboutPageSettingsSerializer
+    AboutPageSettingsSerializer,
+    VotingPageSettingsSerializer, ContactPageSettingsSerializer, FAQPageSettingsSerializer
 )
 
 logger = logging.getLogger(__name__)
@@ -379,6 +381,42 @@ class AboutPageSettingsAPIView(APIView):
         if not settings:
             settings = AboutPageSettings.objects.create()
         serializer = AboutPageSettingsSerializer(settings)
+        return Response(serializer.data)
+
+
+class VotingPageSettingsAPIView(APIView):
+    """API endpoint for voting page settings"""
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        settings = VotingPageSettings.objects.first()
+        if not settings:
+            settings = VotingPageSettings.objects.create()
+        serializer = VotingPageSettingsSerializer(settings)
+        return Response(serializer.data)
+
+
+class ContactPageSettingsAPIView(APIView):
+    """API endpoint for contact page settings"""
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        settings = ContactPageSettings.objects.first()
+        if not settings:
+            settings = ContactPageSettings.objects.create()
+        serializer = ContactPageSettingsSerializer(settings)
+        return Response(serializer.data)
+
+
+class FAQPageSettingsAPIView(APIView):
+    """API endpoint for FAQ page settings"""
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        settings = FAQPageSettings.objects.first()
+        if not settings:
+            settings = FAQPageSettings.objects.create()
+        serializer = FAQPageSettingsSerializer(settings)
         return Response(serializer.data)
 
 

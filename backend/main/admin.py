@@ -6,7 +6,8 @@ from .models import (
     Ambassador, CulturalCommunity, CulturalHeritage, KenyaRegion,
     Achievement, Partner, SocialMediaPost, KenyaGalleryPhoto, SiteSettings,
     HomePageSettings, KenyaPageSettings, AmbassadorPageSettings,
-    EventsPageSettings, GalleryPageSettings, PartnershipPageSettings, AboutPageSettings
+    EventsPageSettings, GalleryPageSettings, PartnershipPageSettings, AboutPageSettings,
+    VotingPageSettings, ContactPageSettings, FAQPageSettings
 )
 
 
@@ -93,7 +94,7 @@ class SocialMediaPostAdmin(admin.ModelAdmin):
 
 @admin.register(SiteSettings)
 class SiteSettingsAdmin(admin.ModelAdmin):
-    """Site-wide media settings — organized by page for easy management"""
+    """Site-wide logos only — organized on their own tab"""
     readonly_fields = ['created_at', 'updated_at']
 
     fieldsets = (
@@ -104,46 +105,6 @@ class SiteSettingsAdmin(admin.ModelAdmin):
                 'mpesa_logo',
             ),
             'description': 'Upload logos for Miss Culture Global Kenya, Miss Culture Global, and M-Pesa payment branding'
-        }),
-        ('Home Page', {
-            'fields': (
-                'home_hero_image', 'home_hero_video_url',
-            )
-        }),
-        ('Kenya Page', {
-            'fields': (
-                'kenya_hero_image',
-            )
-        }),
-        ('Ambassador Page', {
-            'fields': (
-                'ambassador_hero_image', 'ambassador_profile_image', 'ambassador_video_url'
-            )
-        }),
-        ('Events & Gallery', {
-            'fields': ('events_hero_image', 'gallery_hero_image')
-        }),
-        ('Voting Page', {
-            'fields': (
-                'voting_hero_image', 
-                'voting_event_1_image', 'voting_event_2_image', 
-                'voting_event_3_image', 'voting_event_4_image',
-                'voting_participant_1_image', 'voting_participant_2_image', 
-                'voting_participant_3_image', 'voting_participant_4_image',
-                'voting_participant_5_image', 'voting_participant_6_image'
-            )
-        }),
-        ('About Page', {
-            'fields': (
-                'about_hero_image', 'about_mission_image', 
-                'about_leader_1_image', 'about_leader_2_image', 'about_leader_3_image'
-            )
-        }),
-        ('Other Pages', {
-            'fields': (
-                'partnership_hero_image', 'contribute_hero_image', 
-                'contact_hero_image', 'faq_hero_image', 'privacy_hero_image'
-            )
         }),
         ('Metadata', {
             'fields': ('created_at', 'updated_at'),
@@ -172,7 +133,7 @@ class SiteSettingsAdmin(admin.ModelAdmin):
 
 @admin.register(HomePageSettings)
 class HomePageSettingsAdmin(admin.ModelAdmin):
-    """Home page settings — hero, features, content toggles"""
+    """Home page settings — hero, highlights, and feature toggles"""
     readonly_fields = ['created_at', 'updated_at']
     
     fieldsets = (
@@ -183,13 +144,13 @@ class HomePageSettingsAdmin(admin.ModelAdmin):
         ('Welcome Message', {
             'fields': ('welcome_title', 'welcome_subtitle')
         }),
-        ('Feature Sections', {
-            'fields': (
-                'upcoming_event_enabled',
-                'kenya_highlight_enabled',
-                'ambassador_highlight_enabled'
-            ),
-            'description': 'Toggle which sections appear on the home page'
+        ('Kenya Highlight Card (on Homepage)', {
+            'fields': ('kenya_highlight_image', 'kenya_highlight_enabled'),
+            'description': 'Image and toggle for the Kenya highlight card shown on homepage'
+        }),
+        ('Ambassador Highlight Card (on Homepage)', {
+            'fields': ('ambassador_highlight_image', 'ambassador_highlight_enabled'),
+            'description': 'Image and toggle for the Ambassador spotlight card shown on homepage'
         }),
         ('Metadata', {
             'fields': ('created_at', 'updated_at'),
@@ -401,7 +362,7 @@ class PartnershipPageSettingsAdmin(admin.ModelAdmin):
 
 @admin.register(AboutPageSettings)
 class AboutPageSettingsAdmin(admin.ModelAdmin):
-    """About page settings — hero, mission, leaders"""
+    """About page settings — hero, mission, leaders, committee"""
     readonly_fields = ['created_at', 'updated_at']
     
     fieldsets = (
@@ -411,9 +372,29 @@ class AboutPageSettingsAdmin(admin.ModelAdmin):
         ('Mission Section', {
             'fields': ('mission_image',)
         }),
-        ('Leaders', {
-            'fields': ('leader_1_image', 'leader_2_image', 'leader_3_image'),
-            'description': 'Images for leadership team members'
+        ('Leader 1', {
+            'fields': ('leader_1_image', 'leader_1_name', 'leader_1_title', 'leader_1_bio'),
+            'classes': ('collapse',)
+        }),
+        ('Leader 2', {
+            'fields': ('leader_2_image', 'leader_2_name', 'leader_2_title', 'leader_2_bio'),
+            'classes': ('collapse',)
+        }),
+        ('Leader 3', {
+            'fields': ('leader_3_image', 'leader_3_name', 'leader_3_title', 'leader_3_bio'),
+            'classes': ('collapse',)
+        }),
+        ('Committee Members', {
+            'fields': (
+                'committee_1_name', 'committee_1_role', 'committee_1_bio',
+                'committee_2_name', 'committee_2_role', 'committee_2_bio',
+                'committee_3_name', 'committee_3_role', 'committee_3_bio',
+                'committee_4_name', 'committee_4_role', 'committee_4_bio',
+                'committee_5_name', 'committee_5_role', 'committee_5_bio',
+                'committee_6_name', 'committee_6_role', 'committee_6_bio',
+            ),
+            'classes': ('collapse',),
+            'description': 'Organizing committee member details'
         }),
         ('Metadata', {
             'fields': ('created_at', 'updated_at'),

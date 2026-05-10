@@ -186,99 +186,15 @@ class TeamMember(models.Model):
 
 
 class SiteSettings(models.Model):
-    """Singleton model for site-wide hero images per navbar tab"""
+    """Singleton model for site-wide logos only"""
 
-    # ── Leader labels (editable from Django admin) ──
-    leader_1_name = models.CharField(max_length=100, blank=True, default='')
-    leader_1_title = models.CharField(max_length=200, blank=True, default='')
-    leader_1_bio = models.TextField(blank=True, default='')
-    leader_2_name = models.CharField(max_length=100, blank=True, default='')
-    leader_2_title = models.CharField(max_length=200, blank=True, default='')
-    leader_2_bio = models.TextField(blank=True, default='')
-    leader_3_name = models.CharField(max_length=100, blank=True, default='')
-    leader_3_title = models.CharField(max_length=200, blank=True, default='')
-    leader_3_bio = models.TextField(blank=True, default='')
-
-    # ── Committee labels (editable from Django admin) ──
-    committee_1_name = models.CharField(max_length=100, blank=True, default='')
-    committee_1_role = models.CharField(max_length=200, blank=True, default='')
-    committee_1_bio = models.TextField(blank=True, default='')
-    committee_2_name = models.CharField(max_length=100, blank=True, default='')
-    committee_2_role = models.CharField(max_length=200, blank=True, default='')
-    committee_2_bio = models.TextField(blank=True, default='')
-    committee_3_name = models.CharField(max_length=100, blank=True, default='')
-    committee_3_role = models.CharField(max_length=200, blank=True, default='')
-    committee_3_bio = models.TextField(blank=True, default='')
-    committee_4_name = models.CharField(max_length=100, blank=True, default='')
-    committee_4_role = models.CharField(max_length=200, blank=True, default='')
-    committee_4_bio = models.TextField(blank=True, default='')
-    committee_5_name = models.CharField(max_length=100, blank=True, default='')
-    committee_5_role = models.CharField(max_length=200, blank=True, default='')
-    committee_5_bio = models.TextField(blank=True, default='')
-    committee_6_name = models.CharField(max_length=100, blank=True, default='')
-    committee_6_role = models.CharField(max_length=200, blank=True, default='')
-    committee_6_bio = models.TextField(blank=True, default='')
-
-    # ── Logos ──
+    # ── Logos (site-wide, used across all pages) ──
     logo_kenya = cloudinary.models.CloudinaryField('logo_kenya', folder='missculture/logos', blank=True, null=True,
         help_text='Logo for Miss Culture Global Kenya (local franchise)')
     logo_global = cloudinary.models.CloudinaryField('logo_global', folder='missculture/logos', blank=True, null=True,
         help_text='Logo for Miss Culture Global (parent organization)')
     mpesa_logo = cloudinary.models.CloudinaryField('mpesa_logo', folder='missculture/logos', blank=True, null=True,
         help_text='M-Pesa logo for payment sections')
-
-    # ── Home tab ──
-    home_hero_image = cloudinary.models.CloudinaryField('home_hero', folder='missculture/site/home', blank=True, null=True)
-    home_hero_video_url = models.URLField('home_hero_video_url', blank=True, null=True)
-
-    # ── Kenya tab ──
-    kenya_hero_image = cloudinary.models.CloudinaryField('kenya_hero', folder='missculture/site/kenya', blank=True, null=True)
-
-    # ── Ambassador tab ──
-    ambassador_hero_image = cloudinary.models.CloudinaryField('ambassador_hero', folder='missculture/site/ambassador', blank=True, null=True)
-    ambassador_profile_image = cloudinary.models.CloudinaryField('ambassador_profile', folder='missculture/site/ambassador', blank=True, null=True)
-    ambassador_video_url = models.URLField('ambassador_video_url', blank=True, null=True)
-
-    # ── Events tab (header only; EventSettings.hero_image also exists)
-    events_hero_image = cloudinary.models.CloudinaryField('events_hero', folder='missculture/site/events', blank=True, null=True)
-
-    # ── Gallery tab (header only; GallerySettings.hero_image also exists)
-    gallery_hero_image = cloudinary.models.CloudinaryField('gallery_hero', folder='missculture/site/gallery', blank=True, null=True)
-
-    # ── Voting tab ──
-    voting_hero_image = cloudinary.models.CloudinaryField('voting_hero', folder='missculture/site/voting', blank=True, null=True)
-    voting_event_1_image = cloudinary.models.CloudinaryField('voting_event_1', folder='missculture/site/voting', blank=True, null=True)
-    voting_event_2_image = cloudinary.models.CloudinaryField('voting_event_2', folder='missculture/site/voting', blank=True, null=True)
-    voting_event_3_image = cloudinary.models.CloudinaryField('voting_event_3', folder='missculture/site/voting', blank=True, null=True)
-    voting_event_4_image = cloudinary.models.CloudinaryField('voting_event_4', folder='missculture/site/voting', blank=True, null=True)
-    voting_participant_1_image = cloudinary.models.CloudinaryField('voting_participant_1', folder='missculture/site/voting', blank=True, null=True)
-    voting_participant_2_image = cloudinary.models.CloudinaryField('voting_participant_2', folder='missculture/site/voting', blank=True, null=True)
-    voting_participant_3_image = cloudinary.models.CloudinaryField('voting_participant_3', folder='missculture/site/voting', blank=True, null=True)
-    voting_participant_4_image = cloudinary.models.CloudinaryField('voting_participant_4', folder='missculture/site/voting', blank=True, null=True)
-    voting_participant_5_image = cloudinary.models.CloudinaryField('voting_participant_5', folder='missculture/site/voting', blank=True, null=True)
-    voting_participant_6_image = cloudinary.models.CloudinaryField('voting_participant_6', folder='missculture/site/voting', blank=True, null=True)
-
-    # ── Partnership tab ──
-    partnership_hero_image = cloudinary.models.CloudinaryField('partnership_hero', folder='missculture/site/partnership', blank=True, null=True)
-
-    # ── Contribute tab ──
-    contribute_hero_image = cloudinary.models.CloudinaryField('contribute_hero', folder='missculture/site/contribute', blank=True, null=True)
-
-    # ── Contact tab ──
-    contact_hero_image = cloudinary.models.CloudinaryField('contact_hero', folder='missculture/site/contact', blank=True, null=True)
-
-    # ── FAQ tab ──
-    faq_hero_image = cloudinary.models.CloudinaryField('faq_hero', folder='missculture/site/faq', blank=True, null=True)
-
-    # ── About tab ──
-    about_hero_image = cloudinary.models.CloudinaryField('about_hero', folder='missculture/site/about', blank=True, null=True)
-    about_mission_image = cloudinary.models.CloudinaryField('about_mission', folder='missculture/site/about', blank=True, null=True)
-    about_leader_1_image = cloudinary.models.CloudinaryField('about_leader_1', folder='missculture/site/about', blank=True, null=True)
-    about_leader_2_image = cloudinary.models.CloudinaryField('about_leader_2', folder='missculture/site/about', blank=True, null=True)
-    about_leader_3_image = cloudinary.models.CloudinaryField('about_leader_3', folder='missculture/site/about', blank=True, null=True)
-
-    # ── Privacy tab ──
-    privacy_hero_image = cloudinary.models.CloudinaryField('privacy_hero', folder='missculture/site/privacy', blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -291,19 +207,85 @@ class SiteSettings(models.Model):
         return "Site Settings"
 
 
+class AboutPageSettings(models.Model):
+    """About page specific settings"""
+    hero_image = cloudinary.models.CloudinaryField('hero', folder='missculture/pages/about', blank=True, null=True)
+    mission_image = cloudinary.models.CloudinaryField('mission', folder='missculture/pages/about', blank=True, null=True)
+    
+    page_title = models.CharField(max_length=200, default='About Us')
+    page_subtitle = models.TextField(blank=True, default='Our story, mission, and values')
+    
+    leader_1_image = cloudinary.models.CloudinaryField('leader_1', folder='missculture/pages/about/leaders', blank=True, null=True)
+    leader_1_name = models.CharField(max_length=100, blank=True, default='')
+    leader_1_title = models.CharField(max_length=200, blank=True, default='')
+    leader_1_bio = models.TextField(blank=True, default='')
+    
+    leader_2_image = cloudinary.models.CloudinaryField('leader_2', folder='missculture/pages/about/leaders', blank=True, null=True)
+    leader_2_name = models.CharField(max_length=100, blank=True, default='')
+    leader_2_title = models.CharField(max_length=200, blank=True, default='')
+    leader_2_bio = models.TextField(blank=True, default='')
+    
+    leader_3_image = cloudinary.models.CloudinaryField('leader_3', folder='missculture/pages/about/leaders', blank=True, null=True)
+    leader_3_name = models.CharField(max_length=100, blank=True, default='')
+    leader_3_title = models.CharField(max_length=200, blank=True, default='')
+    leader_3_bio = models.TextField(blank=True, default='')
+    
+    committee_1_name = models.CharField(max_length=100, blank=True, default='')
+    committee_1_role = models.CharField(max_length=200, blank=True, default='')
+    committee_1_bio = models.TextField(blank=True, default='')
+    
+    committee_2_name = models.CharField(max_length=100, blank=True, default='')
+    committee_2_role = models.CharField(max_length=200, blank=True, default='')
+    committee_2_bio = models.TextField(blank=True, default='')
+    
+    committee_3_name = models.CharField(max_length=100, blank=True, default='')
+    committee_3_role = models.CharField(max_length=200, blank=True, default='')
+    committee_3_bio = models.TextField(blank=True, default='')
+    
+    committee_4_name = models.CharField(max_length=100, blank=True, default='')
+    committee_4_role = models.CharField(max_length=200, blank=True, default='')
+    committee_4_bio = models.TextField(blank=True, default='')
+    
+    committee_5_name = models.CharField(max_length=100, blank=True, default='')
+    committee_5_role = models.CharField(max_length=200, blank=True, default='')
+    committee_5_bio = models.TextField(blank=True, default='')
+    
+    committee_6_name = models.CharField(max_length=100, blank=True, default='')
+    committee_6_role = models.CharField(max_length=200, blank=True, default='')
+    committee_6_bio = models.TextField(blank=True, default='')
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = "About Page Settings"
+        verbose_name_plural = "About Page Settings"
+    
+    def __str__(self):
+        return "About Page Settings"
+
+
 # ── Individual Page Settings Models ──────────────────────────────────────────
 
 class HomePageSettings(models.Model):
-    """Home page specific settings"""
+    """Home page specific settings - hero, highlights, and feature toggles"""
+    # Hero Section
     hero_image = cloudinary.models.CloudinaryField('hero', folder='missculture/pages/home', blank=True, null=True)
     hero_video_url = models.URLField('hero_video_url', blank=True, null=True, help_text='YouTube embed URL for hero background')
+    
+    # Welcome Section
     welcome_title = models.CharField(max_length=200, default='Welcome to Miss Culture Global Kenya')
     welcome_subtitle = models.TextField(blank=True, default='')
     
-    # Feature sections
-    upcoming_event_enabled = models.BooleanField(default=True)
-    kenya_highlight_enabled = models.BooleanField(default=True)
-    ambassador_highlight_enabled = models.BooleanField(default=True)
+    # Kenya Highlight Card (shown on homepage)
+    kenya_highlight_image = cloudinary.models.CloudinaryField('kenya_highlight', folder='missculture/pages/home/highlights', blank=True, null=True,
+        help_text='Image for Kenya highlight card on homepage')
+    kenya_highlight_enabled = models.BooleanField(default=True, help_text='Show Kenya highlight section on homepage')
+    
+    # Ambassador Highlight Card (shown on homepage)
+    ambassador_highlight_image = cloudinary.models.CloudinaryField('ambassador_highlight', folder='missculture/pages/home/highlights', blank=True, null=True,
+        help_text='Image for Ambassador highlight card on homepage')
+    ambassador_highlight_enabled = models.BooleanField(default=True, help_text='Show Ambassador spotlight section on homepage')
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -317,7 +299,8 @@ class HomePageSettings(models.Model):
 
 
 class KenyaPageSettings(models.Model):
-    """Kenya page specific settings"""
+    """Kenya page specific settings - hero and content toggles"""
+    # Hero Section
     hero_image = cloudinary.models.CloudinaryField('hero', folder='missculture/pages/kenya', blank=True, null=True)
     page_title = models.CharField(max_length=200, default='Kenya')
     page_subtitle = models.TextField(blank=True, default='Our homeland, our culture, our global stage.')
@@ -341,13 +324,16 @@ class KenyaPageSettings(models.Model):
 
 
 class AmbassadorPageSettings(models.Model):
-    """Ambassador page specific settings"""
+    """Ambassador page specific settings - hero, profile, video, and content toggles"""
+    # Hero Section
     hero_image = cloudinary.models.CloudinaryField('hero', folder='missculture/pages/ambassador', blank=True, null=True)
-    profile_image = cloudinary.models.CloudinaryField('profile', folder='missculture/pages/ambassador', blank=True, null=True)
-    video_url = models.URLField('video_url', blank=True, null=True, help_text='Featured video URL')
-    
     page_title = models.CharField(max_length=200, default="Susan — Kenya's Voice on the World Stage")
     page_subtitle = models.TextField(blank=True, default='Miss Culture Global Kenya Ambassador · Cultural diplomat · Youth champion')
+    
+    # Profile Section
+    profile_image = cloudinary.models.CloudinaryField('profile', folder='missculture/pages/ambassador', blank=True, null=True,
+        help_text='Profile image for ambassador (also used on homepage spotlight)')
+    video_url = models.URLField('video_url', blank=True, null=True, help_text='Featured video URL for ambassador page')
     
     # Content sections
     show_story_arc = models.BooleanField(default=True)
@@ -369,7 +355,8 @@ class AmbassadorPageSettings(models.Model):
 
 
 class EventsPageSettings(models.Model):
-    """Events page specific settings"""
+    """Events page specific settings - hero only"""
+    # Hero Section
     hero_image = cloudinary.models.CloudinaryField('hero', folder='missculture/pages/events', blank=True, null=True)
     page_title = models.CharField(max_length=200, default='Events')
     page_subtitle = models.TextField(blank=True, default='Upcoming events and past highlights')
@@ -386,7 +373,8 @@ class EventsPageSettings(models.Model):
 
 
 class GalleryPageSettings(models.Model):
-    """Gallery page specific settings"""
+    """Gallery page specific settings - hero only"""
+    # Hero Section
     hero_image = cloudinary.models.CloudinaryField('hero', folder='missculture/pages/gallery', blank=True, null=True)
     page_title = models.CharField(max_length=200, default='Gallery')
     page_subtitle = models.TextField(blank=True, default='Photos and videos from our journey')
@@ -419,32 +407,72 @@ class PartnershipPageSettings(models.Model):
         return "Partnership Page Settings"
 
 
-class AboutPageSettings(models.Model):
-    """About page specific settings"""
-    hero_image = cloudinary.models.CloudinaryField('hero', folder='missculture/pages/about', blank=True, null=True)
-    mission_image = cloudinary.models.CloudinaryField('mission', folder='missculture/pages/about', blank=True, null=True)
+class VotingPageSettings(models.Model):
+    """Voting page specific settings - hero and voting images"""
+    # Hero Section
+    hero_image = cloudinary.models.CloudinaryField('hero', folder='missculture/pages/voting', blank=True, null=True)
+    page_title = models.CharField(max_length=200, default='Vote')
+    page_subtitle = models.TextField(blank=True, default='Support your favorite contestants')
     
-    page_title = models.CharField(max_length=200, default='About Us')
-    page_subtitle = models.TextField(blank=True, default='Our story, mission, and values')
+    # Event images for voting page
+    event_1_image = cloudinary.models.CloudinaryField('event_1', folder='missculture/pages/voting/events', blank=True, null=True)
+    event_2_image = cloudinary.models.CloudinaryField('event_2', folder='missculture/pages/voting/events', blank=True, null=True)
+    event_3_image = cloudinary.models.CloudinaryField('event_3', folder='missculture/pages/voting/events', blank=True, null=True)
+    event_4_image = cloudinary.models.CloudinaryField('event_4', folder='missculture/pages/voting/events', blank=True, null=True)
     
-    leader_1_image = cloudinary.models.CloudinaryField('leader_1', folder='missculture/pages/about/leaders', blank=True, null=True)
-    leader_2_image = cloudinary.models.CloudinaryField('leader_2', folder='missculture/pages/about/leaders', blank=True, null=True)
-    leader_3_image = cloudinary.models.CloudinaryField('leader_3', folder='missculture/pages/about/leaders', blank=True, null=True)
+    # Participant images for voting page
+    participant_1_image = cloudinary.models.CloudinaryField('participant_1', folder='missculture/pages/voting/participants', blank=True, null=True)
+    participant_2_image = cloudinary.models.CloudinaryField('participant_2', folder='missculture/pages/voting/participants', blank=True, null=True)
+    participant_3_image = cloudinary.models.CloudinaryField('participant_3', folder='missculture/pages/voting/participants', blank=True, null=True)
+    participant_4_image = cloudinary.models.CloudinaryField('participant_4', folder='missculture/pages/voting/participants', blank=True, null=True)
+    participant_5_image = cloudinary.models.CloudinaryField('participant_5', folder='missculture/pages/voting/participants', blank=True, null=True)
+    participant_6_image = cloudinary.models.CloudinaryField('participant_6', folder='missculture/pages/voting/participants', blank=True, null=True)
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
     class Meta:
-        verbose_name = "About Page Settings"
-        verbose_name_plural = "About Page Settings"
+        verbose_name = "Voting Page Settings"
+        verbose_name_plural = "Voting Page Settings"
     
     def __str__(self):
-        return "About Page Settings"
+        return "Voting Page Settings"
 
-    def save(self, *args, **kwargs):
-        if not self.pk and SiteSettings.objects.exists():
-            return
-        super().save(*args, **kwargs)
+
+class ContactPageSettings(models.Model):
+    """Contact page specific settings - hero only"""
+    # Hero Section
+    hero_image = cloudinary.models.CloudinaryField('hero', folder='missculture/pages/contact', blank=True, null=True)
+    page_title = models.CharField(max_length=200, default='Contact Us')
+    page_subtitle = models.TextField(blank=True, default='Get in touch with us')
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = "Contact Page Settings"
+        verbose_name_plural = "Contact Page Settings"
+    
+    def __str__(self):
+        return "Contact Page Settings"
+
+
+class FAQPageSettings(models.Model):
+    """FAQ page specific settings - hero only"""
+    # Hero Section
+    hero_image = cloudinary.models.CloudinaryField('hero', folder='missculture/pages/faq', blank=True, null=True)
+    page_title = models.CharField(max_length=200, default='FAQ')
+    page_subtitle = models.TextField(blank=True, default='Frequently asked questions')
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = "FAQ Page Settings"
+        verbose_name_plural = "FAQ Page Settings"
+    
+    def __str__(self):
+        return "FAQ Page Settings"
 
 
 class SocialMediaPost(models.Model):

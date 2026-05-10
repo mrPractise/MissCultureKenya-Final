@@ -8,7 +8,8 @@ from .views import (
     generate_test_pdf_view,
     HomePageSettingsAPIView, KenyaPageSettingsAPIView, AmbassadorPageSettingsAPIView,
     EventsPageSettingsAPIView, GalleryPageSettingsAPIView, PartnershipPageSettingsAPIView,
-    AboutPageSettingsAPIView
+    AboutPageSettingsAPIView,
+    VotingPageSettingsAPIView, ContactPageSettingsAPIView, FAQPageSettingsAPIView
 )
 
 router = DefaultRouter()
@@ -35,5 +36,8 @@ urlpatterns = [
     path('settings/gallery/', GalleryPageSettingsAPIView.as_view(), name='gallery-settings'),
     path('settings/partnership/', PartnershipPageSettingsAPIView.as_view(), name='partnership-settings'),
     path('settings/about/', AboutPageSettingsAPIView.as_view(), name='about-settings'),
+    path('settings/voting/', VotingPageSettingsAPIView.as_view(), name='voting-settings'),
+    path('settings/contact/', ContactPageSettingsAPIView.as_view(), name='contact-settings'),
+    path('settings/faq/', FAQPageSettingsAPIView.as_view(), name='faq-settings'),
     path('', include(router.urls)),
 ]

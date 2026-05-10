@@ -4,7 +4,8 @@ from .models import (
     Ambassador, CulturalCommunity, CulturalHeritage, KenyaRegion,
     Achievement, Partner, SocialMediaPost, KenyaGalleryPhoto, SiteSettings, TeamMember,
     HomePageSettings, KenyaPageSettings, AmbassadorPageSettings,
-    EventsPageSettings, GalleryPageSettings, PartnershipPageSettings, AboutPageSettings
+    EventsPageSettings, GalleryPageSettings, PartnershipPageSettings, AboutPageSettings,
+    VotingPageSettings, ContactPageSettings, FAQPageSettings
 )
 
 
@@ -142,119 +143,12 @@ class SocialMediaPostSerializer(serializers.ModelSerializer):
 
 
 class SiteSettingsSerializer(serializers.ModelSerializer):
-    """Serializer for site-wide hero images per navbar tab"""
-    home_hero_image_url = serializers.SerializerMethodField()
-    home_hero_video_url = serializers.URLField(allow_blank=True, allow_null=True, required=False)
-    
-    kenya_hero_image_url = serializers.SerializerMethodField()
-    
-    ambassador_hero_image_url = serializers.SerializerMethodField()
-    ambassador_profile_image_url = serializers.SerializerMethodField()
-    ambassador_video_url = serializers.URLField(allow_blank=True, allow_null=True, required=False)
-    
-    events_hero_image_url = serializers.SerializerMethodField()
-    gallery_hero_image_url = serializers.SerializerMethodField()
-    
-    voting_hero_image_url = serializers.SerializerMethodField()
-    voting_event_1_image_url = serializers.SerializerMethodField()
-    voting_event_2_image_url = serializers.SerializerMethodField()
-    voting_event_3_image_url = serializers.SerializerMethodField()
-    voting_event_4_image_url = serializers.SerializerMethodField()
-    voting_participant_1_image_url = serializers.SerializerMethodField()
-    voting_participant_2_image_url = serializers.SerializerMethodField()
-    voting_participant_3_image_url = serializers.SerializerMethodField()
-    voting_participant_4_image_url = serializers.SerializerMethodField()
-    voting_participant_5_image_url = serializers.SerializerMethodField()
-    voting_participant_6_image_url = serializers.SerializerMethodField()
-    
-    partnership_hero_image_url = serializers.SerializerMethodField()
-    contribute_hero_image_url = serializers.SerializerMethodField()
-    contact_hero_image_url = serializers.SerializerMethodField()
-    faq_hero_image_url = serializers.SerializerMethodField()
-    
-    about_hero_image_url = serializers.SerializerMethodField()
-    about_mission_image_url = serializers.SerializerMethodField()
-    about_leader_1_image_url = serializers.SerializerMethodField()
-    about_leader_2_image_url = serializers.SerializerMethodField()
-    about_leader_3_image_url = serializers.SerializerMethodField()
-
-    # Leader labels
-    leader_1_name = serializers.CharField(allow_blank=True, required=False)
-    leader_1_title = serializers.CharField(allow_blank=True, required=False)
-    leader_1_bio = serializers.CharField(allow_blank=True, required=False)
-    leader_2_name = serializers.CharField(allow_blank=True, required=False)
-    leader_2_title = serializers.CharField(allow_blank=True, required=False)
-    leader_2_bio = serializers.CharField(allow_blank=True, required=False)
-    leader_3_name = serializers.CharField(allow_blank=True, required=False)
-    leader_3_title = serializers.CharField(allow_blank=True, required=False)
-    leader_3_bio = serializers.CharField(allow_blank=True, required=False)
-
-    # Committee labels
-    committee_1_name = serializers.CharField(allow_blank=True, required=False)
-    committee_1_role = serializers.CharField(allow_blank=True, required=False)
-    committee_1_bio = serializers.CharField(allow_blank=True, required=False)
-    committee_2_name = serializers.CharField(allow_blank=True, required=False)
-    committee_2_role = serializers.CharField(allow_blank=True, required=False)
-    committee_2_bio = serializers.CharField(allow_blank=True, required=False)
-    committee_3_name = serializers.CharField(allow_blank=True, required=False)
-    committee_3_role = serializers.CharField(allow_blank=True, required=False)
-    committee_3_bio = serializers.CharField(allow_blank=True, required=False)
-    committee_4_name = serializers.CharField(allow_blank=True, required=False)
-    committee_4_role = serializers.CharField(allow_blank=True, required=False)
-    committee_4_bio = serializers.CharField(allow_blank=True, required=False)
-    committee_5_name = serializers.CharField(allow_blank=True, required=False)
-    committee_5_role = serializers.CharField(allow_blank=True, required=False)
-    committee_5_bio = serializers.CharField(allow_blank=True, required=False)
-    committee_6_name = serializers.CharField(allow_blank=True, required=False)
-    committee_6_role = serializers.CharField(allow_blank=True, required=False)
-    committee_6_bio = serializers.CharField(allow_blank=True, required=False)
-
+    """Serializer for site-wide logos only"""
     # Logo URLs
     logo_kenya_url = serializers.SerializerMethodField()
     logo_global_url = serializers.SerializerMethodField()
     mpesa_logo_url = serializers.SerializerMethodField()
 
-    privacy_hero_image_url = serializers.SerializerMethodField()
-
-    def _hero_url(self, obj, field_name):
-        return _cloudinary_url(getattr(obj, field_name, None))
-
-    def get_home_hero_image_url(self, obj): return self._hero_url(obj, 'home_hero_image')
-    
-    def get_kenya_hero_image_url(self, obj): return self._hero_url(obj, 'kenya_hero_image')
-    
-    def get_ambassador_hero_image_url(self, obj): return self._hero_url(obj, 'ambassador_hero_image')
-    def get_ambassador_profile_image_url(self, obj): return self._hero_url(obj, 'ambassador_profile_image')
-    
-    def get_events_hero_image_url(self, obj): return self._hero_url(obj, 'events_hero_image')
-    def get_gallery_hero_image_url(self, obj): return self._hero_url(obj, 'gallery_hero_image')
-    
-    def get_voting_hero_image_url(self, obj): return self._hero_url(obj, 'voting_hero_image')
-    def get_voting_event_1_image_url(self, obj): return self._hero_url(obj, 'voting_event_1_image')
-    def get_voting_event_2_image_url(self, obj): return self._hero_url(obj, 'voting_event_2_image')
-    def get_voting_event_3_image_url(self, obj): return self._hero_url(obj, 'voting_event_3_image')
-    def get_voting_event_4_image_url(self, obj): return self._hero_url(obj, 'voting_event_4_image')
-    def get_voting_participant_1_image_url(self, obj): return self._hero_url(obj, 'voting_participant_1_image')
-    def get_voting_participant_2_image_url(self, obj): return self._hero_url(obj, 'voting_participant_2_image')
-    def get_voting_participant_3_image_url(self, obj): return self._hero_url(obj, 'voting_participant_3_image')
-    def get_voting_participant_4_image_url(self, obj): return self._hero_url(obj, 'voting_participant_4_image')
-    def get_voting_participant_5_image_url(self, obj): return self._hero_url(obj, 'voting_participant_5_image')
-    def get_voting_participant_6_image_url(self, obj): return self._hero_url(obj, 'voting_participant_6_image')
-    
-    def get_partnership_hero_image_url(self, obj): return self._hero_url(obj, 'partnership_hero_image')
-    def get_contribute_hero_image_url(self, obj): return self._hero_url(obj, 'contribute_hero_image')
-    def get_contact_hero_image_url(self, obj): return self._hero_url(obj, 'contact_hero_image')
-    def get_faq_hero_image_url(self, obj): return self._hero_url(obj, 'faq_hero_image')
-    
-    def get_about_hero_image_url(self, obj): return self._hero_url(obj, 'about_hero_image')
-    def get_about_mission_image_url(self, obj): return self._hero_url(obj, 'about_mission_image')
-    def get_about_leader_1_image_url(self, obj): return self._hero_url(obj, 'about_leader_1_image')
-    def get_about_leader_2_image_url(self, obj): return self._hero_url(obj, 'about_leader_2_image')
-    def get_about_leader_3_image_url(self, obj): return self._hero_url(obj, 'about_leader_3_image')
-    
-    def get_privacy_hero_image_url(self, obj): return self._hero_url(obj, 'privacy_hero_image')
-
-    # Logo URL methods
     def get_logo_kenya_url(self, obj):
         return _cloudinary_url(obj.logo_kenya)
 
@@ -267,30 +161,8 @@ class SiteSettingsSerializer(serializers.ModelSerializer):
     class Meta:
         model = SiteSettings
         fields = [
-            'home_hero_image_url', 'home_hero_video_url',
-            'kenya_hero_image_url',
-            'ambassador_hero_image_url', 'ambassador_profile_image_url', 'ambassador_video_url',
-            'events_hero_image_url', 'gallery_hero_image_url',
-            'voting_hero_image_url', 'voting_event_1_image_url', 'voting_event_2_image_url',
-            'voting_event_3_image_url', 'voting_event_4_image_url',
-            'voting_participant_1_image_url', 'voting_participant_2_image_url',
-            'voting_participant_3_image_url', 'voting_participant_4_image_url',
-            'voting_participant_5_image_url', 'voting_participant_6_image_url',
-            'partnership_hero_image_url', 'contribute_hero_image_url',
-            'contact_hero_image_url', 'faq_hero_image_url',
-            'about_hero_image_url', 'about_mission_image_url',
-            'about_leader_1_image_url', 'about_leader_2_image_url', 'about_leader_3_image_url',
             'logo_kenya_url', 'logo_global_url', 'mpesa_logo_url',
-            'leader_1_name', 'leader_1_title', 'leader_1_bio',
-            'leader_2_name', 'leader_2_title', 'leader_2_bio',
-            'leader_3_name', 'leader_3_title', 'leader_3_bio',
-            'committee_1_name', 'committee_1_role', 'committee_1_bio',
-            'committee_2_name', 'committee_2_role', 'committee_2_bio',
-            'committee_3_name', 'committee_3_role', 'committee_3_bio',
-            'committee_4_name', 'committee_4_role', 'committee_4_bio',
-            'committee_5_name', 'committee_5_role', 'committee_5_bio',
-            'committee_6_name', 'committee_6_role', 'committee_6_bio',
-            'privacy_hero_image_url',
+            'created_at', 'updated_at'
         ]
 
 
@@ -305,18 +177,27 @@ class DiscoverKenyaSerializer(serializers.Serializer):
 
 class HomePageSettingsSerializer(serializers.ModelSerializer):
     hero_image_url = serializers.SerializerMethodField()
+    kenya_highlight_image_url = serializers.SerializerMethodField()
+    ambassador_highlight_image_url = serializers.SerializerMethodField()
     
     class Meta:
         model = HomePageSettings
         fields = [
             'hero_image', 'hero_image_url', 'hero_video_url',
             'welcome_title', 'welcome_subtitle',
-            'upcoming_event_enabled', 'kenya_highlight_enabled', 'ambassador_highlight_enabled',
+            'kenya_highlight_image', 'kenya_highlight_image_url', 'kenya_highlight_enabled',
+            'ambassador_highlight_image', 'ambassador_highlight_image_url', 'ambassador_highlight_enabled',
             'created_at', 'updated_at'
         ]
     
     def get_hero_image_url(self, obj):
         return _cloudinary_url(obj.hero_image)
+    
+    def get_kenya_highlight_image_url(self, obj):
+        return _cloudinary_url(obj.kenya_highlight_image)
+    
+    def get_ambassador_highlight_image_url(self, obj):
+        return _cloudinary_url(obj.ambassador_highlight_image)
 
 
 class KenyaPageSettingsSerializer(serializers.ModelSerializer):
@@ -401,9 +282,15 @@ class AboutPageSettingsSerializer(serializers.ModelSerializer):
         fields = [
             'hero_image', 'hero_image_url', 'page_title', 'page_subtitle',
             'mission_image', 'mission_image_url',
-            'leader_1_image', 'leader_1_image_url',
-            'leader_2_image', 'leader_2_image_url',
-            'leader_3_image', 'leader_3_image_url',
+            'leader_1_image', 'leader_1_image_url', 'leader_1_name', 'leader_1_title', 'leader_1_bio',
+            'leader_2_image', 'leader_2_image_url', 'leader_2_name', 'leader_2_title', 'leader_2_bio',
+            'leader_3_image', 'leader_3_image_url', 'leader_3_name', 'leader_3_title', 'leader_3_bio',
+            'committee_1_name', 'committee_1_role', 'committee_1_bio',
+            'committee_2_name', 'committee_2_role', 'committee_2_bio',
+            'committee_3_name', 'committee_3_role', 'committee_3_bio',
+            'committee_4_name', 'committee_4_role', 'committee_4_bio',
+            'committee_5_name', 'committee_5_role', 'committee_5_bio',
+            'committee_6_name', 'committee_6_role', 'committee_6_bio',
             'created_at', 'updated_at'
         ]
     
@@ -421,3 +308,68 @@ class AboutPageSettingsSerializer(serializers.ModelSerializer):
     
     def get_leader_3_image_url(self, obj):
         return _cloudinary_url(obj.leader_3_image)
+
+
+class VotingPageSettingsSerializer(serializers.ModelSerializer):
+    hero_image_url = serializers.SerializerMethodField()
+    event_1_image_url = serializers.SerializerMethodField()
+    event_2_image_url = serializers.SerializerMethodField()
+    event_3_image_url = serializers.SerializerMethodField()
+    event_4_image_url = serializers.SerializerMethodField()
+    participant_1_image_url = serializers.SerializerMethodField()
+    participant_2_image_url = serializers.SerializerMethodField()
+    participant_3_image_url = serializers.SerializerMethodField()
+    participant_4_image_url = serializers.SerializerMethodField()
+    participant_5_image_url = serializers.SerializerMethodField()
+    participant_6_image_url = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = VotingPageSettings
+        fields = [
+            'hero_image', 'hero_image_url', 'page_title', 'page_subtitle',
+            'event_1_image', 'event_1_image_url',
+            'event_2_image', 'event_2_image_url',
+            'event_3_image', 'event_3_image_url',
+            'event_4_image', 'event_4_image_url',
+            'participant_1_image', 'participant_1_image_url',
+            'participant_2_image', 'participant_2_image_url',
+            'participant_3_image', 'participant_3_image_url',
+            'participant_4_image', 'participant_4_image_url',
+            'participant_5_image', 'participant_5_image_url',
+            'participant_6_image', 'participant_6_image_url',
+            'created_at', 'updated_at'
+        ]
+    
+    def get_hero_image_url(self, obj): return _cloudinary_url(obj.hero_image)
+    def get_event_1_image_url(self, obj): return _cloudinary_url(obj.event_1_image)
+    def get_event_2_image_url(self, obj): return _cloudinary_url(obj.event_2_image)
+    def get_event_3_image_url(self, obj): return _cloudinary_url(obj.event_3_image)
+    def get_event_4_image_url(self, obj): return _cloudinary_url(obj.event_4_image)
+    def get_participant_1_image_url(self, obj): return _cloudinary_url(obj.participant_1_image)
+    def get_participant_2_image_url(self, obj): return _cloudinary_url(obj.participant_2_image)
+    def get_participant_3_image_url(self, obj): return _cloudinary_url(obj.participant_3_image)
+    def get_participant_4_image_url(self, obj): return _cloudinary_url(obj.participant_4_image)
+    def get_participant_5_image_url(self, obj): return _cloudinary_url(obj.participant_5_image)
+    def get_participant_6_image_url(self, obj): return _cloudinary_url(obj.participant_6_image)
+
+
+class ContactPageSettingsSerializer(serializers.ModelSerializer):
+    hero_image_url = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = ContactPageSettings
+        fields = ['hero_image', 'hero_image_url', 'page_title', 'page_subtitle', 'created_at', 'updated_at']
+    
+    def get_hero_image_url(self, obj):
+        return _cloudinary_url(obj.hero_image)
+
+
+class FAQPageSettingsSerializer(serializers.ModelSerializer):
+    hero_image_url = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = FAQPageSettings
+        fields = ['hero_image', 'hero_image_url', 'page_title', 'page_subtitle', 'created_at', 'updated_at']
+    
+    def get_hero_image_url(self, obj):
+        return _cloudinary_url(obj.hero_image)
