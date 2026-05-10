@@ -418,243 +418,242 @@ class AboutPageSettingsAdmin(admin.ModelAdmin):
             )
             return HttpResponseRedirect(request.path)
 
- 
- 
- 
- @ a d m i n . r e g i s t e r ( V o t i n g P a g e S e t t i n g s ) 
- 
- c l a s s   V o t i n g P a g e S e t t i n g s A d m i n ( a d m i n . M o d e l A d m i n ) : 
- 
-         " " " V o t i n g   p a g e   s e t t i n g s   � �    h e r o ,   e v e n t   i m a g e s ,   p a r t i c i p a n t   i m a g e s " " " 
- 
-         r e a d o n l y _ f i e l d s   =   [ ' c r e a t e d _ a t ' ,   ' u p d a t e d _ a t ' ] 
- 
-         
- 
-         f i e l d s e t s   =   ( 
- 
-                 ( ' H e r o   S e c t i o n ' ,   { 
- 
-                         ' f i e l d s ' :   ( ' h e r o _ i m a g e ' ,   ' p a g e _ t i t l e ' ,   ' p a g e _ s u b t i t l e ' ) , 
- 
-                 } ) , 
- 
-                 ( ' V o t i n g   E v e n t   I m a g e s ' ,   { 
- 
-                         ' f i e l d s ' :   ( 
- 
-                                 ' v o t i n g _ e v e n t _ 1 _ i m a g e ' ,   ' v o t i n g _ e v e n t _ 2 _ i m a g e ' , 
- 
-                                 ' v o t i n g _ e v e n t _ 3 _ i m a g e ' ,   ' v o t i n g _ e v e n t _ 4 _ i m a g e ' , 
- 
-                         ) , 
- 
-                         ' c l a s s e s ' :   ( ' c o l l a p s e ' , ) 
- 
-                 } ) , 
- 
-                 ( ' V o t i n g   P a r t i c i p a n t   I m a g e s ' ,   { 
- 
-                         ' f i e l d s ' :   ( 
- 
-                                 ' v o t i n g _ p a r t i c i p a n t _ 1 _ i m a g e ' ,   ' v o t i n g _ p a r t i c i p a n t _ 2 _ i m a g e ' , 
- 
-                                 ' v o t i n g _ p a r t i c i p a n t _ 3 _ i m a g e ' ,   ' v o t i n g _ p a r t i c i p a n t _ 4 _ i m a g e ' , 
- 
-                                 ' v o t i n g _ p a r t i c i p a n t _ 5 _ i m a g e ' ,   ' v o t i n g _ p a r t i c i p a n t _ 6 _ i m a g e ' , 
- 
-                         ) , 
- 
-                         ' c l a s s e s ' :   ( ' c o l l a p s e ' , ) 
- 
-                 } ) , 
- 
-                 ( ' C o n t e n t   T o g g l e s ' ,   { 
- 
-                         ' f i e l d s ' :   ( ' s h o w _ v o t i n g _ e v e n t s ' ,   ' s h o w _ v o t i n g _ p a r t i c i p a n t s ' ,   ' s h o w _ l e a d e r b o a r d ' ) , 
- 
-                 } ) , 
- 
-                 ( ' M e t a d a t a ' ,   { 
- 
-                         ' f i e l d s ' :   ( ' c r e a t e d _ a t ' ,   ' u p d a t e d _ a t ' ) , 
- 
-                         ' c l a s s e s ' :   ( ' c o l l a p s e ' , ) 
- 
-                 } ) , 
- 
-         ) 
- 
-         
- 
-         d e f   h a s _ a d d _ p e r m i s s i o n ( s e l f ,   r e q u e s t ) : 
- 
-                 r e t u r n   n o t   V o t i n g P a g e S e t t i n g s . o b j e c t s . e x i s t s ( ) 
- 
- 
- 
-         d e f   c h a n g e f o r m _ v i e w ( s e l f ,   r e q u e s t ,   o b j e c t _ i d = N o n e ,   f o r m _ u r l = " " ,   e x t r a _ c o n t e x t = N o n e ) : 
- 
-                 t r y : 
- 
-                         r e t u r n   s u p e r ( ) . c h a n g e f o r m _ v i e w ( 
- 
-                                 r e q u e s t ,   o b j e c t _ i d = o b j e c t _ i d ,   f o r m _ u r l = f o r m _ u r l ,   e x t r a _ c o n t e x t = e x t r a _ c o n t e x t 
- 
-                         ) 
- 
-                 e x c e p t   E x c e p t i o n   a s   e : 
- 
-                         s e l f . m e s s a g e _ u s e r ( 
- 
-                                 r e q u e s t , 
- 
-                                 f " E r r o r   s a v i n g   s e t t i n g s :   { s t r ( e ) } " , 
- 
-                                 l e v e l = m e s s a g e s . E R R O R , 
- 
-                         ) 
- 
-                         r e t u r n   H t t p R e s p o n s e R e d i r e c t ( r e q u e s t . p a t h ) 
- 
- 
- 
- 
- 
- @ a d m i n . r e g i s t e r ( C o n t a c t P a g e S e t t i n g s ) 
- 
- c l a s s   C o n t a c t P a g e S e t t i n g s A d m i n ( a d m i n . M o d e l A d m i n ) : 
- 
-         " " " C o n t a c t   p a g e   s e t t i n g s   � �    h e r o   a n d   p a g e   d e t a i l s " " " 
- 
-         r e a d o n l y _ f i e l d s   =   [ ' c r e a t e d _ a t ' ,   ' u p d a t e d _ a t ' ] 
- 
-         
- 
-         f i e l d s e t s   =   ( 
- 
-                 ( ' H e r o   S e c t i o n ' ,   { 
- 
-                         ' f i e l d s ' :   ( ' h e r o _ i m a g e ' ,   ' p a g e _ t i t l e ' ,   ' p a g e _ s u b t i t l e ' ) , 
- 
-                 } ) , 
- 
-                 ( ' C o n t e n t   T o g g l e s ' ,   { 
- 
-                         ' f i e l d s ' :   ( ' s h o w _ c o n t a c t _ f o r m ' ,   ' s h o w _ s o c i a l _ l i n k s ' ,   ' s h o w _ o f f i c e _ l o c a t i o n s ' ) , 
- 
-                 } ) , 
- 
-                 ( ' M e t a d a t a ' ,   { 
- 
-                         ' f i e l d s ' :   ( ' c r e a t e d _ a t ' ,   ' u p d a t e d _ a t ' ) , 
- 
-                         ' c l a s s e s ' :   ( ' c o l l a p s e ' , ) 
- 
-                 } ) , 
- 
-         ) 
- 
-         
- 
-         d e f   h a s _ a d d _ p e r m i s s i o n ( s e l f ,   r e q u e s t ) : 
- 
-                 r e t u r n   n o t   C o n t a c t P a g e S e t t i n g s . o b j e c t s . e x i s t s ( ) 
- 
- 
- 
-         d e f   c h a n g e f o r m _ v i e w ( s e l f ,   r e q u e s t ,   o b j e c t _ i d = N o n e ,   f o r m _ u r l = " " ,   e x t r a _ c o n t e x t = N o n e ) : 
- 
-                 t r y : 
- 
-                         r e t u r n   s u p e r ( ) . c h a n g e f o r m _ v i e w ( 
- 
-                                 r e q u e s t ,   o b j e c t _ i d = o b j e c t _ i d ,   f o r m _ u r l = f o r m _ u r l ,   e x t r a _ c o n t e x t = e x t r a _ c o n t e x t 
- 
-                         ) 
- 
-                 e x c e p t   E x c e p t i o n   a s   e : 
- 
-                         s e l f . m e s s a g e _ u s e r ( 
- 
-                                 r e q u e s t , 
- 
-                                 f " E r r o r   s a v i n g   s e t t i n g s :   { s t r ( e ) } " , 
- 
-                                 l e v e l = m e s s a g e s . E R R O R , 
- 
-                         ) 
- 
-                         r e t u r n   H t t p R e s p o n s e R e d i r e c t ( r e q u e s t . p a t h ) 
- 
- 
- 
- 
- 
- @ a d m i n . r e g i s t e r ( F A Q P a g e S e t t i n g s ) 
- 
- c l a s s   F A Q P a g e S e t t i n g s A d m i n ( a d m i n . M o d e l A d m i n ) : 
- 
-         " " " F A Q   p a g e   s e t t i n g s   � �    h e r o   a n d   p a g e   d e t a i l s " " " 
- 
-         r e a d o n l y _ f i e l d s   =   [ ' c r e a t e d _ a t ' ,   ' u p d a t e d _ a t ' ] 
- 
-         
- 
-         f i e l d s e t s   =   ( 
- 
-                 ( ' H e r o   S e c t i o n ' ,   { 
- 
-                         ' f i e l d s ' :   ( ' h e r o _ i m a g e ' ,   ' p a g e _ t i t l e ' ,   ' p a g e _ s u b t i t l e ' ) , 
- 
-                 } ) , 
- 
-                 ( ' C o n t e n t   T o g g l e s ' ,   { 
- 
-                         ' f i e l d s ' :   ( ' s h o w _ s e a r c h ' ,   ' s h o w _ c a t e g o r i e s ' ,   ' s h o w _ c o n t a c t _ c t a ' ) , 
- 
-                 } ) , 
- 
-                 ( ' M e t a d a t a ' ,   { 
- 
-                         ' f i e l d s ' :   ( ' c r e a t e d _ a t ' ,   ' u p d a t e d _ a t ' ) , 
- 
-                         ' c l a s s e s ' :   ( ' c o l l a p s e ' , ) 
- 
-                 } ) , 
- 
-         ) 
- 
-         
- 
-         d e f   h a s _ a d d _ p e r m i s s i o n ( s e l f ,   r e q u e s t ) : 
- 
-                 r e t u r n   n o t   F A Q P a g e S e t t i n g s . o b j e c t s . e x i s t s ( ) 
- 
- 
- 
-         d e f   c h a n g e f o r m _ v i e w ( s e l f ,   r e q u e s t ,   o b j e c t _ i d = N o n e ,   f o r m _ u r l = " " ,   e x t r a _ c o n t e x t = N o n e ) : 
- 
-                 t r y : 
- 
-                         r e t u r n   s u p e r ( ) . c h a n g e f o r m _ v i e w ( 
- 
-                                 r e q u e s t ,   o b j e c t _ i d = o b j e c t _ i d ,   f o r m _ u r l = f o r m _ u r l ,   e x t r a _ c o n t e x t = e x t r a _ c o n t e x t 
- 
-                         ) 
- 
-                 e x c e p t   E x c e p t i o n   a s   e : 
- 
-                         s e l f . m e s s a g e _ u s e r ( 
- 
-                                 r e q u e s t , 
- 
-                                 f " E r r o r   s a v i n g   s e t t i n g s :   { s t r ( e ) } " , 
- 
-                                 l e v e l = m e s s a g e s . E R R O R , 
- 
-                         ) 
- 
-                         r e t u r n   H t t p R e s p o n s e R e d i r e c t ( r e q u e s t . p a t h ) 
- 
- 
+
+
+
+@admin.register(VotingPageSettings)
+
+class VotingPageSettingsAdmin(admin.ModelAdmin):
+
+    """Voting page settings ��   hero, event images, participant images"""
+
+    readonly_fields = ['created_at', 'updated_at']
+
+    
+
+    fieldsets = (
+
+        ('Hero Section', {
+
+            'fields': ('hero_image', 'page_title', 'page_subtitle'),
+
+        }),
+
+        ('Voting Event Images', {
+
+            'fields': (
+
+                'voting_event_1_image', 'voting_event_2_image',
+
+                'voting_event_3_image', 'voting_event_4_image',
+
+            ),
+
+            'classes': ('collapse',)
+
+        }),
+
+        ('Voting Participant Images', {
+
+            'fields': (
+
+                'voting_participant_1_image', 'voting_participant_2_image',
+
+                'voting_participant_3_image', 'voting_participant_4_image',
+
+                'voting_participant_5_image', 'voting_participant_6_image',
+
+            ),
+
+            'classes': ('collapse',)
+
+        }),
+
+        ('Content Toggles', {
+
+            'fields': ('show_voting_events', 'show_voting_participants', 'show_leaderboard'),
+
+        }),
+
+        ('Metadata', {
+
+            'fields': ('created_at', 'updated_at'),
+
+            'classes': ('collapse',)
+
+        }),
+
+    )
+
+    
+
+    def has_add_permission(self, request):
+
+        return not VotingPageSettings.objects.exists()
+
+
+
+    def changeform_view(self, request, object_id=None, form_url="", extra_context=None):
+
+        try:
+
+            return super().changeform_view(
+
+                request, object_id=object_id, form_url=form_url, extra_context=extra_context
+
+            )
+
+        except Exception as e:
+
+            self.message_user(
+
+                request,
+
+                f"Error saving settings: {str(e)}",
+
+                level=messages.ERROR,
+
+            )
+
+            return HttpResponseRedirect(request.path)
+
+
+
+
+
+@admin.register(ContactPageSettings)
+
+class ContactPageSettingsAdmin(admin.ModelAdmin):
+
+    """Contact page settings ��   hero and page details"""
+
+    readonly_fields = ['created_at', 'updated_at']
+
+    
+
+    fieldsets = (
+
+        ('Hero Section', {
+
+            'fields': ('hero_image', 'page_title', 'page_subtitle'),
+
+        }),
+
+        ('Content Toggles', {
+
+            'fields': ('show_contact_form', 'show_social_links', 'show_office_locations'),
+
+        }),
+
+        ('Metadata', {
+
+            'fields': ('created_at', 'updated_at'),
+
+            'classes': ('collapse',)
+
+        }),
+
+    )
+
+    
+
+    def has_add_permission(self, request):
+
+        return not ContactPageSettings.objects.exists()
+
+
+
+    def changeform_view(self, request, object_id=None, form_url="", extra_context=None):
+
+        try:
+
+            return super().changeform_view(
+
+                request, object_id=object_id, form_url=form_url, extra_context=extra_context
+
+            )
+
+        except Exception as e:
+
+            self.message_user(
+
+                request,
+
+                f"Error saving settings: {str(e)}",
+
+                level=messages.ERROR,
+
+            )
+
+            return HttpResponseRedirect(request.path)
+
+
+
+
+
+@admin.register(FAQPageSettings)
+
+class FAQPageSettingsAdmin(admin.ModelAdmin):
+
+    """FAQ page settings ��   hero and page details"""
+
+    readonly_fields = ['created_at', 'updated_at']
+
+    
+
+    fieldsets = (
+
+        ('Hero Section', {
+
+            'fields': ('hero_image', 'page_title', 'page_subtitle'),
+
+        }),
+
+        ('Content Toggles', {
+
+            'fields': ('show_search', 'show_categories', 'show_contact_cta'),
+
+        }),
+
+        ('Metadata', {
+
+            'fields': ('created_at', 'updated_at'),
+
+            'classes': ('collapse',)
+
+        }),
+
+    )
+
+    
+
+    def has_add_permission(self, request):
+
+        return not FAQPageSettings.objects.exists()
+
+
+
+    def changeform_view(self, request, object_id=None, form_url="", extra_context=None):
+
+        try:
+
+            return super().changeform_view(
+
+                request, object_id=object_id, form_url=form_url, extra_context=extra_context
+
+            )
+
+        except Exception as e:
+
+            self.message_user(
+
+                request,
+
+                f"Error saving settings: {str(e)}",
+
+                level=messages.ERROR,
+
+            )
+
+            return HttpResponseRedirect(request.path)
+
