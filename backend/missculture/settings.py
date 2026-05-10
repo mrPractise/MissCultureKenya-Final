@@ -240,6 +240,8 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
+    # Custom exception handler for standardized error responses
+    'EXCEPTION_HANDLER': 'missculture.error_handlers.custom_exception_handler',
     # Rate limiting for high traffic protection
     'DEFAULT_THROTTLE_CLASSES': [
         'rest_framework.throttling.AnonRateThrottle',

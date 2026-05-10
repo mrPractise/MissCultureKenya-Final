@@ -19,13 +19,23 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.http import JsonResponse
+from .error_handlers import (
+    health_check, debug_info, admin_debug_info,
+    error_404, error_500, error_403, error_400
+)
 
 
 def health(request):
     return JsonResponse({"status": "ok"})
 
 urlpatterns = [
-    path('health/', health),
+    # Health & Debug endpoints
+    path('health/', health_check, name='health-check'),
+    path('api/health/', health_check, name='api-health-check'),
+    path('api/debug/', debug_info, name='debug-info'),
+    path('api/admin-debug/', admin_debug_info, name='admin-debug'),
+    
+    # Main application URLs
     path('admin/', admin.site.urls),
     path('api/main/', include('main.urls')),
     path('api/gallery/', include('gallery.urls')),
@@ -35,3 +45,9 @@ urlpatterns = [
 # Serve media files in development
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+# Error handlers
+handler404 = 'missculture.error_handlers.error_404'
+handler500 = 'missculture.error_handlers.error_500'
+handler403 = 'missculture.error_handlers.error_403'
+handler400 = 'missculture.error_handlers.error_400'
