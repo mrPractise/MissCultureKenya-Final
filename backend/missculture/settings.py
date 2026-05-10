@@ -255,8 +255,16 @@ REST_FRAMEWORK = {
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = config('EMAIL_HOST', default='smtp.zoho.com')
 EMAIL_PORT = config('EMAIL_PORT', default=465, cast=int)
-EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=False, cast=bool)
-EMAIL_USE_SSL = config('EMAIL_USE_SSL', default=True, cast=bool)
+
+# Zoho works best with SSL on 465 or TLS on 587. 
+# We default to 465 (SSL) for Railway reliability.
+if EMAIL_PORT == 465:
+    EMAIL_USE_TLS = False
+    EMAIL_USE_SSL = True
+else:
+    EMAIL_USE_TLS = True
+    EMAIL_USE_SSL = False
+
 EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='info@misscultureglobalkenya.com')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='Miss Culture Global Kenya <info@misscultureglobalkenya.com>')
