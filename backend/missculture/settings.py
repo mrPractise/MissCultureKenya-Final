@@ -251,24 +251,11 @@ REST_FRAMEWORK = {
     }
 }
 
-# Email Configuration (Zoho Mail)
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = config('EMAIL_HOST', default='smtp.zoho.com')
-EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
-
-# Zoho works best with SSL on 465 or TLS on 587. 
-if EMAIL_PORT == 465:
-    EMAIL_USE_TLS = False
-    EMAIL_USE_SSL = True
-else:
-    EMAIL_USE_TLS = True
-    EMAIL_USE_SSL = False
-
-EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='info@misscultureglobalkenya.com')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
-DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='Miss Culture Global Kenya <info@misscultureglobalkenya.com>')
+# Email Configuration - Using Resend API
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # Fallback for local dev
+RESEND_API_KEY = config('RESEND_API_KEY', default='')
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='onboarding@resend.dev')
 ADMIN_EMAIL = config('ADMIN_EMAIL', default='info@misscultureglobalkenya.com')
-EMAIL_TIMEOUT = 10
 
 # Cloudinary Configuration
 CLOUDINARY_STORAGE = {

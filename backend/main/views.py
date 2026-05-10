@@ -5,7 +5,7 @@ from rest_framework.decorators import api_view, permission_classes, authenticati
 from rest_framework.permissions import AllowAny
 from django_filters.rest_framework import DjangoFilterBackend
 from django.conf import settings
-from django.core.mail import send_mail
+import resend
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from .models import (
@@ -204,24 +204,21 @@ def contact_message(request):
         f"---\nSent via Miss Culture Global Kenya website"
     )
 
+    # Send admin notification via Resend
     try:
-        send_mail(
-            subject=email_subject,
-            message=plain_body,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[settings.ADMIN_EMAIL],
-            html_message=html_body,
-            fail_silently=False,  # Throw exception on failure
-        )
+        resend.api_key = settings.RESEND_API_KEY
+        resend.Emails.send({
+            'from': settings.DEFAULT_FROM_EMAIL,
+            'to': settings.ADMIN_EMAIL,
+            'subject': email_subject,
+            'html': html_body,
+            'text': plain_body,
+        })
     except Exception as e:
-        # Log error and inform the user
+        # Log error but don't fail the request - user experience is priority
         import logging
         logger = logging.getLogger(__name__)
-        logger.error(f'Failed to send admin email: {str(e)}')
-        return Response(
-            {'error': f'Email error: {str(e)}. Please contact us directly.'},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        )
+        logger.error(f'Failed to send admin email via Resend: {str(e)}')
 
     # Send auto-reply to the sender
     auto_subject = "Thank you for contacting Miss Culture Global Kenya"
@@ -246,19 +243,20 @@ def contact_message(request):
         f"We have received your message and will get back to you within 24-48 hours.\n\n"
         f"Miss Culture Global Kenya\ninfo@misscultureglobalkenya.com"
     )
+    # Send auto-reply to sender via Resend
     try:
-        send_mail(
-            subject=auto_subject,
-            message=auto_plain,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[email],
-            html_message=auto_html,
-            fail_silently=False,
-        )
+        resend.api_key = settings.RESEND_API_KEY
+        resend.Emails.send({
+            'from': settings.DEFAULT_FROM_EMAIL,
+            'to': email,
+            'subject': auto_subject,
+            'html': auto_html,
+            'text': auto_plain,
+        })
     except Exception as e:
         import logging
         logger = logging.getLogger(__name__)
-        logger.error(f'Failed to send auto-reply email: {str(e)}')
+        logger.error(f'Failed to send auto-reply via Resend: {str(e)}')
 
 
     return Response(
@@ -269,27 +267,22 @@ def contact_message(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def check_email_connection(request):
-    import socket
-    
-    hosts = ['smtp.zoho.com', 'smtp.gmail.com']
-    ports = [587, 465]
-    results = {}
-    
-    for host in hosts:
-        host_results = {}
-        for port in ports:
-            # Try IPv4 specifically
-            try:
-                # Get IPv4 address
-                ip = socket.gethostbyname(host)
-                host_results[f"{port}_ipv4_addr"] = ip
-                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                s.settimeout(5)
-                s.connect((ip, port))
-                host_results[port] = "Connected (IPv4)"
-                s.close()
-            except Exception as e:
-                host_results[port] = f"Failed: {str(e)}"
-        results[host] = host_results
-        
-    return Response(results)
+    """Check Resend API connection status"""
+    try:
+        resend.api_key = settings.RESEND_API_KEY
+        # Try to get domains list to verify API key works
+        domains = resend.Domains.list()
+        return Response({
+            'status': 'connected',
+            'service': 'Resend API',
+            'api_key_configured': bool(settings.RESEND_API_KEY),
+            'from_email': settings.DEFAULT_FROM_EMAIL,
+            'admin_email': settings.ADMIN_EMAIL,
+        })
+    except Exception as e:
+        return Response({
+            'status': 'error',
+            'service': 'Resend API',
+            'error': str(e),
+            'api_key_configured': bool(settings.RESEND_API_KEY),
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
