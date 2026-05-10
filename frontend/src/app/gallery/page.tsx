@@ -7,7 +7,7 @@ import Link from 'next/link'
 import PhotoLightboxModal from '@/components/PhotoLightboxModal'
 import VideoModal from '@/components/VideoModal'
 import apiClient from '@/lib/api'
-import { useSiteSettings } from '@/lib/useSiteSettings'
+import { useGalleryPageSettings } from '@/lib/usePageSettings'
 
 const galleryCategories = [
   {
@@ -73,7 +73,7 @@ const GalleryPage = () => {
   const [error, setError] = useState<string | null>(null)
   const [likedPhotoIds, setLikedPhotoIds] = useState<Record<number, boolean>>({})
   const [shareStatus, setShareStatus] = useState<string>('')
-  const settings = useSiteSettings()
+  const { settings: pageSettings, loading: settingsLoading } = useGalleryPageSettings()
 
   useEffect(() => {
     const fetchGalleryData = async () => {
@@ -217,7 +217,7 @@ const GalleryPage = () => {
             <div className="absolute inset-0 bg-black/60 z-10" />
             <div
               className="w-full h-full bg-cover bg-center"
-              style={settings.gallery_hero_image_url ? { backgroundImage: `url(${settings.gallery_hero_image_url})` } : undefined}
+              style={pageSettings.hero_image_url ? { backgroundImage: `url(${pageSettings.hero_image_url})` } : undefined}
             />
           </motion.div>
         </div>

@@ -3,28 +3,48 @@
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { Compass, User, ArrowRight, Globe } from 'lucide-react'
-import { useSiteSettings } from '@/lib/useSiteSettings'
+import { useHomePageSettings } from '@/lib/usePageSettings'
 
 const Highlights = () => {
-  const settings = useSiteSettings()
+  const { settings, loading } = useHomePageSettings()
+  
+  // Don't render until settings are loaded
+  if (loading) {
+    return (
+      <section className="py-16 sm:py-20 lg:py-24 bg-gray-50">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="h-80 bg-gray-200 rounded-2xl animate-pulse" />
+            <div className="h-80 bg-gray-200 rounded-2xl animate-pulse" />
+          </div>
+        </div>
+      </section>
+    )
+  }
+  
   const highlights = [
     {
       title: 'Kenya Overview',
       description: 'Explore Our Kenya, Our Culture, and Global Stage in one clean, photo-led page.',
       icon: Compass,
       href: '/kenya',
-      image: settings.home_kenya_highlight_image_url || '',
-      color: 'bg-green-600'
+      image: settings.kenya_highlight_image_url || '',
+      color: 'bg-green-600',
+      enabled: settings.kenya_highlight_enabled
     },
     {
       title: 'The Ambassador',
       description: 'Meet Susan, the inspiring individual who represents Kenya\'s cultural heritage and values globally.',
       icon: User,
       href: '/ambassador',
-      image: settings.home_ambassador_highlight_image_url || '',
-      color: 'bg-red-600'
+      image: settings.ambassador_highlight_image_url || '',
+      color: 'bg-red-600',
+      enabled: settings.ambassador_highlight_enabled
     }
   ]
+  
+  // Filter out disabled highlights
+  const visibleHighlights = highlights.filter(h => h.enabled)
 
   return (
     <section className="py-16 sm:py-20 lg:py-24 bg-gray-50 relative overflow-hidden">
@@ -49,7 +69,7 @@ const Highlights = () => {
         </motion.div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-7 lg:gap-8 max-w-4xl mx-auto">
-          {highlights.map((highlight, index) => (
+          {visibleHighlights.map((highlight, index) => (
             <motion.div
               key={highlight.title}
               initial={{ opacity: 0, y: 30 }}

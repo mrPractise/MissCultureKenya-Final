@@ -132,9 +132,40 @@ const apiClient = {
   get(path: string, params = {}) {
     return handle(client.get(path, { params }))
   },
-  // Site settings (hero images per tab)
+  // Site settings (logos only)
   getSiteSettings() {
     return handle(client.get('/api/main/settings/'))
+  },
+  // Page-specific settings APIs
+  getHomePageSettings() {
+    return handle(client.get('/api/main/settings/home/'))
+  },
+  getKenyaPageSettings() {
+    return handle(client.get('/api/main/settings/kenya/'))
+  },
+  getAmbassadorPageSettings() {
+    return handle(client.get('/api/main/settings/ambassador/'))
+  },
+  getEventsPageSettings() {
+    return handle(client.get('/api/main/settings/events/'))
+  },
+  getGalleryPageSettings() {
+    return handle(client.get('/api/main/settings/gallery/'))
+  },
+  getPartnershipPageSettings() {
+    return handle(client.get('/api/main/settings/partnership/'))
+  },
+  getAboutPageSettings() {
+    return handle(client.get('/api/main/settings/about/'))
+  },
+  getVotingPageSettings() {
+    return handle(client.get('/api/main/settings/voting/'))
+  },
+  getContactPageSettings() {
+    return handle(client.get('/api/main/settings/contact/'))
+  },
+  getFAQPageSettings() {
+    return handle(client.get('/api/main/settings/faq/'))
   },
   // Contact form
   sendContactMessage(data: { name: string; email: string; phone?: string; subject?: string; message: string; type?: string }) {

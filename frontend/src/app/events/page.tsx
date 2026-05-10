@@ -7,7 +7,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import ContactModal from '@/components/ContactModal'
 import apiClient from '@/lib/api'
-import { useSiteSettings } from '@/lib/useSiteSettings'
+import { useEventsPageSettings } from '@/lib/usePageSettings'
 
 const fadeInUp = {
   initial: { opacity: 0, y: 30 },
@@ -57,7 +57,7 @@ const EventsPage = () => {
   const [activeCategory, setActiveCategory] = useState('All')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const settings = useSiteSettings()
+  const { settings: pageSettings, loading: settingsLoading } = useEventsPageSettings()
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -147,7 +147,7 @@ const EventsPage = () => {
             <div className="absolute inset-0 bg-black/60 z-10" />
             <div
               className="w-full h-full bg-cover bg-center"
-              style={settings.events_hero_image_url ? { backgroundImage: `url(${settings.events_hero_image_url})` } : undefined}
+              style={pageSettings.hero_image_url ? { backgroundImage: `url(${pageSettings.hero_image_url})` } : undefined}
             />
           </motion.div>
         </div>

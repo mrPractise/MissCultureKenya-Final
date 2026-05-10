@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import ContactModal from '@/components/ContactModal'
 import apiClient from '@/lib/api'
-import { useSiteSettings } from '@/lib/useSiteSettings'
+import { useAmbassadorPageSettings } from '@/lib/usePageSettings'
 
 const fadeInUp = {
   initial: { opacity: 0, y: 30 },
@@ -21,14 +21,14 @@ const stagger = {
 }
 
 const Ambassador = () => {
-  const settings = useSiteSettings()
+  const { settings, loading } = useAmbassadorPageSettings()
   const [isContactModalOpen, setIsContactModalOpen] = useState(false)
   const [ambassadorInfo, setAmbassadorInfo] = useState<any>({
     name: "Susan Abong'o",
     title: 'Cultural Ambassador',
     bio: "A passionate advocate for Kenya's cultural heritage, Susan represents the beauty and diversity of our nation on the global stage.",
     mission: 'To bridge cultures, promote understanding, and showcase the rich tapestry of Kenyan traditions to the world.',
-    image: settings.ambassador_profile_image_url || '',
+    image: settings.profile_image_url || '',
     gallery: [] as string[]
   })
 
@@ -47,7 +47,7 @@ const Ambassador = () => {
             title: ambassadorData.title || 'Cultural Ambassador',
             bio: ambassadorData.bio || ambassadorData.description || prev.bio,
             mission: ambassadorData.mission_statement || ambassadorData.mission || prev.mission,
-            image: settings.ambassador_profile_image_url || ambassadorData.profile_image_url || ambassadorData.profile_image || ambassadorData.image || ambassadorData.featured_image || prev.image,
+            image: settings.profile_image_url || ambassadorData.profile_image_url || ambassadorData.profile_image || ambassadorData.image || ambassadorData.featured_image || prev.image,
           }))
         }
 
@@ -71,12 +71,12 @@ const Ambassador = () => {
             : (videosResponse.results || [])
 
           let allVideos = [...videosData]
-          if (settings.ambassador_video_url) {
+          if (settings.video_url) {
             allVideos = [
               {
                 id: 'featured-video',
                 title: 'Featured Ambassador Video',
-                video_url: settings.ambassador_video_url,
+                video_url: settings.video_url,
                 is_featured: true
               },
               ...allVideos

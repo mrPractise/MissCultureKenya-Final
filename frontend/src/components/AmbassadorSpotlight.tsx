@@ -3,10 +3,33 @@
 import { motion } from 'framer-motion'
 import { Award, ArrowRight, Quote, User } from 'lucide-react'
 import Link from 'next/link'
-import { useSiteSettings } from '@/lib/useSiteSettings'
+import { useHomePageSettings } from '@/lib/usePageSettings'
 
 const AmbassadorSpotlight = () => {
-  const settings = useSiteSettings()
+  const { settings, loading } = useHomePageSettings()
+
+  // Don't render until settings are loaded
+  if (loading) {
+    return (
+      <section className="py-20 sm:py-24 bg-white relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="h-[500px] bg-gray-200 rounded-3xl animate-pulse" />
+            <div className="space-y-4">
+              <div className="h-8 bg-gray-200 rounded w-3/4 animate-pulse" />
+              <div className="h-4 bg-gray-200 rounded w-full animate-pulse" />
+              <div className="h-4 bg-gray-200 rounded w-5/6 animate-pulse" />
+            </div>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  // If ambassador highlight is disabled, don't render
+  if (!settings.ambassador_highlight_enabled) {
+    return null
+  }
 
   return (
     <section className="py-20 sm:py-24 bg-white relative overflow-hidden">
@@ -44,9 +67,9 @@ const AmbassadorSpotlight = () => {
           >
             <div className="absolute inset-0 bg-green-600/10 rounded-3xl rotate-2 group-hover:rotate-3 transition-transform duration-500" />
             <div className="relative overflow-hidden rounded-3xl shadow-2xl">
-              {(settings.ambassador_profile_image_url || settings.home_ambassador_highlight_image_url) ? (
+              {settings.ambassador_highlight_image_url ? (
                 <img
-                  src={(settings.ambassador_profile_image_url || settings.home_ambassador_highlight_image_url) as string}
+                  src={settings.ambassador_highlight_image_url}
                   alt="Susan - Miss Culture Global Kenya Ambassador"
                   className="w-full h-[500px] object-cover"
                 />

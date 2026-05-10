@@ -2,15 +2,15 @@
 
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { ChevronDown, ExternalLink } from 'lucide-react'
-import { useRef, useState } from 'react'
-import { useSiteSettings } from '@/lib/useSiteSettings'
+import { useRef } from 'react'
+import { useHomePageSettings } from '@/lib/usePageSettings'
 
 const Hero = () => {
   const ref = useRef(null)
-  const settings = useSiteSettings()
+  const { settings } = useHomePageSettings()
   
-  const heroImage = settings.home_hero_image_url || process.env.NEXT_PUBLIC_HERO_IMAGE_URL || ''
-  const heroVideo = settings.home_hero_video_url || 'https://www.youtube.com/embed/NgqljvNDPA8'
+  const heroImage = settings.hero_image_url || process.env.NEXT_PUBLIC_HERO_IMAGE_URL || ''
+  const heroVideo = settings.hero_video_url || 'https://www.youtube.com/embed/NgqljvNDPA8'
 
   const { scrollYProgress } = useScroll({
     target: ref,
