@@ -138,11 +138,7 @@ class HomePageSettingsAdmin(admin.ModelAdmin):
     
     fieldsets = (
         ('Hero Section', {
-            'fields': ('hero_image', 'hero_video_url'),
-            'description': 'Upload hero image or provide YouTube video URL'
-        }),
-        ('Welcome Message', {
-            'fields': ('welcome_title', 'welcome_subtitle')
+            'fields': ('hero_image',),
         }),
         ('Kenya Highlight Card (on Homepage)', {
             'fields': ('kenya_highlight_image', 'kenya_highlight_enabled'),
@@ -151,6 +147,10 @@ class HomePageSettingsAdmin(admin.ModelAdmin):
         ('Ambassador Highlight Card (on Homepage)', {
             'fields': ('ambassador_highlight_image', 'ambassador_highlight_enabled'),
             'description': 'Image and toggle for the Ambassador spotlight card shown on homepage'
+        }),
+        ('Events Section', {
+            'fields': ('upcoming_event_enabled', 'recent_event_enabled'),
+            'description': 'Toggle event sections on homepage'
         }),
         ('Metadata', {
             'fields': ('created_at', 'updated_at'),
@@ -443,9 +443,9 @@ class VotingPageSettingsAdmin(admin.ModelAdmin):
 
             'fields': (
 
-                'voting_event_1_image', 'voting_event_2_image',
+                'event_1_image', 'event_2_image',
 
-                'voting_event_3_image', 'voting_event_4_image',
+                'event_3_image', 'event_4_image',
 
             ),
 
@@ -457,11 +457,11 @@ class VotingPageSettingsAdmin(admin.ModelAdmin):
 
             'fields': (
 
-                'voting_participant_1_image', 'voting_participant_2_image',
+                'participant_1_image', 'participant_2_image',
 
-                'voting_participant_3_image', 'voting_participant_4_image',
+                'participant_3_image', 'participant_4_image',
 
-                'voting_participant_5_image', 'voting_participant_6_image',
+                'participant_5_image', 'participant_6_image',
 
             ),
 
@@ -469,11 +469,6 @@ class VotingPageSettingsAdmin(admin.ModelAdmin):
 
         }),
 
-        ('Content Toggles', {
-
-            'fields': ('show_voting_events', 'show_voting_participants', 'show_leaderboard'),
-
-        }),
 
         ('Metadata', {
 
@@ -539,11 +534,6 @@ class ContactPageSettingsAdmin(admin.ModelAdmin):
 
         }),
 
-        ('Content Toggles', {
-
-            'fields': ('show_contact_form', 'show_social_links', 'show_office_locations'),
-
-        }),
 
         ('Metadata', {
 
@@ -609,11 +599,6 @@ class FAQPageSettingsAdmin(admin.ModelAdmin):
 
         }),
 
-        ('Content Toggles', {
-
-            'fields': ('show_search', 'show_categories', 'show_contact_cta'),
-
-        }),
 
         ('Metadata', {
 
