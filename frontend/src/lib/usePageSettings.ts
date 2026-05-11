@@ -83,6 +83,12 @@ interface PartnershipPageSettings {
   page_subtitle: string
 }
 
+interface VotingPageSettings {
+  hero_image_url: string | null
+  page_title: string
+  page_subtitle: string
+}
+
 interface ContactPageSettings {
   hero_image_url: string | null
   page_title: string
@@ -329,6 +335,33 @@ export function usePartnershipPageSettings() {
         setSettings(prev => ({ ...prev, ...data }))
       } catch (err: any) {
         setError(err.message || 'Failed to load partnership page settings')
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadSettings()
+  }, [])
+
+  return { settings, loading, error }
+}
+
+// Hook for Voting Page Settings
+export function useVotingPageSettings() {
+  const [settings, setSettings] = useState<VotingPageSettings>({
+    hero_image_url: null,
+    page_title: 'Vote',
+    page_subtitle: 'Support your favorite contestants',
+  })
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    async function loadSettings() {
+      try {
+        const data = await apiClient.getVotingPageSettings()
+        setSettings(prev => ({ ...prev, ...data }))
+      } catch (err: any) {
+        setError(err.message || 'Failed to load voting page settings')
       } finally {
         setLoading(false)
       }

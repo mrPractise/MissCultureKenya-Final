@@ -15,7 +15,8 @@ from .models import (
     Achievement, Partner, SocialMediaPost, SiteSettings, TeamMember,
     HomePageSettings, KenyaPageSettings, AmbassadorPageSettings,
     EventsPageSettings, GalleryPageSettings, PartnershipPageSettings, AboutPageSettings,
-    VotingPageSettings, ContactPageSettings, FAQPageSettings
+    VotingPageSettings, ContactPageSettings, FAQPageSettings,
+    ContributePageSettings, PrivacyPageSettings, TermsPageSettings
 )
 from .serializers import (
     AmbassadorSerializer, CulturalCommunitySerializer, CulturalHeritageSerializer,
@@ -415,7 +416,7 @@ class FAQPageSettingsAPIView(APIView):
     def get(self, request):
         settings = FAQPageSettings.objects.first()
         if not settings:
-            return Response({})
+            settings = FAQPageSettings.objects.create()
         serializer = FAQPageSettingsSerializer(settings)
         return Response(serializer.data)
 
@@ -427,7 +428,7 @@ class ContributePageSettingsAPIView(APIView):
     def get(self, request):
         settings = ContributePageSettings.objects.first()
         if not settings:
-            return Response({})
+            settings = ContributePageSettings.objects.create()
         serializer = ContributePageSettingsSerializer(settings)
         return Response(serializer.data)
 
@@ -439,7 +440,7 @@ class PrivacyPageSettingsAPIView(APIView):
     def get(self, request):
         settings = PrivacyPageSettings.objects.first()
         if not settings:
-            return Response({})
+            settings = PrivacyPageSettings.objects.create()
         serializer = PrivacyPageSettingsSerializer(settings)
         return Response(serializer.data)
 
@@ -451,7 +452,7 @@ class TermsPageSettingsAPIView(APIView):
     def get(self, request):
         settings = TermsPageSettings.objects.first()
         if not settings:
-            return Response({})
+            settings = TermsPageSettings.objects.create()
         serializer = TermsPageSettingsSerializer(settings)
         return Response(serializer.data)
 

@@ -60,6 +60,15 @@ const galleryCategories = [
   }
 ]
 
+const getItemDate = (item: any) => item.date_taken || item.created_at || item.date || null
+
+const getItemYear = (item: any) => {
+  const date = getItemDate(item)
+  if (!date) return null
+  const year = new Date(date).getFullYear()
+  return Number.isFinite(year) ? year.toString() : null
+}
+
 const GalleryPage = () => {
   const [selectedCollection, setSelectedCollection] = useState('All')
   const [selectedYear, setSelectedYear] = useState('All')
@@ -74,7 +83,7 @@ const GalleryPage = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [shareStatus, setShareStatus] = useState<string>('')
-  const { settings: pageSettings, loading: settingsLoading } = useGalleryPageSettings()
+  const { settings: pageSettings } = useGalleryPageSettings()
 
   useEffect(() => {
     const fetchGalleryData = async () => {
@@ -92,9 +101,10 @@ const GalleryPage = () => {
         const allCollections: string[] = ['All', ...uniqueCategories]
         setCollections(allCollections)
         // Extract years from photos and videos dates
-        const photoYears: string[] = photosData.map((p: any) => p.date ? new Date(p.date).getFullYear().toString() : null).filter((y: string | null): y is string => y !== null)
-        const videoYears: string[] = videosData.map((v: any) => v.date ? new Date(v.date).getFullYear().toString() : null).filter((y: string | null): y is string => y !== null)
-        const allYears: string[] = ['All', ...new Set([...photoYears, ...videoYears])].sort((a, b) => b.localeCompare(a)) // Recent first
+        const photoYears: string[] = photosData.map(getItemYear).filter((y: string | null): y is string => y !== null)
+        const videoYears: string[] = videosData.map(getItemYear).filter((y: string | null): y is string => y !== null)
+        const uniqueYears = [...new Set([...photoYears, ...videoYears])].sort((a, b) => Number(b) - Number(a))
+        const allYears: string[] = ['All', ...uniqueYears]
         setYears(allYears)
       } catch (err) {
         console.error('Error fetching gallery data:', err)
@@ -115,7 +125,7 @@ const GalleryPage = () => {
     category: photo.category || 'Uncategorized',
     image: photo.image_url || photo.thumbnail_url || photo.image || '',
     photographer: photo.photographer || 'Unknown',
-    date: photo.date_taken || photo.created_at || photo.date,
+    date: getItemDate(photo),
     location: photo.location || '',
     caption: photo.caption || photo.description || '',
     likes: photo.likes || 0,
@@ -130,7 +140,7 @@ const GalleryPage = () => {
     videoUrl: video.video_url || video.videoUrl || video.url || '',
     duration: video.duration || '0:00',
     views: video.views || '0',
-    date: video.created_at || video.date,
+    date: getItemDate(video),
     description: video.description || '',
     caption: video.caption || ''
   })
@@ -328,7 +338,7 @@ const GalleryPage = () => {
                   collections.map((collection) => (
                     <button
                       key={collection}
-                      onClick={() => { setSelectedCollection(collection); setSelectedYear('All'); }}
+                      onClick={() => setSelectedCollection(collection)}
                       className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 text-sm sm:text-base transform hover:-translate-y-1 ${
                         selectedCollection === collection
                           ? 'bg-red-600 text-white shadow-lg'
@@ -341,8 +351,8 @@ const GalleryPage = () => {
                 )}
               </motion.div>
 
-              {/* Year Filter - Only show when a collection is selected */}
-              {selectedCollection !== 'All' && (
+              {/* Year Filter */}
+              {years.length > 1 && (
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -400,14 +410,20 @@ const GalleryPage = () => {
                   whileInView={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.5, delay: index * 0.05 }}
                   viewport={{ once: true }}
-                  className="relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 group cursor-pointer h-96"
+                  className="relative aspect-[4/5] overflow-hidden rounded-xl bg-gray-100 shadow-lg hover:shadow-2xl transition-all duration-500 group cursor-pointer"
                   onClick={() => handlePhotoClick(index)}
                 >
-                  <img
-                    src={photo.image}
-                    alt={photo.title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                  />
+                  {photo.image ? (
+                    <img
+                      src={photo.image}
+                      alt={photo.title}
+                      className="h-full w-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center">
+                      <Camera className="h-10 w-10 text-gray-300" />
+                    </div>
+                  )}
 
                   {/* Overlay */}
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />

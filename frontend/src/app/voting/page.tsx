@@ -8,6 +8,7 @@ import apiClient from '@/lib/api'
 import type { ApiError } from '@/lib/api'
 import VotePaymentModal from '@/components/VotePaymentModal'
 import ContestantDetailsModal from '@/components/ContestantDetailsModal'
+import { useVotingPageSettings } from '@/lib/usePageSettings'
 
 interface Contestant {
   id: number
@@ -70,6 +71,7 @@ const VotingPage = () => {
   const [verifyLoading, setVerifyLoading] = useState(false)
   const [verifyError, setVerifyError] = useState('')
   const [showVerify, setShowVerify] = useState(false)
+  const { settings: pageSettings } = useVotingPageSettings()
 
   // Fetch voting events on mount
   useEffect(() => {
@@ -171,17 +173,26 @@ const VotingPage = () => {
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
       <section className="relative h-[50vh] min-h-[400px] flex items-center justify-center overflow-hidden bg-gradient-to-br from-green-900 via-green-800 to-green-900">
-        <div className="absolute inset-0 bg-black/30" />
+        {pageSettings.hero_image_url && (
+          <div
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ backgroundImage: `url(${pageSettings.hero_image_url})` }}
+          />
+        )}
+        <div className="absolute inset-0 bg-black/60" />
         <div className="relative z-10 text-center text-white px-4 max-w-4xl mx-auto">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
             <p className="text-sm uppercase tracking-[0.3em] text-green-300 mb-3 font-semibold">Your Voice Shapes the Stage</p>
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 tracking-tight">
-              Vote <span className="text-red-500">Now</span>
+              {(pageSettings.page_title || 'Vote') === 'Vote' ? (
+                <>Vote <span className="text-red-500">Now</span></>
+              ) : (
+                pageSettings.page_title
+              )}
             </h1>
             <div className="w-20 h-1 bg-red-500 mx-auto mb-6 rounded-full" />
             <p className="text-lg text-gray-200 max-w-2xl mx-auto font-light">
-              Cast your vote for contestants competing to represent Kenya&apos;s cultural future.
-              Every vote is backed by a verified payment.
+              {pageSettings.page_subtitle || "Cast your vote for contestants competing to represent Kenya's cultural future."}
             </p>
           </motion.div>
         </div>

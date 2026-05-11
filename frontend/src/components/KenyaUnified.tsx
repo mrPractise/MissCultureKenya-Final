@@ -183,8 +183,8 @@ const KenyaUnified = () => {
       const img = getImage(a)
       if (img) photos.push({ src: img, alt: a.title, caption: a.description })
     })
-    // No fallback photos — gallery section will be hidden when empty
-    return photos.slice(0, 12)
+    // No fallback photos: gallery section will be hidden when empty.
+    return photos.slice(0, 10)
   }, [regions, communities, heritage, achievements])
 
   if (loading) {
@@ -267,14 +267,14 @@ const KenyaUnified = () => {
                 and why it matters to our mission.
               </p>
             </motion.div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 auto-rows-[220px] sm:auto-rows-[240px]">
               {galleryPhotos.map((photo, idx) => (
                 <motion.div
                   key={`${photo.src}-${idx}`}
                   {...stagger}
                   transition={{ duration: 0.4, delay: idx * 0.06 }}
-                  className={`relative overflow-hidden rounded-2xl group cursor-pointer bg-gray-100 ${
-                    idx === 0 ? 'sm:col-span-2 sm:row-span-2' : ''
+                  className={`relative overflow-hidden rounded-xl group cursor-pointer bg-gray-100 ${
+                    idx === 0 ? 'sm:col-span-2 sm:row-span-2' : idx === 3 || idx === 6 ? 'lg:col-span-2' : ''
                   }`}
                 >
                   {photo.src ? (
@@ -282,9 +282,7 @@ const KenyaUnified = () => {
                       <img
                         src={photo.src}
                         alt={photo.alt}
-                        className={`w-full object-cover group-hover:scale-105 transition-transform duration-700 ${
-                          idx === 0 ? 'h-64 sm:h-full min-h-[320px]' : 'h-56 sm:h-64'
-                        }`}
+                        className="h-full w-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
                       />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/60 transition-colors duration-500" />
                       <div className="absolute inset-0 p-5 sm:p-6 flex flex-col justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-500">
@@ -297,7 +295,7 @@ const KenyaUnified = () => {
                       </div>
                     </>
                   ) : (
-                    <div className={`flex items-center justify-center bg-gray-100 ${idx === 0 ? 'h-64 sm:h-full min-h-[320px]' : 'h-56 sm:h-64'}`}>
+                    <div className="flex h-full items-center justify-center bg-gray-100">
                       <Camera className="w-10 h-10 text-gray-300" />
                     </div>
                   )}
