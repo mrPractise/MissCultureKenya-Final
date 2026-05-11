@@ -61,6 +61,8 @@ class Event(models.Model):
     # Additional info
     capacity = models.PositiveIntegerField(null=True, blank=True)
     registration_required = models.BooleanField(default=False)
+    ticket_url = models.URLField(blank=True, help_text="External ticketing URL (e.g. Eventbrite). If set, users will be redirected here to buy tickets.")
+    registration_url = models.URLField(blank=True, help_text="External registration URL. If set, users will be redirected here to register.")
 
     # Voting configuration
     voting_enabled = models.BooleanField(default=False, help_text="Enable voting for this event")

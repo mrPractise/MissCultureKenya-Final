@@ -32,19 +32,19 @@ const AboutPage = () => {
       name: settings.leader_1_name || 'Susan Abongo',
       title: settings.leader_1_title || 'Miss Culture Global Kenya',
       bio: settings.leader_1_bio || 'A passionate cultural ambassador with over 5 years of experience promoting Kenyan heritage. Susan holds a degree in Cultural Studies and has represented Kenya in international cultural forums across 15+ countries.',
-      image: settings.about_leader_1_image_url || '',
+      image: settings.leader_1_image_url || '',
     },
     {
       name: settings.leader_2_name || 'Pacific Awuor Oriato',
       title: settings.leader_2_title || 'Director of Operations',
       bio: settings.leader_2_bio || 'Oversees all operational aspects of the organization with a focus on community engagement and event management. James has a background in event planning and cultural tourism.',
-      image: settings.about_leader_2_image_url || '',
+      image: settings.leader_2_image_url || '',
     },
     {
       name: settings.leader_3_name || 'Grace Njeri',
       title: settings.leader_3_title || 'Community Outreach Coordinator',
       bio: settings.leader_3_bio || 'Leads community engagement initiatives and works directly with local artisans and cultural groups. Grace has a Master\'s degree in Anthropology and extensive experience in grassroots organizing.',
-      image: settings.about_leader_3_image_url || '',
+      image: settings.leader_3_image_url || '',
     }
   ]
 
@@ -98,8 +98,8 @@ const AboutPage = () => {
       <section className="relative h-[55vh] min-h-[450px] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <div className="w-full h-full bg-black/80">
-            {settings.about_hero_image_url ? (
-              <div className="w-full h-full bg-cover bg-center bg-no-repeat opacity-40 mix-blend-overlay" style={{ backgroundImage: `url(${settings.about_hero_image_url})` }} />
+            {settings.hero_image_url ? (
+              <div className="w-full h-full bg-cover bg-center bg-no-repeat opacity-40 mix-blend-overlay" style={{ backgroundImage: `url(${settings.hero_image_url})` }} />
             ) : null}
           </div>
         </div>
@@ -160,9 +160,9 @@ const AboutPage = () => {
               className="relative"
             >
               <div className="absolute inset-0 bg-green-600/10 rounded-2xl transform rotate-3" />
-              {settings.about_mission_image_url ? (
+              {settings.mission_image_url ? (
                 <img
-                  src={settings.about_mission_image_url}
+                  src={settings.mission_image_url}
                   alt="Kenyan Culture"
                   className="relative rounded-2xl shadow-2xl transform -rotate-3 hover:rotate-0 transition-transform duration-500"
                 />
