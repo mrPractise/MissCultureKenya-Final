@@ -2,16 +2,16 @@
 
 import { motion } from 'framer-motion'
 import PageHeader from '@/components/PageHeader'
-import { useSiteSettings } from '@/lib/useSiteSettings'
+import { usePrivacyPageSettings } from '@/lib/usePageSettings'
 
 export default function PrivacyPolicy() {
-  const settings = useSiteSettings()
+  const { settings } = usePrivacyPageSettings()
   return (
     <div className="min-h-screen bg-white">
       <PageHeader 
         title="Privacy Policy" 
         subtitle="Your privacy is important to us"
-        backgroundImage={settings.privacy_hero_image_url || undefined}
+        backgroundImage={settings.hero_image_url || undefined}
       />
       
       <motion.div

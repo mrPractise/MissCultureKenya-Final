@@ -83,6 +83,36 @@ interface PartnershipPageSettings {
   page_subtitle: string
 }
 
+interface ContactPageSettings {
+  hero_image_url: string | null
+  page_title: string
+  page_subtitle: string
+}
+
+interface FAQPageSettings {
+  hero_image_url: string | null
+  page_title: string
+  page_subtitle: string
+}
+
+interface ContributePageSettings {
+  hero_image_url: string | null
+  page_title: string
+  page_subtitle: string
+}
+
+interface PrivacyPageSettings {
+  hero_image_url: string | null
+  page_title: string
+  page_subtitle: string
+}
+
+interface TermsPageSettings {
+  hero_image_url: string | null
+  page_title: string
+  page_subtitle: string
+}
+
 // Hook for Home Page Settings
 export function useHomePageSettings() {
   const [settings, setSettings] = useState<HomePageSettings>({
@@ -299,6 +329,141 @@ export function usePartnershipPageSettings() {
         setSettings(prev => ({ ...prev, ...data }))
       } catch (err: any) {
         setError(err.message || 'Failed to load partnership page settings')
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadSettings()
+  }, [])
+
+  return { settings, loading, error }
+}
+
+// Hook for Contact Page Settings
+export function useContactPageSettings() {
+  const [settings, setSettings] = useState<ContactPageSettings>({
+    hero_image_url: null,
+    page_title: 'Contact Us',
+    page_subtitle: 'Get in touch with us',
+  })
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    async function loadSettings() {
+      try {
+        const data = await apiClient.getContactPageSettings()
+        setSettings(prev => ({ ...prev, ...data }))
+      } catch (err: any) {
+        setError(err.message || 'Failed to load contact page settings')
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadSettings()
+  }, [])
+
+  return { settings, loading, error }
+}
+
+// Hook for FAQ Page Settings
+export function useFAQPageSettings() {
+  const [settings, setSettings] = useState<FAQPageSettings>({
+    hero_image_url: null,
+    page_title: 'FAQ',
+    page_subtitle: 'Frequently asked questions',
+  })
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    async function loadSettings() {
+      try {
+        const data = await apiClient.getFAQPageSettings()
+        setSettings(prev => ({ ...prev, ...data }))
+      } catch (err: any) {
+        setError(err.message || 'Failed to load FAQ page settings')
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadSettings()
+  }, [])
+
+  return { settings, loading, error }
+}
+
+// Hook for Contribute Page Settings
+export function useContributePageSettings() {
+  const [settings, setSettings] = useState<ContributePageSettings>({
+    hero_image_url: null,
+    page_title: 'Contribute',
+    page_subtitle: 'Support our mission',
+  })
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    async function loadSettings() {
+      try {
+        const data = await apiClient.getContributePageSettings()
+        setSettings(prev => ({ ...prev, ...data }))
+      } catch (err: any) {
+        setError(err.message || 'Failed to load contribute page settings')
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadSettings()
+  }, [])
+
+  return { settings, loading, error }
+}
+
+// Hook for Privacy Page Settings
+export function usePrivacyPageSettings() {
+  const [settings, setSettings] = useState<PrivacyPageSettings>({
+    hero_image_url: null,
+    page_title: 'Privacy Policy',
+    page_subtitle: 'Your privacy matters to us',
+  })
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    async function loadSettings() {
+      try {
+        const data = await apiClient.getPrivacyPageSettings()
+        setSettings(prev => ({ ...prev, ...data }))
+      } catch (err: any) {
+        setError(err.message || 'Failed to load privacy page settings')
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadSettings()
+  }, [])
+
+  return { settings, loading, error }
+}
+
+// Hook for Terms Page Settings
+export function useTermsPageSettings() {
+  const [settings, setSettings] = useState<TermsPageSettings>({
+    hero_image_url: null,
+    page_title: 'Terms of Service',
+    page_subtitle: 'Terms and conditions',
+  })
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    async function loadSettings() {
+      try {
+        const data = await apiClient.getTermsPageSettings()
+        setSettings(prev => ({ ...prev, ...data }))
+      } catch (err: any) {
+        setError(err.message || 'Failed to load terms page settings')
       } finally {
         setLoading(false)
       }

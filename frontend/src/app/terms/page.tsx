@@ -2,16 +2,16 @@
 
 import { motion } from 'framer-motion'
 import PageHeader from '@/components/PageHeader'
-import { useSiteSettings } from '@/lib/useSiteSettings'
+import { useTermsPageSettings } from '@/lib/usePageSettings'
 
 export default function TermsAndConditions() {
-  const settings = useSiteSettings()
+  const { settings } = useTermsPageSettings()
   return (
     <div className="min-h-screen bg-white">
       <PageHeader 
         title="Terms & Conditions" 
         subtitle="Please read these terms carefully before using our services"
-        backgroundImage={settings.about_hero_image_url || undefined}
+        backgroundImage={settings.hero_image_url || undefined}
       />
       
       <motion.div

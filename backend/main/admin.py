@@ -7,7 +7,8 @@ from .models import (
     Achievement, Partner, SocialMediaPost, KenyaGalleryPhoto, SiteSettings,
     HomePageSettings, KenyaPageSettings, AmbassadorPageSettings,
     EventsPageSettings, GalleryPageSettings, PartnershipPageSettings, AboutPageSettings,
-    VotingPageSettings, ContactPageSettings, FAQPageSettings
+    VotingPageSettings, ContactPageSettings, FAQPageSettings,
+    ContributePageSettings, PrivacyPageSettings, TermsPageSettings
 )
 
 
@@ -642,3 +643,98 @@ class FAQPageSettingsAdmin(admin.ModelAdmin):
 
             return HttpResponseRedirect(request.path)
 
+
+@admin.register(ContributePageSettings)
+class ContributePageSettingsAdmin(admin.ModelAdmin):
+    """Contribute page settings — hero and page details"""
+    readonly_fields = ['created_at', 'updated_at']
+    
+    fieldsets = (
+        ('Hero Section', {
+            'fields': ('hero_image', 'page_title', 'page_subtitle'),
+        }),
+        ('Metadata', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def has_add_permission(self, request):
+        return not ContributePageSettings.objects.exists()
+
+    def changeform_view(self, request, object_id=None, form_url="", extra_context=None):
+        try:
+            return super().changeform_view(
+                request, object_id=object_id, form_url=form_url, extra_context=extra_context
+            )
+        except Exception as e:
+            self.message_user(
+                request,
+                f"Error saving settings: {str(e)}",
+                level=messages.ERROR,
+            )
+            return HttpResponseRedirect(request.path)
+
+
+@admin.register(PrivacyPageSettings)
+class PrivacyPageSettingsAdmin(admin.ModelAdmin):
+    """Privacy page settings — hero and page details"""
+    readonly_fields = ['created_at', 'updated_at']
+    
+    fieldsets = (
+        ('Hero Section', {
+            'fields': ('hero_image', 'page_title', 'page_subtitle'),
+        }),
+        ('Metadata', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def has_add_permission(self, request):
+        return not PrivacyPageSettings.objects.exists()
+
+    def changeform_view(self, request, object_id=None, form_url="", extra_context=None):
+        try:
+            return super().changeform_view(
+                request, object_id=object_id, form_url=form_url, extra_context=extra_context
+            )
+        except Exception as e:
+            self.message_user(
+                request,
+                f"Error saving settings: {str(e)}",
+                level=messages.ERROR,
+            )
+            return HttpResponseRedirect(request.path)
+
+
+@admin.register(TermsPageSettings)
+class TermsPageSettingsAdmin(admin.ModelAdmin):
+    """Terms page settings — hero and page details"""
+    readonly_fields = ['created_at', 'updated_at']
+    
+    fieldsets = (
+        ('Hero Section', {
+            'fields': ('hero_image', 'page_title', 'page_subtitle'),
+        }),
+        ('Metadata', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def has_add_permission(self, request):
+        return not TermsPageSettings.objects.exists()
+
+    def changeform_view(self, request, object_id=None, form_url="", extra_context=None):
+        try:
+            return super().changeform_view(
+                request, object_id=object_id, form_url=form_url, extra_context=extra_context
+            )
+        except Exception as e:
+            self.message_user(
+                request,
+                f"Error saving settings: {str(e)}",
+                level=messages.ERROR,
+            )
+            return HttpResponseRedirect(request.path)

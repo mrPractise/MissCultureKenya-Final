@@ -7,7 +7,7 @@ import Link from 'next/link'
 import ContactModal from '@/components/ContactModal'
 import TikTokIcon from '@/components/TikTokIcon'
 import apiClient from '@/lib/api'
-import { useSiteSettings } from '@/lib/useSiteSettings'
+import { useContactPageSettings } from '@/lib/usePageSettings'
 
 const contactInfo = [
   {
@@ -68,7 +68,7 @@ const socialLinks = [
 ]
 
 const ContactPage = () => {
-  const settings = useSiteSettings()
+  const { settings } = useContactPageSettings()
   const [isContactModalOpen, setIsContactModalOpen] = useState(false)
   const [contactForm, setContactForm] = useState({
     firstName: '',
@@ -93,7 +93,7 @@ const ContactPage = () => {
             animate={{ scale: 1 }}
             transition={{ duration: 10, repeat: Infinity, repeatType: "reverse" }}
             className="w-full h-full bg-cover bg-center"
-            style={settings.contact_hero_image_url ? { backgroundImage: `url(${settings.contact_hero_image_url})` } : undefined}
+            style={settings.hero_image_url ? { backgroundImage: `url(${settings.hero_image_url})` } : undefined}
           />
         </div>
 

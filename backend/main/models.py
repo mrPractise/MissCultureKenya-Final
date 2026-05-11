@@ -474,6 +474,60 @@ class FAQPageSettings(models.Model):
         return "FAQ Page Settings"
 
 
+class ContributePageSettings(models.Model):
+    """Contribute page specific settings - hero only"""
+    # Hero Section
+    hero_image = cloudinary.models.CloudinaryField('hero', folder='missculture/pages/contribute', blank=True, null=True)
+    page_title = models.CharField(max_length=200, default='Contribute')
+    page_subtitle = models.TextField(blank=True, default='Support our mission')
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = "Contribute Page Settings"
+        verbose_name_plural = "Contribute Page Settings"
+    
+    def __str__(self):
+        return "Contribute Page Settings"
+
+
+class PrivacyPageSettings(models.Model):
+    """Privacy page specific settings - hero only"""
+    # Hero Section
+    hero_image = cloudinary.models.CloudinaryField('hero', folder='missculture/pages/privacy', blank=True, null=True)
+    page_title = models.CharField(max_length=200, default='Privacy Policy')
+    page_subtitle = models.TextField(blank=True, default='Your privacy matters to us')
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = "Privacy Page Settings"
+        verbose_name_plural = "Privacy Page Settings"
+    
+    def __str__(self):
+        return "Privacy Page Settings"
+
+
+class TermsPageSettings(models.Model):
+    """Terms page specific settings - hero only"""
+    # Hero Section
+    hero_image = cloudinary.models.CloudinaryField('hero', folder='missculture/pages/terms', blank=True, null=True)
+    page_title = models.CharField(max_length=200, default='Terms of Service')
+    page_subtitle = models.TextField(blank=True, default='Terms and conditions')
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = "Terms Page Settings"
+        verbose_name_plural = "Terms Page Settings"
+    
+    def __str__(self):
+        return "Terms Page Settings"
+
+
 class SocialMediaPost(models.Model):
     """Model for social media integration"""
     platform = models.CharField(max_length=50, choices=[

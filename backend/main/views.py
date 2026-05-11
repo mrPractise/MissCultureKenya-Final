@@ -415,8 +415,44 @@ class FAQPageSettingsAPIView(APIView):
     def get(self, request):
         settings = FAQPageSettings.objects.first()
         if not settings:
-            settings = FAQPageSettings.objects.create()
+            return Response({})
         serializer = FAQPageSettingsSerializer(settings)
+        return Response(serializer.data)
+
+
+class ContributePageSettingsAPIView(APIView):
+    """API endpoint for Contribute page settings"""
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        settings = ContributePageSettings.objects.first()
+        if not settings:
+            return Response({})
+        serializer = ContributePageSettingsSerializer(settings)
+        return Response(serializer.data)
+
+
+class PrivacyPageSettingsAPIView(APIView):
+    """API endpoint for Privacy page settings"""
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        settings = PrivacyPageSettings.objects.first()
+        if not settings:
+            return Response({})
+        serializer = PrivacyPageSettingsSerializer(settings)
+        return Response(serializer.data)
+
+
+class TermsPageSettingsAPIView(APIView):
+    """API endpoint for Terms page settings"""
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        settings = TermsPageSettings.objects.first()
+        if not settings:
+            return Response({})
+        serializer = TermsPageSettingsSerializer(settings)
         return Response(serializer.data)
 
 

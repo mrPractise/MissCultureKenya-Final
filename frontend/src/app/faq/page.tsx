@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronDown, Mail, Phone, Heart, Calendar, Users, Globe, HelpCircle } from 'lucide-react'
 import { useState } from 'react'
 import Link from 'next/link'
-import { useSiteSettings } from '@/lib/useSiteSettings'
+import { useFAQPageSettings } from '@/lib/usePageSettings'
 
 const faqCategories = [
   {
@@ -110,7 +110,7 @@ const faqCategories = [
 ]
 
 const FAQPage = () => {
-  const settings = useSiteSettings()
+  const { settings } = useFAQPageSettings()
   const [openIndex, setOpenIndex] = useState<string | null>(null)
 
   const toggleAccordion = (key: string) => {
@@ -128,7 +128,7 @@ const FAQPage = () => {
             animate={{ scale: 1 }}
             transition={{ duration: 10, repeat: Infinity, repeatType: "reverse" }}
             className="w-full h-full bg-cover bg-center"
-            style={settings.faq_hero_image_url ? { backgroundImage: `url(${settings.faq_hero_image_url})` } : undefined}
+            style={settings.hero_image_url ? { backgroundImage: `url(${settings.hero_image_url})` } : undefined}
           />
         </div>
 

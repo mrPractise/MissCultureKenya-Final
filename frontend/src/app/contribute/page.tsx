@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import { Smartphone, Check, Palette, GraduationCap, Globe2, Home, Building2, Copy } from 'lucide-react'
 import { useState } from 'react'
 import Link from 'next/link'
-import { useSiteSettings } from '@/lib/useSiteSettings'
+import { useContributePageSettings } from '@/lib/usePageSettings'
 import MpesaLogo from '@/components/MpesaLogo'
 
 const impactAreas = [
@@ -35,7 +35,7 @@ const impactAreas = [
 ]
 
 const ContributePage = () => {
-  const settings = useSiteSettings()
+  const { settings } = useContributePageSettings()
   const [amount, setAmount] = useState('')
   const [phoneNumber, setPhoneNumber] = useState('')
   const [isProcessing, setIsProcessing] = useState(false)
@@ -69,7 +69,7 @@ const ContributePage = () => {
             animate={{ scale: 1 }}
             transition={{ duration: 10, repeat: Infinity, repeatType: "reverse" }}
             className="w-full h-full bg-cover bg-center"
-            style={settings.contribute_hero_image_url ? { backgroundImage: `url(${settings.contribute_hero_image_url})` } : undefined}
+            style={settings.hero_image_url ? { backgroundImage: `url(${settings.hero_image_url})` } : undefined}
           />
         </div>
 

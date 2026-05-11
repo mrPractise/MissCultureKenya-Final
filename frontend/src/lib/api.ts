@@ -162,6 +162,15 @@ const apiClient = {
   getFAQPageSettings() {
     return handle(client.get('/api/main/settings/faq/'))
   },
+  getContributePageSettings() {
+    return handle(client.get('/api/main/settings/contribute/'))
+  },
+  getPrivacyPageSettings() {
+    return handle(client.get('/api/main/settings/privacy/'))
+  },
+  getTermsPageSettings() {
+    return handle(client.get('/api/main/settings/terms/'))
+  },
   // Contact form
   sendContactMessage(data: { name: string; email: string; phone?: string; subject?: string; message: string; type?: string }) {
     return handle(client.post('/api/main/contact/', data))

@@ -5,7 +5,8 @@ from .models import (
     Achievement, Partner, SocialMediaPost, KenyaGalleryPhoto, SiteSettings, TeamMember,
     HomePageSettings, KenyaPageSettings, AmbassadorPageSettings,
     EventsPageSettings, GalleryPageSettings, PartnershipPageSettings, AboutPageSettings,
-    VotingPageSettings, ContactPageSettings, FAQPageSettings
+    VotingPageSettings, ContactPageSettings, FAQPageSettings,
+    ContributePageSettings, PrivacyPageSettings, TermsPageSettings
 )
 
 
@@ -369,6 +370,39 @@ class FAQPageSettingsSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = FAQPageSettings
+        fields = ['hero_image', 'hero_image_url', 'page_title', 'page_subtitle', 'created_at', 'updated_at']
+    
+    def get_hero_image_url(self, obj):
+        return _cloudinary_url(obj.hero_image)
+
+
+class ContributePageSettingsSerializer(serializers.ModelSerializer):
+    hero_image_url = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = ContributePageSettings
+        fields = ['hero_image', 'hero_image_url', 'page_title', 'page_subtitle', 'created_at', 'updated_at']
+    
+    def get_hero_image_url(self, obj):
+        return _cloudinary_url(obj.hero_image)
+
+
+class PrivacyPageSettingsSerializer(serializers.ModelSerializer):
+    hero_image_url = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = PrivacyPageSettings
+        fields = ['hero_image', 'hero_image_url', 'page_title', 'page_subtitle', 'created_at', 'updated_at']
+    
+    def get_hero_image_url(self, obj):
+        return _cloudinary_url(obj.hero_image)
+
+
+class TermsPageSettingsSerializer(serializers.ModelSerializer):
+    hero_image_url = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = TermsPageSettings
         fields = ['hero_image', 'hero_image_url', 'page_title', 'page_subtitle', 'created_at', 'updated_at']
     
     def get_hero_image_url(self, obj):
