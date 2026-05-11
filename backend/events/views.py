@@ -38,7 +38,7 @@ from .daraja import initiate_stk_push, process_callback
 class EventViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Event.objects.filter(published=True)
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['event_type', 'status', 'event_status', 'featured', 'city', 'country', 'voting_enabled']
+    filterset_fields = ['event_type', 'event_status', 'featured', 'city', 'country', 'voting_enabled']
     search_fields = ['title', 'description', 'venue_name', 'city']
     ordering_fields = ['start_date', 'title', 'created_at']
     ordering = ['-start_date']
