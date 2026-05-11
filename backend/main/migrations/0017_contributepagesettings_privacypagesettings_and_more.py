@@ -68,32 +68,42 @@ class Migration(migrations.Migration):
             model_name='homepagesettings',
             name='welcome_title',
         ),
-        migrations.RemoveField(
-            model_name='sitesettings',
-            name='home_ambassador_highlight_image',
-        ),
-        migrations.RemoveField(
-            model_name='sitesettings',
-            name='home_kenya_highlight_image',
-        ),
-        migrations.RemoveField(
-            model_name='sitesettings',
-            name='home_upcoming_event_image',
-        ),
-        migrations.RemoveField(
-            model_name='sitesettings',
-            name='kenya_artisan_1_image',
-        ),
-        migrations.RemoveField(
-            model_name='sitesettings',
-            name='kenya_artisan_2_image',
-        ),
-        migrations.RemoveField(
-            model_name='sitesettings',
-            name='kenya_artisan_3_image',
-        ),
-        migrations.RemoveField(
-            model_name='sitesettings',
-            name='kenya_artisan_4_image',
+        # NOTE: Migration 0016 already dropped these 7 columns at the DB level via
+        # RunPython(safe_remove_columns) using DROP COLUMN IF EXISTS.
+        # We only need to sync Django's migration state here - issuing another
+        # DDL DROP would fail on Postgres with UndefinedColumn. So we use
+        # SeparateDatabaseAndState with database_operations=[] (no-op on DB).
+        migrations.SeparateDatabaseAndState(
+            database_operations=[],
+            state_operations=[
+                migrations.RemoveField(
+                    model_name='sitesettings',
+                    name='home_ambassador_highlight_image',
+                ),
+                migrations.RemoveField(
+                    model_name='sitesettings',
+                    name='home_kenya_highlight_image',
+                ),
+                migrations.RemoveField(
+                    model_name='sitesettings',
+                    name='home_upcoming_event_image',
+                ),
+                migrations.RemoveField(
+                    model_name='sitesettings',
+                    name='kenya_artisan_1_image',
+                ),
+                migrations.RemoveField(
+                    model_name='sitesettings',
+                    name='kenya_artisan_2_image',
+                ),
+                migrations.RemoveField(
+                    model_name='sitesettings',
+                    name='kenya_artisan_3_image',
+                ),
+                migrations.RemoveField(
+                    model_name='sitesettings',
+                    name='kenya_artisan_4_image',
+                ),
+            ],
         ),
     ]
