@@ -130,7 +130,8 @@ const EventDetailPage = () => {
           account_name: data.account_name || 'The Misscomm Events',
           payment_method: data.payment_method || 'till_number',
           contestant_count: data.contestant_count || 0,
-          total_votes: data.total_votes || 0,
+          total_votes: data.total_votes ?? null,
+          result_visibility: data.result_visibility || 'full_live',
           slug: data.slug || '',
           ticket_url: data.ticket_url || '',
           registration_url: data.registration_url || '',
@@ -727,7 +728,7 @@ const EventDetailPage = () => {
                       {isVotingOpen ? 'Voting is Open' : 'Voting is Closed'}
                     </h3>
                     <p className="text-sm text-gray-600 mt-1">
-                      KES {event.vote_price} per vote | {event.contestant_count} contestants | {event.total_votes} votes cast
+                      KES {event.vote_price} per vote | {event.contestant_count} contestants{event.total_votes !== null && event.total_votes !== undefined ? ` | ${event.total_votes} votes cast` : ''}
                     </p>
                     {!isVotingOpen && (
                       <p className="text-xs text-gray-500 mt-1">

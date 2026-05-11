@@ -50,6 +50,9 @@ class EventSerializer(serializers.ModelSerializer):
         return obj.contestants.filter(is_active=True).count()
 
     def get_total_votes(self, obj):
+        # Respect result_visibility: only expose totals when fully public
+        if getattr(obj, 'result_visibility', 'full_live') != 'full_live':
+            return None
         result = obj.vote_transactions.filter(status='successful').aggregate(
             total=Sum('vote_count')
         )
@@ -143,6 +146,10 @@ class ContestantSerializer(serializers.ModelSerializer):
         return _cloudinary_url(obj.photo)
 
     def get_vote_count(self, obj):
+        # Respect event.result_visibility so hidden/rankings_only/no_public don't leak totals
+        event = obj.event
+        if getattr(event, 'result_visibility', 'full_live') != 'full_live':
+            return None
         result = obj.vote_transactions.filter(status='successful').aggregate(
             total=Sum('vote_count')
         )
@@ -173,7 +180,8 @@ class ContestantPublicSerializer(serializers.ModelSerializer):
     def get_vote_count(self, obj):
         event = obj.event
         # Respect result_visibility settings
-        if event.result_visibility == 'no_public':
+        # Only 'full_live' exposes raw totals to the public
+        if getattr(event, 'result_visibility', 'full_live') != 'full_live':
             return None
         result = obj.vote_transactions.filter(status='successful').aggregate(
             total=Sum('vote_count')
