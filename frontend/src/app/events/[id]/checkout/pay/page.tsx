@@ -62,10 +62,9 @@ export default function EventCheckoutPayPage() {
         setEvent({
           id: data.id,
           title: data.title || data.name,
-          paybill_number: data.paybill_number || '542542',
-          account_number: data.account_number || '0310848627615',
+          till_number: data.till_number || '4766976',
           account_name: data.account_name || 'The Misscomm Events',
-          payment_method: data.payment_method || 'paybill',
+          payment_method: data.payment_method || 'till_number',
         })
 
         try {
@@ -210,20 +209,11 @@ export default function EventCheckoutPayPage() {
               <div className="divide-y divide-gray-100">
                 <div className="flex items-center justify-between px-4 py-3">
                   <div>
-                    <p className="text-xs text-gray-500 uppercase tracking-wider font-medium">Paybill</p>
-                    <p className="text-lg font-bold text-gray-900 font-mono">{event?.paybill_number || '542542'}</p>
+                    <p className="text-xs text-gray-500 uppercase tracking-wider font-medium">Till Number</p>
+                    <p className="text-lg font-bold text-gray-900 font-mono">{event?.till_number || '4766976'}</p>
                   </div>
-                  <button onClick={() => handleCopy(event?.paybill_number || '542542', 'paybill')} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                    {copiedField === 'paybill' ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4 text-gray-400" />}
-                  </button>
-                </div>
-                <div className="flex items-center justify-between px-4 py-3">
-                  <div>
-                    <p className="text-xs text-gray-500 uppercase tracking-wider font-medium">Account</p>
-                    <p className="text-lg font-bold text-gray-900 font-mono">{event?.account_number || '0310848627615'}</p>
-                  </div>
-                  <button onClick={() => handleCopy(event?.account_number || '0310848627615', 'account')} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                    {copiedField === 'account' ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4 text-gray-400" />}
+                  <button onClick={() => handleCopy(event?.till_number || '4766976', 'till')} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                    {copiedField === 'till' ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4 text-gray-400" />}
                   </button>
                 </div>
                 <div className="flex items-center justify-between px-4 py-3">

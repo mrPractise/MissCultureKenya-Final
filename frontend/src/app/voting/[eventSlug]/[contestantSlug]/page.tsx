@@ -27,8 +27,6 @@ interface EventData {
   id: number
   title: string
   vote_price: number
-  paybill_number: string
-  account_number: string
   account_name: string
   payment_method: string
   till_number: string
@@ -57,11 +55,9 @@ export default function ContestantPage({ params }: { params: Promise<{ eventSlug
             id: matchedEvent.id,
             title: matchedEvent.title,
             vote_price: matchedEvent.vote_price,
-            paybill_number: matchedEvent.paybill_number,
-            account_number: matchedEvent.account_number,
-            account_name: matchedEvent.account_name,
-            payment_method: matchedEvent.payment_method,
-            till_number: matchedEvent.till_number,
+            account_name: matchedEvent.account_name || 'The Misscomm Events',
+            payment_method: matchedEvent.payment_method || 'till_number',
+            till_number: matchedEvent.till_number || '4766976',
             is_voting_active: matchedEvent.is_voting_active,
           })
 

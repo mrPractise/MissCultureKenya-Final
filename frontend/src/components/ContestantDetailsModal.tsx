@@ -123,34 +123,41 @@ const ContestantDetailsModal = ({ isOpen, onClose, contestant, onVote, isVotingA
                   </div>
                 )}
 
-                <div className="grid sm:grid-cols-2 gap-4">
-                  {contestant.beliefs && (
-                    <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
-                      <h4 className="font-bold text-gray-900 mb-2 flex items-center gap-2 text-xs uppercase tracking-wider">
-                        <Shield className="w-3.5 h-3.5 text-green-600" />
-                        Beliefs
-                      </h4>
-                      <p className="text-sm text-gray-600 leading-relaxed">{contestant.beliefs}</p>
+                {(contestant.beliefs || contestant.mission_statement || contestant.achievements) && (
+                  <div>
+                    <h3 className="text-sm uppercase tracking-wider font-bold text-green-700 mb-3 flex items-center gap-2">
+                      <Star className="w-4 h-4" />
+                      Why Vote For Me
+                    </h3>
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      {contestant.beliefs && (
+                        <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                          <h4 className="font-bold text-gray-900 mb-2 flex items-center gap-2 text-xs uppercase tracking-wider">
+                            <Shield className="w-3.5 h-3.5 text-green-600" />
+                            Beliefs
+                          </h4>
+                          <p className="text-sm text-gray-600 leading-relaxed">{contestant.beliefs}</p>
+                        </div>
+                      )}
+                      {contestant.mission_statement && (
+                        <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                          <h4 className="font-bold text-gray-900 mb-2 flex items-center gap-2 text-xs uppercase tracking-wider">
+                            <Target className="w-3.5 h-3.5 text-green-600" />
+                            Mission
+                          </h4>
+                          <p className="text-sm text-gray-600 leading-relaxed">{contestant.mission_statement}</p>
+                        </div>
+                      )}
                     </div>
-                  )}
-                  {contestant.mission_statement && (
-                    <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
-                      <h4 className="font-bold text-gray-900 mb-2 flex items-center gap-2 text-xs uppercase tracking-wider">
-                        <Target className="w-3.5 h-3.5 text-green-600" />
-                        Mission
-                      </h4>
-                      <p className="text-sm text-gray-600 leading-relaxed">{contestant.mission_statement}</p>
-                    </div>
-                  )}
-                </div>
-
-                {contestant.achievements && (
-                  <div className="bg-green-50/50 rounded-xl p-4 border border-green-100">
-                    <h4 className="font-bold text-gray-900 mb-2 flex items-center gap-2 text-xs uppercase tracking-wider">
-                      <Star className="w-3.5 h-3.5 text-green-600" />
-                      Achievements
-                    </h4>
-                    <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">{contestant.achievements}</p>
+                    {contestant.achievements && (
+                      <div className="bg-green-50/50 rounded-xl p-4 border border-green-100 mt-4">
+                        <h4 className="font-bold text-gray-900 mb-2 flex items-center gap-2 text-xs uppercase tracking-wider">
+                          <Star className="w-3.5 h-3.5 text-green-600" />
+                          Achievements
+                        </h4>
+                        <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">{contestant.achievements}</p>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

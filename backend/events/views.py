@@ -12,12 +12,12 @@ from django.core.mail import send_mail
 from django.db.models import Sum, F, Q
 
 from .models import (
-    Event, EventInquiry, EventCategory, EventSettings,
+    Event, EventCategory,
     TicketCategory, Contestant, GuestSpeaker, Payment, Ticket, VoteTransaction, AuditLog
 )
 from .serializers import (
-    EventSerializer, EventListSerializer, EventInquirySerializer,
-    EventCategorySerializer, EventSettingsSerializer,
+    EventSerializer, EventListSerializer,
+    EventCategorySerializer,
     TicketCategorySerializer, ContestantSerializer, ContestantPublicSerializer,
     PaymentSerializer, PaymentCreateSerializer,
     TicketSerializer, TicketDetailSerializer,
@@ -574,69 +574,6 @@ Emails Sent: {len(emails_sent)}/{len(tickets)}"""
         return request.META.get('REMOTE_ADDR')
 
 
-# ── EventInquiry ViewSet ─────────────────────────────────────────────────────
-
-class EventInquiryViewSet(viewsets.ModelViewSet):
-    queryset = EventInquiry.objects.all()
-    serializer_class = EventInquirySerializer
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['inquiry_type', 'status']
-    search_fields = ['name', 'organization', 'email', 'event_title']
-    ordering_fields = ['created_at', 'name']
-    ordering = ['-created_at']
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            inquiry = serializer.save()
-
-            email_subject = f"[Miss Culture Kenya] Event Inquiry: {inquiry.event_title or 'New Inquiry'}"
-            plain_body = (
-                f"New Event Inquiry\n"
-                f"------------------\n"
-                f"Name: {inquiry.name}\n"
-                f"Organization: {inquiry.organization or 'N/A'}\n"
-                f"Email: {inquiry.email}\n"
-                f"Phone: {inquiry.phone or 'N/A'}\n"
-                f"Event Title: {inquiry.event_title or 'N/A'}\n"
-                f"Inquiry Type: {inquiry.inquiry_type}\n\n"
-                f"Message:\n{inquiry.message or 'No message provided'}\n\n"
-                f"---\nSent via Miss Culture Global Kenya website"
-            )
-            html_body = f"""
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                <h2 style="color: #15803d;">New Event Inquiry — Miss Culture Global Kenya</h2>
-                <table style="width: 100%; border-collapse: collapse;">
-                    <tr><td style="padding: 8px; font-weight: bold; width: 120px;">Name:</td><td style="padding: 8px;">{inquiry.name}</td></tr>
-                    <tr><td style="padding: 8px; font-weight: bold;">Organization:</td><td style="padding: 8px;">{inquiry.organization or 'N/A'}</td></tr>
-                    <tr><td style="padding: 8px; font-weight: bold;">Email:</td><td style="padding: 8px;"><a href="mailto:{inquiry.email}">{inquiry.email}</a></td></tr>
-                    <tr><td style="padding: 8px; font-weight: bold;">Phone:</td><td style="padding: 8px;">{inquiry.phone or 'N/A'}</td></tr>
-                    <tr><td style="padding: 8px; font-weight: bold;">Event Title:</td><td style="padding: 8px;">{inquiry.event_title or 'N/A'}</td></tr>
-                    <tr><td style="padding: 8px; font-weight: bold;">Inquiry Type:</td><td style="padding: 8px;">{inquiry.inquiry_type}</td></tr>
-                </table>
-                <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 16px 0;" />
-                <h3 style="color: #374151;">Message</h3>
-                <p style="white-space: pre-wrap; color: #4b5563; line-height: 1.6;">{inquiry.message or 'No message provided'}</p>
-                <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 16px 0;" />
-                <p style="font-size: 12px; color: #9ca3af;">This inquiry was submitted via the Miss Culture Global Kenya events page.</p>
-            </div>
-            """
-            try:
-                send_mail(
-                    subject=email_subject,
-                    message=plain_body,
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    recipient_list=[settings.ADMIN_EMAIL],
-                    html_message=html_body,
-                    fail_silently=True,
-                )
-            except Exception:
-                pass
-
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
 # ── EventCategory ViewSet ────────────────────────────────────────────────────
 
 class EventCategoryViewSet(viewsets.ReadOnlyModelViewSet):
@@ -646,13 +583,6 @@ class EventCategoryViewSet(viewsets.ReadOnlyModelViewSet):
     search_fields = ['name', 'description']
     ordering_fields = ['name', 'created_at']
     ordering = ['name']
-
-
-# ── EventSettings ViewSet ────────────────────────────────────────────────────
-
-class EventSettingsViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = EventSettings.objects.all()
-    serializer_class = EventSettingsSerializer
 
 
 # ── TicketCategory ViewSet ───────────────────────────────────────────────────
@@ -695,6 +625,11 @@ class PaymentViewSet(viewsets.ModelViewSet):
     search_fields = ['mpesa_code', 'phone_number']
     ordering_fields = ['created_at', 'amount']
     ordering = ['-created_at']
+
+    def get_permissions(self):
+        if self.action in ['create', 'retrieve']:
+            return [AllowAny()]
+        return [IsAdminUser()]
 
     def get_serializer_class(self):
         if self.action == 'create':
@@ -838,6 +773,7 @@ class TicketViewSet(viewsets.ReadOnlyModelViewSet):
 class VoteTransactionViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = VoteTransaction.objects.all().select_related('event', 'contestant', 'payment')
     serializer_class = VoteTransactionSerializer
+    permission_classes = [IsAdminUser]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['event', 'contestant', 'status']
     search_fields = ['mpesa_code', 'phone_number']

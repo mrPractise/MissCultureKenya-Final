@@ -90,7 +90,7 @@ const EventDetailPage = () => {
           image: data.featured_image_url || data.featured_image || data.image || '',
           category: data.event_type || data.category || 'Event',
           capacity: data.capacity || 0,
-          price: data.ticket_price ? `KES ${Number(data.ticket_price).toLocaleString()}` : 'Free',
+          price: 'Free',
           organizer: data.organizer || 'Miss Culture Global Kenya',
           contactEmail: data.contact_email || 'info@misscultureglobalkenya.com',
           contactPhone: data.contact_phone || '+254 721 706983',
@@ -99,10 +99,9 @@ const EventDetailPage = () => {
           is_voting_active: data.is_voting_active || false,
           vote_price: data.vote_price || 10,
           event_status: data.event_status || 'draft',
-          paybill_number: data.paybill_number || '542542',
-          account_number: data.account_number || '0310848627615',
+          till_number: data.till_number || '4766976',
           account_name: data.account_name || 'The Misscomm Events',
-          payment_method: data.payment_method || 'paybill',
+          payment_method: data.payment_method || 'till_number',
           contestant_count: data.contestant_count || 0,
           total_votes: data.total_votes || 0,
           slug: data.slug || '',
@@ -926,27 +925,18 @@ const EventDetailPage = () => {
             {/* Payment Info */}
             <div className="bg-green-50 rounded-xl p-5 border border-green-100">
               <h3 className="font-semibold text-green-900 mb-3">Payment Info</h3>
-              <p className="text-sm text-green-800 mb-3">Pay via M-Pesa Paybill:</p>
+              <p className="text-sm text-green-800 mb-3">Pay via M-Pesa Till Number:</p>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-[10px] text-green-600 uppercase tracking-wider font-medium">Paybill</p>
-                    <p className="text-lg font-bold text-gray-900 font-mono">{event.paybill_number}</p>
+                    <p className="text-[10px] text-green-600 uppercase tracking-wider font-medium">Till Number</p>
+                    <p className="text-lg font-bold text-gray-900 font-mono">{event.till_number || '4766976'}</p>
                   </div>
-                  <button onClick={() => handleCopy(event.paybill_number, 'paybill')} className="p-1.5 rounded-lg hover:bg-green-100 transition-colors">
-                    {copiedField === 'paybill' ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4 text-green-500" />}
+                  <button onClick={() => handleCopy(event.till_number || '4766976', 'till')} className="p-1.5 rounded-lg hover:bg-green-100 transition-colors">
+                    {copiedField === 'till' ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4 text-green-500" />}
                   </button>
                 </div>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-[10px] text-green-600 uppercase tracking-wider font-medium">Account</p>
-                    <p className="text-sm font-bold text-gray-900 font-mono">{event.account_number}</p>
-                  </div>
-                  <button onClick={() => handleCopy(event.account_number, 'account')} className="p-1.5 rounded-lg hover:bg-green-100 transition-colors">
-                    {copiedField === 'account' ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4 text-green-500" />}
-                  </button>
-                </div>
-                <p className="text-xs text-green-700 pt-1">{event.account_name}</p>
+                <p className="text-xs text-green-700 pt-1">{event.account_name || 'The Misscomm Events'}</p>
               </div>
             </div>
 

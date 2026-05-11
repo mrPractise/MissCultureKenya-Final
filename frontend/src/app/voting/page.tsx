@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
-import { Calendar, Trophy, Search, Vote, Phone, ChevronRight, ChevronDown, AlertCircle, Loader2, Check, X, Share2 } from 'lucide-react'
+import { Calendar, Trophy, Search, Vote, Phone, ChevronRight, ChevronDown, AlertCircle, Loader2, Check, X } from 'lucide-react'
 import Link from 'next/link'
 import apiClient from '@/lib/api'
 import type { ApiError } from '@/lib/api'
@@ -36,8 +36,6 @@ interface VotingEvent {
   is_voting_active: boolean
   result_visibility: string
   contestant_count: number
-  paybill_number: string
-  account_number: string
   account_name: string
   payment_method: string
   till_number: string
@@ -345,12 +343,12 @@ const VotingPage = () => {
                             <Vote className="w-3.5 h-3.5" />
                             Vote
                           </button>
-                          <Link
-                            href={`/voting/${selectedEvent?.slug}/${contestant.slug}`}
-                            className="px-3 py-2.5 border border-gray-200 rounded-xl text-gray-500 hover:bg-gray-50 transition-colors"
+                          <button
+                            onClick={() => handleDetailsClick(contestant)}
+                            className="px-3 py-2.5 border border-gray-200 rounded-xl text-gray-500 hover:bg-green-50 hover:text-green-600 hover:border-green-200 transition-colors text-xs font-semibold whitespace-nowrap"
                           >
-                            <Share2 className="w-4 h-4" />
-                          </Link>
+                            Why Vote For Me
+                          </button>
                         </div>
                       </div>
                     </motion.div>

@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.db.models import Sum, Count
 from .models import (
-    Event, EventInquiry, EventCategory, EventSettings,
+    Event, EventCategory,
     TicketCategory, ContestantCategory, Contestant, GuestSpeaker, Payment, Ticket, VoteTransaction, AuditLog
 )
 import cloudinary
@@ -95,22 +95,13 @@ class EventListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
         fields = [
-            'id', 'title', 'slug', 'event_type', 'event_status', 'status',
+            'id', 'title', 'slug', 'event_type', 'event_status',
             'start_date', 'end_date', 'venue_name', 'city', 'country',
-            'featured_image_url', 'ticket_price', 'featured', 'published',
+            'featured_image_url', 'featured', 'published',
             'voting_enabled', 'vote_price', 'is_voting_active',
             'result_visibility', 'contestant_count',
-            'payment_method', 'paybill_number', 'till_number',
-            'account_number', 'account_name',
+            'payment_method', 'till_number', 'account_name',
         ]
-
-
-# ── EventInquiry ─────────────────────────────────────────────────────────────
-
-class EventInquirySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = EventInquiry
-        fields = '__all__'
 
 
 # ── EventCategory ────────────────────────────────────────────────────────────
@@ -118,14 +109,6 @@ class EventInquirySerializer(serializers.ModelSerializer):
 class EventCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = EventCategory
-        fields = '__all__'
-
-
-# ── EventSettings ────────────────────────────────────────────────────────────
-
-class EventSettingsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = EventSettings
         fields = '__all__'
 
 
