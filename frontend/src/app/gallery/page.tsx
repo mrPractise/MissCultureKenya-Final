@@ -1,64 +1,13 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Camera, Video, Download, Share2, Heart, Filter, MapPin, Calendar, Play, ChevronRight } from 'lucide-react'
+import { Camera, Video, Download, Share2, MapPin, Calendar, Play, ChevronRight } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import PhotoLightboxModal from '@/components/PhotoLightboxModal'
 import VideoModal from '@/components/VideoModal'
 import apiClient from '@/lib/api'
 import { useGalleryPageSettings } from '@/lib/usePageSettings'
-
-const galleryCategories = [
-  {
-    id: 'pageant-nights',
-    title: 'Pageant Nights',
-    description: 'Stage moments, crowning ceremonies, talent performances — the glamour and purpose combined.',
-    color: 'bg-red-600',
-    lightColor: 'bg-red-50',
-    textColor: 'text-red-600'
-  },
-  {
-    id: 'cultural-events',
-    title: 'Cultural Events',
-    description: 'Traditional showcases, heritage festivals, artisan exhibitions — culture in its authentic form.',
-    color: 'bg-green-600',
-    lightColor: 'bg-green-50',
-    textColor: 'text-green-600'
-  },
-  {
-    id: 'behind-the-scenes',
-    title: 'Behind the Scenes',
-    description: 'Rehearsals, fittings, prep work, candid moments — humanizes the ambassadors and team.',
-    color: 'bg-purple-600',
-    lightColor: 'bg-purple-50',
-    textColor: 'text-purple-600'
-  },
-  {
-    id: 'community-work',
-    title: 'Community Work',
-    description: 'Outreach programs, youth mentorship, artisan support — the impact beyond the stage.',
-    color: 'bg-yellow-600',
-    lightColor: 'bg-yellow-50',
-    textColor: 'text-yellow-600'
-  },
-  {
-    id: 'global-diplomacy',
-    title: 'Global Diplomacy',
-    description: 'International conferences, cross-border events, diplomatic forums — Kenya on the world stage.',
-    color: 'bg-blue-600',
-    lightColor: 'bg-blue-50',
-    textColor: 'text-blue-600'
-  },
-  {
-    id: 'awards-recognition',
-    title: 'Awards & Recognition',
-    description: 'Trophies, certificates, media features, partner acknowledgements — external validation.',
-    color: 'bg-emerald-600',
-    lightColor: 'bg-emerald-50',
-    textColor: 'text-emerald-600'
-  }
-]
 
 const getItemDate = (item: any) => item.date_taken || item.created_at || item.date || null
 
@@ -117,8 +66,6 @@ const GalleryPage = () => {
     fetchGalleryData()
   }, [])
 
-  const defaultCategories = ['All', 'Pageant Nights', 'Cultural Events', 'Behind the Scenes', 'Community Work', 'Global Diplomacy', 'Awards & Recognition']
-
   const transformPhoto = (photo: any) => ({
     id: photo.id,
     title: photo.title,
@@ -145,7 +92,6 @@ const GalleryPage = () => {
     caption: video.caption || ''
   })
 
-  const displayCategories = collections.length > 1 ? collections : defaultCategories
   const displayPhotos = photos.length > 0 ? photos.map(transformPhoto) : []
   const displayVideos = videos.length > 0 ? videos.map(transformVideo) : []
 
@@ -206,10 +152,6 @@ const GalleryPage = () => {
     link.remove()
   }
 
-  const getCategoryInfo = (categoryName: string) => {
-    return galleryCategories.find(c => c.id === categoryName.toLowerCase().replace(/\s+/g, '-'))
-  }
-
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
@@ -250,49 +192,6 @@ const GalleryPage = () => {
               From pageant stages to community workshops, diplomatic forums to cultural celebrations — this is where words become images.
             </p>
           </motion.div>
-        </div>
-      </section>
-
-      {/* Gallery Categories — What They Communicate */}
-      <section className="py-16 bg-white relative overflow-hidden">
-        <div className="absolute inset-0 decorative-pattern opacity-[0.03]" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-12"
-          >
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Every Photo Tells a <span className="text-red-600">Story</span></h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">Each category captures a different dimension of our mission. Browse by what you want to see — and understand.</p>
-          </motion.div>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {displayCategories.map((collection, index) => (
-              <motion.button
-                key={collection}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.08 }}
-                viewport={{ once: true }}
-                onClick={() => setSelectedCollection(collection)}
-                className={`text-left p-6 rounded-2xl border-2 transition-all duration-300 group hover:shadow-lg ${
-                  selectedCollection === collection
-                    ? 'bg-red-600 text-white border-transparent shadow-lg'
-                    : 'bg-white border-gray-100 hover:border-gray-200'
-                }`}
-              >
-                <div className={`w-10 h-10 rounded-xl ${selectedCollection === collection ? 'bg-white/20' : 'bg-red-600'} flex items-center justify-center mb-4`}>
-                  <Camera className={`w-5 h-5 ${selectedCollection === collection ? 'text-white' : 'text-red-600'}`} />
-                </div>
-                <h3 className="text-lg font-bold mb-2">{collection === 'All' ? 'All Collections' : collection.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</h3>
-                <p className={`text-sm leading-relaxed ${selectedCollection === collection ? 'text-white/80' : 'text-gray-600'}`}>
-                  {collection === 'All' ? 'View all photos and videos' : `Browse ${collection.replace(/-/g, ' ')} moments`}
-                </p>
-              </motion.button>
-            ))}
-          </div>
         </div>
       </section>
 
