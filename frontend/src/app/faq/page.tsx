@@ -142,12 +142,12 @@ const FAQPage = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <p className="text-sm sm:text-base uppercase tracking-[0.3em] text-green-400 mb-4 font-semibold">Self-Service Support</p>
+            <p className="text-sm sm:text-base uppercase tracking-[0.3em] text-green-400 mb-4 font-semibold">Quick Answers</p>
             <h1 className="text-5xl md:text-7xl font-bold mb-6 text-white tracking-tight">
-              Frequently Asked <span className="text-red-600">Questions</span>
+              {settings.page_title || "FAQ"}
             </h1>
             <p className="text-xl md:text-2xl text-gray-200 max-w-3xl mx-auto font-light leading-relaxed">
-              Everything you need to know about Miss Culture Global Kenya — how to participate, partner, support, and stay involved.
+              {settings.page_subtitle || "Frequently asked questions"}
             </p>
             <div className="mt-8 flex justify-center">
               <div className="h-1 w-24 bg-red-600 rounded-full" />

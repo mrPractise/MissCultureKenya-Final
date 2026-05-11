@@ -109,11 +109,12 @@ const ContactPage = () => {
           >
             <p className="text-sm sm:text-base uppercase tracking-[0.3em] text-green-400 mb-4 font-semibold">We&apos;re Here to Listen</p>
             <h1 className="text-5xl md:text-7xl font-bold mb-6 text-white tracking-tight">
-              Let&apos;s <span className="text-red-600">Talk</span>
+              {settings.page_title || "Let's"} <span className="text-red-600">Talk</span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-200 max-w-3xl mx-auto font-light leading-relaxed">
-              Questions, partnership inquiries, media requests, or just want to learn more? Reach out — we respond to every message.
+              {settings.page_subtitle || "Get in touch with us"}
             </p>
+            <p className="text-gray-600 text-sm mb-8 leading-relaxed">Questions, partnership inquiries, media requests, or just want to learn more? Reach out — we respond to every message.</p>
             <div className="mt-8 flex justify-center">
               <div className="h-1 w-24 bg-red-600 rounded-full" />
             </div>

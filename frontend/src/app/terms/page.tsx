@@ -9,8 +9,8 @@ export default function TermsAndConditions() {
   return (
     <div className="min-h-screen bg-white">
       <PageHeader 
-        title="Terms & Conditions" 
-        subtitle="Please read these terms carefully before using our services"
+        title={settings.page_title || "Terms & Conditions"} 
+        subtitle={settings.page_subtitle || "Please read these terms carefully before using our services"}
         backgroundImage={settings.hero_image_url || undefined}
       />
       

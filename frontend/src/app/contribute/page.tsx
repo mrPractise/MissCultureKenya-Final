@@ -83,12 +83,12 @@ const ContributePage = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <p className="text-sm sm:text-base uppercase tracking-[0.3em] text-green-400 mb-4 font-semibold">Give to Culture, Empower a Generation</p>
+            <p className="text-sm sm:text-base uppercase tracking-[0.3em] text-green-400 mb-4 font-semibold">Support Our Mission</p>
             <h1 className="text-5xl md:text-7xl font-bold mb-6 text-white tracking-tight">
-              Every <span className="text-red-600">Shilling</span> Counts
+              {settings.page_title || "Contribute"}
             </h1>
             <p className="text-xl md:text-2xl text-gray-200 max-w-3xl mx-auto font-light leading-relaxed">
-              Your contribution preserves Kenya&apos;s heritage, funds youth programs, supports artisans, and amplifies our global voice.
+              {settings.page_subtitle || "Support our mission"}
             </p>
             <div className="mt-8 flex justify-center">
               <div className="h-1 w-24 bg-red-600 rounded-full" />

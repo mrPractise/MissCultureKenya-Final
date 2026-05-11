@@ -9,8 +9,8 @@ export default function PrivacyPolicy() {
   return (
     <div className="min-h-screen bg-white">
       <PageHeader 
-        title="Privacy Policy" 
-        subtitle="Your privacy is important to us"
+        title={settings.page_title || "Privacy Policy"} 
+        subtitle={settings.page_subtitle || "Your privacy is important to us"}
         backgroundImage={settings.hero_image_url || undefined}
       />
       
