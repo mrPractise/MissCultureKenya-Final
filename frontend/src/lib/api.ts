@@ -111,6 +111,9 @@ const apiClient = {
   getPhotos(params = {}) {
     return handle(client.get('/api/gallery/photos/', { params }))
   },
+  getPhotoCollections(params = {}) {
+    return handle(client.get('/api/gallery/collections/', { params }))
+  },
   getVideos(params = {}) {
     return handle(client.get('/api/gallery/videos/', { params }))
   },

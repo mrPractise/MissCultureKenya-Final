@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { Camera, Video, Download, Share2, MapPin, Calendar, Play, ChevronRight } from 'lucide-react'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import PhotoLightboxModal from '@/components/PhotoLightboxModal'
 import VideoModal from '@/components/VideoModal'
@@ -18,6 +18,8 @@ const getItemYear = (item: any) => {
   return Number.isFinite(year) ? year.toString() : null
 }
 
+const getCollectionId = (item: any) => item.collection ? String(item.collection) : 'uncategorized'
+
 const GalleryPage = () => {
   const [selectedCollection, setSelectedCollection] = useState('All')
   const [selectedYear, setSelectedYear] = useState('All')
@@ -28,7 +30,7 @@ const GalleryPage = () => {
   const [photos, setPhotos] = useState<any[]>([])
   const [videos, setVideos] = useState<any[]>([])
   const [collections, setCollections] = useState<string[]>(['All'])
-  const [years, setYears] = useState<string[]>(['All'])
+  const [collectionNames, setCollectionNames] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [shareStatus, setShareStatus] = useState<string>('')
@@ -38,27 +40,35 @@ const GalleryPage = () => {
     const fetchGalleryData = async () => {
       try {
         setLoading(true)
-        const photosResponse = await apiClient.getPhotos()
+        const [photosResponse, videosResponse, collectionsResponse] = await Promise.all([
+          apiClient.getPhotos(),
+          apiClient.getVideos(),
+          apiClient.getPhotoCollections(),
+        ])
+
         const photosData = Array.isArray(photosResponse) ? photosResponse : (photosResponse.results || [])
         setPhotos(photosData)
 
-        const videosResponse = await apiClient.getVideos()
         const videosData = Array.isArray(videosResponse) ? videosResponse : (videosResponse.results || [])
         setVideos(videosData)
 
-        const uniqueCategories: string[] = [...new Set(photosData.map((p: any) => p.category || 'Uncategorized').filter(Boolean))] as string[]
-        const allCollections: string[] = ['All', ...uniqueCategories]
+        const collectionsData = Array.isArray(collectionsResponse) ? collectionsResponse : (collectionsResponse.results || [])
+        const namesById = collectionsData.reduce((acc: Record<string, string>, collection: any) => {
+          acc[String(collection.id)] = collection.name
+          return acc
+        }, { uncategorized: 'Uncategorized' })
+        setCollectionNames(namesById)
+
+        const uniqueCollections = [...new Set([
+          ...photosData.map(getCollectionId),
+          ...videosData.map(getCollectionId),
+        ])]
+        const allCollections: string[] = ['All', ...uniqueCollections]
         setCollections(allCollections)
-        // Extract years from photos and videos dates
-        const photoYears: string[] = photosData.map(getItemYear).filter((y: string | null): y is string => y !== null)
-        const videoYears: string[] = videosData.map(getItemYear).filter((y: string | null): y is string => y !== null)
-        const uniqueYears = [...new Set([...photoYears, ...videoYears])].sort((a, b) => Number(b) - Number(a))
-        const allYears: string[] = ['All', ...uniqueYears]
-        setYears(allYears)
       } catch (err) {
         console.error('Error fetching gallery data:', err)
         setError('Failed to load gallery. Make sure the backend server is running.')
-        setCollections(['All', 'Pageant Nights', 'Cultural Events', 'Behind the Scenes', 'Community Work', 'Global Diplomacy', 'Awards & Recognition'])
+        setCollections(['All'])
       } finally {
         setLoading(false)
       }
@@ -69,7 +79,8 @@ const GalleryPage = () => {
   const transformPhoto = (photo: any) => ({
     id: photo.id,
     title: photo.title,
-    category: photo.category || 'Uncategorized',
+    category: collectionNames[getCollectionId(photo)] || `Collection ${getCollectionId(photo)}`,
+    collectionId: getCollectionId(photo),
     image: photo.image_url || photo.thumbnail_url || photo.image || '',
     photographer: photo.photographer || 'Unknown',
     date: getItemDate(photo),
@@ -82,7 +93,8 @@ const GalleryPage = () => {
   const transformVideo = (video: any) => ({
     id: video.id,
     title: video.title,
-    category: video.category || 'Uncategorized',
+    category: collectionNames[getCollectionId(video)] || `Collection ${getCollectionId(video)}`,
+    collectionId: getCollectionId(video),
     thumbnail: video.thumbnail_url || video.thumbnail || '',
     videoUrl: video.video_url || video.videoUrl || video.url || '',
     duration: video.duration || '0:00',
@@ -92,8 +104,14 @@ const GalleryPage = () => {
     caption: video.caption || ''
   })
 
-  const displayPhotos = photos.length > 0 ? photos.map(transformPhoto) : []
-  const displayVideos = videos.length > 0 ? videos.map(transformVideo) : []
+  const displayPhotos = useMemo(
+    () => photos.length > 0 ? photos.map(transformPhoto) : [],
+    [photos, collectionNames]
+  )
+  const displayVideos = useMemo(
+    () => videos.length > 0 ? videos.map(transformVideo) : [],
+    [videos, collectionNames]
+  )
 
   const handlePhotoClick = (index: number) => {
     setSelectedPhotoIndex(index)
@@ -108,17 +126,44 @@ const GalleryPage = () => {
   const finalPhotos = displayPhotos
   const finalVideos = displayVideos
 
+  const getCollectionLabel = (collection: string) => (
+    collection === 'All' ? 'All' : collectionNames[collection] || `Collection ${collection}`
+  )
+
   const filteredPhotos = finalPhotos.filter(photo => {
-    const matchesCollection = selectedCollection === 'All' || photo.category === selectedCollection
+    const matchesCollection = selectedCollection === 'All' || photo.collectionId === selectedCollection
     const matchesYear = selectedYear === 'All' || (photo.date && new Date(photo.date).getFullYear().toString() === selectedYear)
     return matchesCollection && matchesYear
   })
 
   const filteredVideos = finalVideos.filter(video => {
-    const matchesCollection = selectedCollection === 'All' || video.category === selectedCollection
+    const matchesCollection = selectedCollection === 'All' || video.collectionId === selectedCollection
     const matchesYear = selectedYear === 'All' || (video.date && new Date(video.date).getFullYear().toString() === selectedYear)
     return matchesCollection && matchesYear
   })
+
+  const years = useMemo(() => (
+    ['All', ...new Set([
+      ...finalPhotos
+        .filter(photo => selectedCollection === 'All' || photo.collectionId === selectedCollection)
+        .map(getItemYear)
+        .filter((year): year is string => year !== null),
+      ...finalVideos
+        .filter(video => selectedCollection === 'All' || video.collectionId === selectedCollection)
+        .map(getItemYear)
+        .filter((year): year is string => year !== null),
+    ])].sort((a, b) => {
+      if (a === 'All') return -1
+      if (b === 'All') return 1
+      return Number(b) - Number(a)
+    })
+  ), [finalPhotos, finalVideos, selectedCollection])
+
+  useEffect(() => {
+    if (!years.includes(selectedYear)) {
+      setSelectedYear('All')
+    }
+  }, [selectedYear, years])
 
   const handlePhotoShare = async (e: React.MouseEvent<HTMLButtonElement>, photo: any) => {
     e.stopPropagation()
@@ -237,14 +282,17 @@ const GalleryPage = () => {
                   collections.map((collection) => (
                     <button
                       key={collection}
-                      onClick={() => setSelectedCollection(collection)}
+                      onClick={() => {
+                        setSelectedCollection(collection)
+                        setSelectedYear('All')
+                      }}
                       className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 text-sm sm:text-base transform hover:-translate-y-1 ${
                         selectedCollection === collection
                           ? 'bg-red-600 text-white shadow-lg'
                           : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-100'
                       }`}
                     >
-                      {collection === 'All' ? 'All' : collection.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                      {getCollectionLabel(collection)}
                     </button>
                   ))
                 )}
@@ -298,7 +346,7 @@ const GalleryPage = () => {
               </div>
             ) : filteredPhotos.length === 0 ? (
               <div className="text-center py-12">
-                <p className="text-gray-600">No photos in this category yet.</p>
+                <p className="text-gray-600">No photos in this collection yet.</p>
               </div>
             ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -336,7 +384,7 @@ const GalleryPage = () => {
                     </div>
                   )}
 
-                  {/* Category Badge */}
+                  {/* Collection Badge */}
                   <div className="absolute top-4 right-4 transform -translate-y-10 group-hover:translate-y-0 transition-transform duration-300 delay-100">
                     <span className="bg-white/20 backdrop-blur-md text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide border border-white/20">
                       {photo.category}
@@ -407,7 +455,7 @@ const GalleryPage = () => {
             </h2>
             {filteredVideos.length === 0 ? (
               <div className="text-center py-12">
-                <p className="text-gray-600">No videos in this category yet.</p>
+                <p className="text-gray-600">No videos in this collection yet.</p>
               </div>
             ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
