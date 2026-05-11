@@ -105,6 +105,8 @@ const EventDetailPage = () => {
           contestant_count: data.contestant_count || 0,
           total_votes: data.total_votes || 0,
           slug: data.slug || '',
+          ticket_url: data.ticket_url || '',
+          registration_url: data.registration_url || '',
           guest_speakers: (data.guest_speakers || []) as GuestSpeakerData[],
           contestant_categories: (data.contestant_categories || []) as ContestantCategoryData[],
         }
@@ -722,12 +724,22 @@ const EventDetailPage = () => {
               </div>
             )}
 
-            {/* Share */}
+            {/* Share & Action Buttons */}
             <div className="flex items-center gap-3">
               <button onClick={handleShare} className="flex items-center gap-2 px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold transition-colors">
                 <Share2 className="w-4 h-4" /> Share Event
               </button>
-              {ticketCategories.length === 0 && (
+              {event.ticket_url && (
+                <a href={event.ticket_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition-colors">
+                  <ExternalLink className="w-4 h-4" /> Buy Tickets
+                </a>
+              )}
+              {event.registration_url && (
+                <a href={event.registration_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold transition-colors">
+                  <ExternalLink className="w-4 h-4" /> Register
+                </a>
+              )}
+              {!event.ticket_url && !event.registration_url && ticketCategories.length === 0 && (
                 <button onClick={() => setShowTicketForm(true)} className="flex items-center gap-2 px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold transition-colors">
                   <Ticket className="w-4 h-4" /> Register
                 </button>

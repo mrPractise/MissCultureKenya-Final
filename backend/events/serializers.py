@@ -101,6 +101,7 @@ class EventListSerializer(serializers.ModelSerializer):
             'voting_enabled', 'vote_price', 'is_voting_active',
             'result_visibility', 'contestant_count',
             'payment_method', 'till_number', 'account_name',
+            'ticket_url', 'registration_url',
         ]
 
 

@@ -23,14 +23,6 @@ class Migration(migrations.Migration):
         ),
         migrations.RemoveField(
             model_name='event',
-            name='ticket_url',
-        ),
-        migrations.RemoveField(
-            model_name='event',
-            name='registration_url',
-        ),
-        migrations.RemoveField(
-            model_name='event',
             name='paybill_number',
         ),
         migrations.RemoveField(
