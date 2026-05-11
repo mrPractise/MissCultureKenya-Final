@@ -6,7 +6,9 @@ import apiClient from './api'
 // Types for each page settings
 interface HomePageSettings {
   hero_image_url: string | null
+  kenya_highlight_image_url: string | null
   ambassador_highlight_image_url: string | null
+  kenya_highlight_enabled: boolean
   ambassador_highlight_enabled: boolean
   upcoming_event_enabled: boolean
   recent_event_enabled: boolean
@@ -85,7 +87,9 @@ interface PartnershipPageSettings {
 export function useHomePageSettings() {
   const [settings, setSettings] = useState<HomePageSettings>({
     hero_image_url: null,
+    kenya_highlight_image_url: null,
     ambassador_highlight_image_url: null,
+    kenya_highlight_enabled: true,
     ambassador_highlight_enabled: true,
     upcoming_event_enabled: true,
     recent_event_enabled: true,

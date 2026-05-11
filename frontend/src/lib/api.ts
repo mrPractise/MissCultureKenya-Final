@@ -1,13 +1,8 @@
 import axios from 'axios'
 
-if (
-  process.env.NODE_ENV === "production" &&
-  !process.env.NEXT_PUBLIC_API_BASE_URL
-) {
-  throw new Error("NEXT_PUBLIC_API_BASE_URL is not configured");
-}
-
-const rawBase = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"
+const rawBaseFromEnv = process.env.NEXT_PUBLIC_API_BASE_URL
+const rawBase =
+  rawBaseFromEnv ?? (process.env.NODE_ENV === 'production' ? '' : 'http://localhost:8000')
 let BASE = rawBase.replace(/\/+$/, "")
 if (BASE.endsWith("/admin")) {
   BASE = BASE.slice(0, -"/admin".length)
