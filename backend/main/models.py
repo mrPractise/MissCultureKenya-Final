@@ -272,6 +272,11 @@ class HomePageSettings(models.Model):
     # Hero Section
     hero_image = cloudinary.models.CloudinaryField('hero', folder='missculture/pages/home', blank=True, null=True)
     
+    # Kenya Highlight Card (shown on homepage)
+    kenya_highlight_image = cloudinary.models.CloudinaryField('kenya_highlight', folder='missculture/pages/home/highlights', blank=True, null=True,
+        help_text='Image for Kenya highlight card on homepage')
+    kenya_highlight_enabled = models.BooleanField(default=True, help_text='Show Kenya highlight section on homepage')
+    
     # Ambassador Highlight Card (shown on homepage)
     ambassador_highlight_image = cloudinary.models.CloudinaryField('ambassador_highlight', folder='missculture/pages/home/highlights', blank=True, null=True,
         help_text='Image for Ambassador highlight card on homepage')
