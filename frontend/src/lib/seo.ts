@@ -394,3 +394,65 @@ export const PREFETCH_ROUTES = [
   '/events',
   '/ambassador',
 ]
+
+// ═══════════════════════════════════════════════════════════
+// AI SEO — Optimized for LLMs & AI Search Engines
+// ═══════════════════════════════════════════════════════════
+
+/**
+ * AI-specific meta tags for LLM crawlers (ChatGPT, Perplexity, Google AI Overviews, etc.)
+ * These help AI systems understand content context, entity relationships, and authority.
+ */
+export const AI_META_TAGS = {
+  'ai-content-declaration': 'This website contains original content about Miss Culture Global Kenya, a cultural preservation organization based in Nairobi, Kenya.',
+  'ai-org-name': SITE_CONFIG.name,
+  'ai-org-description': SITE_CONFIG.description,
+  'ai-ambassador': SITE_CONFIG.ambassador.name,
+  'ai-location': `${SITE_CONFIG.city}, Kenya`,
+  'ai-content-language': 'en',
+  'ai-content-country': 'KE',
+}
+
+/**
+ * Generate page-specific AI metadata for each route.
+ * AI crawlers use these to build knowledge graphs and provide accurate responses.
+ */
+export function generateAIPageMeta(page: keyof typeof PAGE_METADATA) {
+  const pageMeta = PAGE_METADATA[page]
+  return {
+    ...AI_META_TAGS,
+    'ai-page-topic': pageMeta.title,
+    'ai-page-summary': pageMeta.description,
+  }
+}
+
+/**
+ * Generate SpeakableSpecification schema for voice AI (Google Assistant, Siri, Alexa).
+ * Indicates which parts of the page content can be read aloud.
+ */
+export function generateSpeakableSchema(pageName: string, pageUrl: string) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    'name': pageName,
+    'url': pageUrl,
+    'speakable': {
+      '@type': 'SpeakableSpecification',
+      'cssSelector': ['h1', 'h2', '.hero-description', 'article p', 'main p'],
+    },
+    'isPartOf': {
+      '@id': `${SITE_CONFIG.url}/#website`,
+    },
+  }
+}
+
+/**
+ * AI crawlers index: URLs designed for AI discovery.
+ * Reference: https://llmstxt.org/
+ */
+export const AI_DISCOVERY_URLS = {
+  llms: `${SITE_CONFIG.url}/llms.txt`,
+  llmsFull: `${SITE_CONFIG.url}/llms-full.txt`,
+  sitemap: `${SITE_CONFIG.url}/sitemap.xml`,
+  robots: `${SITE_CONFIG.url}/robots.txt`,
+}
