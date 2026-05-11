@@ -8,7 +8,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        # Restore ticket_url and registration_url fields
         migrations.AddField(
             model_name='event',
             name='ticket_url',
