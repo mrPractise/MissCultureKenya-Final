@@ -59,6 +59,35 @@ const EventsPage = () => {
   const [error, setError] = useState<string | null>(null)
   const { settings: pageSettings, loading: settingsLoading } = useEventsPageSettings()
 
+  const derivePriceLabel = (ticketCategories: any[], fallback?: any) => {
+    if (!Array.isArray(ticketCategories) || ticketCategories.length === 0) {
+      if (typeof fallback === 'string' && fallback.trim()) return fallback
+      if (typeof fallback === 'number' && Number.isFinite(fallback)) {
+        return Number(fallback) <= 0 ? 'Free' : `From KES ${Number(fallback).toLocaleString()}`
+      }
+      return ''
+    }
+
+    const prices = ticketCategories
+      .map((tc) => {
+        const pv = tc?.price_value
+        if (pv !== undefined && pv !== null && pv !== '') return Number(pv)
+        const p = tc?.price
+        if (typeof p === 'number') return p
+        if (typeof p === 'string') {
+          if (p.toLowerCase() === 'free') return 0
+          const n = Number(String(p).replace(/[^\d.]/g, ''))
+          return Number.isFinite(n) ? n : NaN
+        }
+        return NaN
+      })
+      .filter((n) => Number.isFinite(n)) as number[]
+
+    if (prices.length === 0) return ''
+    const min = Math.min(...prices)
+    return min <= 0 ? 'Free' : `From KES ${min.toLocaleString()}`
+  }
+
   useEffect(() => {
     const fetchEvents = async () => {
       try {
@@ -89,6 +118,7 @@ const EventsPage = () => {
 
   const transformEvent = (event: any) => {
     if (event.title && event.date && event.venue && !event.start_date) return event
+    const ticketCategories = event.ticket_categories || []
     return {
       id: event.id,
       title: event.title || event.name,
@@ -100,11 +130,11 @@ const EventsPage = () => {
       image: event.featured_image_url || event.featured_image || event.image || '',
       category: event.event_type || event.category || 'Event',
       capacity: event.capacity || 0,
-      price: event.price || 'Free',
+      price: derivePriceLabel(ticketCategories, event.price),
       organizer: event.organizer || 'Miss Culture Global Kenya',
       contactEmail: event.contact_email || 'info@misscultureglobalkenya.com',
       contactPhone: event.contact_phone || '+254 721 706983',
-      ticketCategories: event.ticket_categories || [],
+      ticketCategories,
       audience: event.audience || 'General Public',
       votingEnabled: event.voting_enabled || false,
       currentVotes: event.current_votes || 0,

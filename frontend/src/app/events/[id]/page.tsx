@@ -44,6 +44,33 @@ interface GuestSpeakerData {
   order: number
 }
 
+const derivePriceLabel = (ticketCategories: any[], fallback?: any): string => {
+  if (!Array.isArray(ticketCategories) || ticketCategories.length === 0) {
+    if (typeof fallback === 'string' && fallback.trim()) return fallback
+    if (typeof fallback === 'number' && Number.isFinite(fallback)) {
+      return Number(fallback) <= 0 ? 'Free' : `From KES ${Number(fallback).toLocaleString()}`
+    }
+    return ''
+  }
+  const prices = ticketCategories
+    .map((tc) => {
+      const pv = tc?.price_value
+      if (pv !== undefined && pv !== null && pv !== '') return Number(pv)
+      const p = tc?.price
+      if (typeof p === 'number') return p
+      if (typeof p === 'string') {
+        if (p.toLowerCase() === 'free') return 0
+        const n = Number(String(p).replace(/[^\d.]/g, ''))
+        return Number.isFinite(n) ? n : NaN
+      }
+      return NaN
+    })
+    .filter((n) => Number.isFinite(n)) as number[]
+  if (prices.length === 0) return ''
+  const min = Math.min(...prices)
+  return min <= 0 ? 'Free' : `From KES ${min.toLocaleString()}`
+}
+
 const EventDetailPage = () => {
   const params = useParams()
   const router = useRouter()
@@ -90,7 +117,7 @@ const EventDetailPage = () => {
           image: data.featured_image_url || data.featured_image || data.image || '',
           category: data.event_type || data.category || 'Event',
           capacity: data.capacity || 0,
-          price: 'Free',
+          price: derivePriceLabel(data.ticket_categories || [], data.price),
           organizer: data.organizer || 'Miss Culture Global Kenya',
           contactEmail: data.contact_email || 'info@misscultureglobalkenya.com',
           contactPhone: data.contact_phone || '+254 721 706983',
@@ -321,6 +348,10 @@ const EventDetailPage = () => {
 
   const isVotingOpen = Boolean(event.voting_enabled && (event.is_voting_active || event.event_status === 'voting_open'))
 
+  const priceLabel = ticketCategories.length > 0
+    ? derivePriceLabel(ticketCategories, event.price)
+    : (event.price || '')
+
   return (
     <div className="min-h-screen bg-white">
       {/* Hero */}
@@ -338,7 +369,7 @@ const EventDetailPage = () => {
           <div className="flex flex-wrap items-center gap-2 mb-3">
             <span className="bg-green-600 text-white px-3 py-1 rounded-full text-xs font-bold uppercase">{event.category}</span>
             {event.audience && <span className="bg-white/20 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-medium">{event.audience}</span>}
-            <span className="bg-white/20 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-medium">{event.price}</span>
+            {priceLabel && <span className="bg-white/20 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-medium">{priceLabel}</span>}
             {isVotingOpen && (
               <Link href="/voting" className="bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold uppercase flex items-center gap-1 hover:bg-red-700 transition-colors">
                 <Vote className="w-3 h-3" /> Voting Open
