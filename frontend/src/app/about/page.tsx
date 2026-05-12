@@ -27,6 +27,13 @@ const AboutPage = () => {
     { title: '5. Excellence', description: 'We strive for quality, innovation, and continuous improvement in all our programs and partnerships.', icon: Award }
   ]
 
+  const objectives = [
+    { title: '1. Cultural Preservation & Innovation', description: 'To document and promote diverse Kenyan traditions while integrating them into the modern creative economy — fashion, arts, and digital media.', icon: Lightbulb },
+    { title: '2. Global Ambassadorship', description: 'To equip titleholders with the diplomacy and communication skills necessary to represent Kenya on international stages and attract foreign investment.', icon: Globe },
+    { title: '3. Youth & Female Leadership', description: 'To provide a rigorous mentorship ecosystem focused on entrepreneurship, public speaking, and community project management.', icon: GraduationCap },
+    { title: '4. Sustainable Tourism Advocacy', description: 'To partner with stakeholders in the travel industry to highlight Kenya\'s "Hidden Gems" — promoting eco-tourism and community-based travel.', icon: Landmark }
+  ]
+
   const [leadershipTeam, setLeadershipTeam] = useState<any[]>([])
   const [committeeTeam, setCommitteeTeam] = useState<any[]>([])
   const [teamLoading, setTeamLoading] = useState(true)
@@ -161,9 +168,51 @@ const AboutPage = () => {
           >
             <h2 className="text-4xl font-bold mb-8">Our <span className="text-red-600">Vision</span></h2>
             <p className="text-xl md:text-2xl text-green-100 font-light leading-relaxed max-w-3xl mx-auto">
-              To be Africa&apos;s premier leadership platform that transforms cultural heritage into a global asset for socio-economic empowerment and international diplomacy.
+              To be Kenya&apos;s premier leadership platform that transforms culture into a global asset for social-economic empowerment and international diplomacy through Miss Culture Global PTY Ethical values.
             </p>
           </motion.div>
+        </div>
+      </section>
+
+      {/* Objectives */}
+      <section className="py-24 bg-white relative overflow-hidden">
+        <div className="absolute inset-0 decorative-dots opacity-20" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl font-bold text-gray-900 mb-6">Our <span className="text-red-600">Objectives</span></h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto font-light">
+              Four strategic commitments that translate our mission and vision into measurable impact — across Kenya and beyond.
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            {objectives.map((obj, index) => (
+              <motion.div
+                key={obj.title}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className="bg-gray-50 rounded-3xl p-8 hover:shadow-elegant-lg hover:bg-white transition-all duration-300 border border-gray-100 hover:border-green-100 group"
+              >
+                <div className="flex items-start gap-5">
+                  <div className="flex-shrink-0 w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center group-hover:bg-red-100 transition-colors duration-300">
+                    <obj.icon className="w-7 h-7 text-red-600 group-hover:scale-110 transition-transform duration-300" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-green-700 transition-colors duration-300">{obj.title}</h3>
+                    <p className="text-gray-600 leading-relaxed">{obj.description}</p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 
