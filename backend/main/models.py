@@ -56,6 +56,7 @@ class CulturalCommunity(models.Model):
     class Meta:
         verbose_name = "Kenya - Community"
         verbose_name_plural = "Kenya - Communities"
+        ordering = ['-featured', 'name']
 
     def __str__(self):
         return self.name
@@ -86,6 +87,7 @@ class CulturalHeritage(models.Model):
     class Meta:
         verbose_name = "Kenya - Heritage"
         verbose_name_plural = "Kenya - Heritage"
+        ordering = ['-featured', 'title']
 
     def __str__(self):
         return self.title
@@ -105,6 +107,7 @@ class KenyaRegion(models.Model):
     class Meta:
         verbose_name = "Kenya - Region"
         verbose_name_plural = "Kenya - Regions"
+        ordering = ['-featured', 'name']
 
     def __str__(self):
         return self.name
@@ -132,6 +135,7 @@ class Achievement(models.Model):
     class Meta:
         verbose_name = "Kenya - Achievement"
         verbose_name_plural = "Kenya - Achievements"
+        ordering = ['-featured', '-year', 'title']
 
     def __str__(self):
         return self.title
@@ -154,6 +158,7 @@ class Partner(models.Model):
     class Meta:
         verbose_name = "Partnership - Partner/Sponsor"
         verbose_name_plural = "Partnership - Partners/Sponsors"
+        ordering = ['-featured', '-created_at']
 
     def __str__(self):
         return self.name
@@ -527,4 +532,4 @@ class TermsPageSettings(models.Model):
     def __str__(self):
         return "Terms Page Settings"
 
-
+
