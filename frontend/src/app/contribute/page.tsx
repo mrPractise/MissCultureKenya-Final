@@ -9,27 +9,27 @@ import { useContributePageSettings } from '@/lib/usePageSettings'
 const impactAreas = [
   {
     title: 'Cultural Preservation',
-    description: 'Funding traditional craftspeople, documenting oral histories, and archiving endangered art forms before they disappear.',
+    description: 'Documenting and promoting diverse Kenyan traditions while integrating them into the modern creative economy — fashion, arts, and digital media.',
     icon: Palette,
-    impact: '500+ artisans supported'
+    impact: 'Heritage & Innovation'
   },
   {
-    title: 'Youth Empowerment',
-    description: 'Scholarships, leadership training, mentorship programs — preparing the next generation of cultural ambassadors.',
+    title: 'Youth & Female Leadership',
+    description: 'A rigorous mentorship ecosystem for young women and youth — entrepreneurship, public speaking, etiquette, and community project management.',
     icon: GraduationCap,
-    impact: '1,000+ youth reached'
+    impact: 'Mentorship Ecosystem'
   },
   {
-    title: 'Global Outreach',
-    description: 'Ambassador travel, international conference attendance, cross-border cultural exchange — taking Kenya to the world.',
+    title: 'Global Ambassadorship',
+    description: 'Equipping titleholders with the diplomacy and communication skills to represent Kenya on international stages and attract foreign investment.',
     icon: Globe2,
-    impact: '50+ countries reached'
+    impact: 'Cultural Diplomacy'
   },
   {
     title: 'Community Development',
-    description: 'Grassroots programs, artisan markets, school outreach — direct impact in local communities across Kenya.',
+    description: "Partnering with the travel industry to highlight Kenya's \u201CHidden Gems\u201D — promoting eco-tourism, community-based travel, and tangible impact in local communities.",
     icon: Home,
-    impact: '100+ communities impacted'
+    impact: 'Sustainable Tourism'
   }
 ]
 
@@ -95,7 +95,7 @@ const ContributePage = () => {
           >
             <div className="text-center mb-16">
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Where Your <span className="text-red-600">Money</span> Goes</h2>
-              <p className="text-lg text-gray-600 max-w-2xl mx-auto">Every donation channel has a direct, measurable impact. Here&apos;s exactly what your contribution funds.</p>
+              <p className="text-lg text-gray-600 max-w-2xl mx-auto">Every shilling is channeled into programs that directly advance our four strategic objectives — from cultural preservation to community development.</p>
               <div className="h-1 w-20 bg-green-500 mx-auto rounded-full mt-4" />
             </div>
 
