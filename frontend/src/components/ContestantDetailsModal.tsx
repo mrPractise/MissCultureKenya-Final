@@ -24,12 +24,14 @@ interface ContestantDetailsModalProps {
   contestant: Contestant | null
   onVote: (contestant: Contestant) => void
   isVotingActive: boolean
+  resultVisibility?: string
 }
 
-const ContestantDetailsModal = ({ isOpen, onClose, contestant, onVote, isVotingActive }: ContestantDetailsModalProps) => {
+const ContestantDetailsModal = ({ isOpen, onClose, contestant, onVote, isVotingActive, resultVisibility = 'full_live' }: ContestantDetailsModalProps) => {
   const [copied, setCopied] = useState(false)
 
   if (!contestant) return null
+  const visibleVoteCount = resultVisibility === 'full_live' ? contestant.vote_count : null
 
   const handleShare = async () => {
     const url = contestant.event_slug 
@@ -99,10 +101,10 @@ const ContestantDetailsModal = ({ isOpen, onClose, contestant, onVote, isVotingA
               <div className="mb-6">
                 <h2 className="text-3xl font-bold text-gray-900 mb-1">{contestant.name}</h2>
                 <div className="flex items-center gap-4 mt-2">
-                  {contestant.vote_count !== null && (
+                  {visibleVoteCount !== null && visibleVoteCount !== undefined && (
                     <div className="flex items-center gap-1.5 text-green-600 bg-green-50 px-3 py-1 rounded-full text-sm font-semibold">
                       <Trophy className="w-4 h-4" />
-                      {contestant.vote_count.toLocaleString()} votes
+                      {visibleVoteCount.toLocaleString()} votes
                     </div>
                   )}
                   <button

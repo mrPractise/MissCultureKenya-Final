@@ -31,6 +31,7 @@ interface EventData {
   payment_method: string
   till_number: string
   is_voting_active: boolean
+  result_visibility: string
 }
 
 export default function ContestantPage({ params }: { params: Promise<{ eventSlug: string; contestantSlug: string }> }) {
@@ -59,6 +60,7 @@ export default function ContestantPage({ params }: { params: Promise<{ eventSlug
             payment_method: matchedEvent.payment_method || 'till_number',
             till_number: matchedEvent.till_number || '4766976',
             is_voting_active: matchedEvent.is_voting_active,
+            result_visibility: matchedEvent.result_visibility || 'full_live',
           })
 
           const contestantsData = await apiClient.getEventContestants(matchedEvent.id)
@@ -220,7 +222,7 @@ export default function ContestantPage({ params }: { params: Promise<{ eventSlug
                 )}
 
                 {/* Vote Count */}
-                {contestant.vote_count !== null && contestant.vote_count !== undefined && (
+                {event?.result_visibility === 'full_live' && contestant.vote_count !== null && contestant.vote_count !== undefined && (
                   <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6">
                     <div className="flex items-center gap-3">
                       <Trophy className="w-5 h-5 text-green-600" />

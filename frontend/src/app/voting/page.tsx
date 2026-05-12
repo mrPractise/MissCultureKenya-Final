@@ -332,7 +332,7 @@ const VotingPage = () => {
                           {contestant.contestant_number}
                         </div>
                         {/* Vote count if visible */}
-                        {contestant.vote_count !== null && contestant.vote_count !== undefined && (
+                        {selectedEvent?.result_visibility === 'full_live' && contestant.vote_count !== null && contestant.vote_count !== undefined && (
                           <div className="absolute bottom-3 left-3 bg-black/70 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-semibold">
                             {contestant.vote_count.toLocaleString()} votes
                           </div>
@@ -503,6 +503,7 @@ const VotingPage = () => {
         contestant={selectedContestant}
         onVote={handleVoteClick}
         isVotingActive={selectedEvent?.is_voting_active || false}
+        resultVisibility={selectedEvent?.result_visibility}
       />
     </div>
   )
