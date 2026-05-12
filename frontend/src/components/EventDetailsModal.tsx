@@ -96,6 +96,31 @@ const EventDetailsModal = ({ isOpen, onClose, event }: EventDetailsModalProps) =
   if (!isOpen || !event) return null
   const hasTicketCategories = Boolean(event.ticketCategories && event.ticketCategories.length > 0)
 
+  const derivePriceLabel = (ticketCategories: TicketCategory[] | undefined, fallback?: string): string => {
+    if (!Array.isArray(ticketCategories) || ticketCategories.length === 0) {
+      return typeof fallback === 'string' ? fallback : ''
+    }
+    const prices = ticketCategories
+      .map((tc) => {
+        const pv = tc?.price_value
+        if (pv !== undefined && pv !== null && pv !== '') return Number(pv)
+        const p = tc?.price
+        if (typeof p === 'number') return p
+        if (typeof p === 'string') {
+          if (p.toLowerCase() === 'free') return 0
+          const n = Number(String(p).replace(/[^\d.]/g, ''))
+          return Number.isFinite(n) ? n : NaN
+        }
+        return NaN
+      })
+      .filter((n) => Number.isFinite(n)) as number[]
+    if (prices.length === 0) return typeof fallback === 'string' ? fallback : ''
+    const min = Math.min(...prices)
+    return min <= 0 ? 'Free' : `From KES ${min.toLocaleString()}`
+  }
+
+  const priceLabel = derivePriceLabel(event.ticketCategories, event.price)
+
   const updateQuantity = (ticketName: string, quantity: number) => {
     setTicketQuantities(prev => ({
       ...prev,
@@ -153,7 +178,7 @@ const EventDetailsModal = ({ isOpen, onClose, event }: EventDetailsModalProps) =
           </div>
           <div className="absolute top-3 right-12 lg:right-auto lg:top-auto lg:bottom-3 lg:left-3">
             <span className="bg-white/90 text-gray-900 px-2.5 py-0.5 rounded-full text-xs font-semibold">
-              {event.price}
+              {priceLabel}
             </span>
           </div>
           <div className="absolute bottom-3 left-3 right-14 text-white lg:bottom-3 lg:left-3 lg:right-3">
