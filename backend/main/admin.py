@@ -4,7 +4,7 @@ from django.http import HttpResponseRedirect
 import cloudinary
 from .models import (
     Ambassador, CulturalCommunity, CulturalHeritage, KenyaRegion,
-    Achievement, Partner, SocialMediaPost, KenyaGalleryPhoto, SiteSettings,
+    Achievement, Partner, KenyaGalleryPhoto, SiteSettings,
     HomePageSettings, KenyaPageSettings, AmbassadorPageSettings,
     EventsPageSettings, GalleryPageSettings, PartnershipPageSettings, AboutPageSettings,
     VotingPageSettings, ContactPageSettings, FAQPageSettings,
@@ -82,15 +82,6 @@ class PartnerAdmin(admin.ModelAdmin):
     list_filter = ['partner_type', 'featured', 'created_at']
     search_fields = ['name', 'description']
     list_editable = ['featured']
-
-
-@admin.register(SocialMediaPost)
-class SocialMediaPostAdmin(admin.ModelAdmin):
-    list_display = ['platform', 'created_at', 'featured', 'imported_at']
-    list_filter = ['platform', 'featured', 'created_at', 'imported_at']
-    search_fields = ['content', 'post_id']
-    list_editable = ['featured']
-    readonly_fields = ['imported_at']
 
 
 @admin.register(SiteSettings)

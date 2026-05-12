@@ -527,28 +527,4 @@ class TermsPageSettings(models.Model):
     def __str__(self):
         return "Terms Page Settings"
 
-
-class SocialMediaPost(models.Model):
-    """Model for social media integration"""
-    platform = models.CharField(max_length=50, choices=[
-        ('instagram', 'Instagram'),
-        ('facebook', 'Facebook'),
-        ('x', 'X'),
-        ('tiktok', 'TikTok'),
-    ])
-    post_id = models.CharField(max_length=100)
-    content = models.TextField()
-    image_url = models.URLField(blank=True)
-    video_url = models.URLField(blank=True)
-    post_url = models.URLField()
-    created_at = models.DateTimeField()
-    featured = models.BooleanField(default=False)
-    imported_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        verbose_name = "Social Media Post"
-        verbose_name_plural = "Social Media Posts"
-        ordering = ['-created_at']
-
-    def __str__(self):
-        return f"{self.platform} - {self.created_at.strftime('%Y-%m-%d')}"
+

@@ -12,7 +12,7 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from .models import (
     Ambassador, CulturalCommunity, CulturalHeritage, KenyaRegion,
-    Achievement, Partner, SocialMediaPost, SiteSettings, TeamMember,
+    Achievement, Partner, SiteSettings, TeamMember,
     HomePageSettings, KenyaPageSettings, AmbassadorPageSettings,
     EventsPageSettings, GalleryPageSettings, PartnershipPageSettings, AboutPageSettings,
     VotingPageSettings, ContactPageSettings, FAQPageSettings,
@@ -21,7 +21,7 @@ from .models import (
 from .serializers import (
     AmbassadorSerializer, CulturalCommunitySerializer, CulturalHeritageSerializer,
     KenyaRegionSerializer, AchievementSerializer,
-    PartnerSerializer, SocialMediaPostSerializer, DiscoverKenyaSerializer,
+    PartnerSerializer, DiscoverKenyaSerializer,
     SiteSettingsSerializer, TeamMemberSerializer,
     HomePageSettingsSerializer, KenyaPageSettingsSerializer, AmbassadorPageSettingsSerializer,
     EventsPageSettingsSerializer, GalleryPageSettingsSerializer, PartnershipPageSettingsSerializer,
@@ -81,16 +81,6 @@ class PartnerViewSet(viewsets.ReadOnlyModelViewSet):
     filterset_fields = ['partner_type', 'featured']
     search_fields = ['name', 'description']
     ordering_fields = ['name', 'created_at']
-
-
-class SocialMediaPostViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = SocialMediaPost.objects.all()
-    serializer_class = SocialMediaPostSerializer
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['platform', 'featured']
-    search_fields = ['content']
-    ordering_fields = ['created_at', 'imported_at']
-    ordering = ['-created_at']
 
 
 class TeamMemberViewSet(viewsets.ReadOnlyModelViewSet):

@@ -2,7 +2,7 @@ from rest_framework import serializers
 import cloudinary
 from .models import (
     Ambassador, CulturalCommunity, CulturalHeritage, KenyaRegion,
-    Achievement, Partner, SocialMediaPost, KenyaGalleryPhoto, SiteSettings, TeamMember,
+    Achievement, Partner, KenyaGalleryPhoto, SiteSettings, TeamMember,
     HomePageSettings, KenyaPageSettings, AmbassadorPageSettings,
     EventsPageSettings, GalleryPageSettings, PartnershipPageSettings, AboutPageSettings,
     VotingPageSettings, ContactPageSettings, FAQPageSettings,
@@ -134,12 +134,6 @@ class TeamMemberSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TeamMember
-        fields = '__all__'
-
-
-class SocialMediaPostSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = SocialMediaPost
         fields = '__all__'
 
 

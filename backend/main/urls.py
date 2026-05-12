@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 from .views import (
     AmbassadorViewSet, CulturalCommunityViewSet, CulturalHeritageViewSet,
     KenyaRegionViewSet, AchievementViewSet,
-    PartnerViewSet, SocialMediaPostViewSet, DiscoverKenyaAPIView,
+    PartnerViewSet, DiscoverKenyaAPIView,
     SiteSettingsAPIView, contact_message, TeamMemberViewSet, check_email_connection,
     generate_test_pdf_view,
     HomePageSettingsAPIView, KenyaPageSettingsAPIView, AmbassadorPageSettingsAPIView,
@@ -20,7 +20,6 @@ router.register(r'heritage', CulturalHeritageViewSet)
 router.register(r'regions', KenyaRegionViewSet)
 router.register(r'achievements', AchievementViewSet)
 router.register(r'partners', PartnerViewSet)
-router.register(r'social-media', SocialMediaPostViewSet)
 router.register(r'team', TeamMemberViewSet)
 
 urlpatterns = [
