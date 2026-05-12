@@ -1,11 +1,10 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Smartphone, Check, Palette, GraduationCap, Globe2, Home, Building2, Copy } from 'lucide-react'
+import { Check, Palette, GraduationCap, Globe2, Home, Building2, Copy } from 'lucide-react'
 import { useState } from 'react'
 import Link from 'next/link'
 import { useContributePageSettings } from '@/lib/usePageSettings'
-import MpesaLogo from '@/components/MpesaLogo'
 
 const impactAreas = [
   {
@@ -36,26 +35,12 @@ const impactAreas = [
 
 const ContributePage = () => {
   const { settings } = useContributePageSettings()
-  const [amount, setAmount] = useState('')
-  const [phoneNumber, setPhoneNumber] = useState('')
-  const [isProcessing, setIsProcessing] = useState(false)
-  const [showSuccess, setShowSuccess] = useState(false)
   const [copiedField, setCopiedField] = useState<string | null>(null)
 
   const handleCopy = (text: string, field: string) => {
     navigator.clipboard.writeText(text)
     setCopiedField(field)
     setTimeout(() => setCopiedField(null), 2000)
-  }
-
-  const handleContribute = (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsProcessing(true)
-    setTimeout(() => {
-      setIsProcessing(false)
-      setShowSuccess(true)
-      setTimeout(() => { setShowSuccess(false); setAmount(''); setPhoneNumber('') }, 5000)
-    }, 2000)
   }
 
   return (
@@ -159,85 +144,30 @@ const ContributePage = () => {
             <div className="text-center mb-8">
               <div className="flex items-center justify-center gap-3 mb-4">
                 <h2 className="text-3xl md:text-4xl font-bold text-gray-900">Make a Contribution</h2>
-                <MpesaLogo size="md" />
               </div>
               <p className="text-gray-600 max-w-2xl mx-auto">Secure, fast, and every shilling goes directly to our programs.</p>
             </div>
 
-            {/* Success Message */}
-            {showSuccess && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="bg-green-50 border border-green-200 rounded-2xl p-8 mb-8 text-center relative overflow-hidden"
-              >
-                <div className="absolute top-0 left-0 w-full h-full bg-green-100/50 animate-pulse" />
-                <div className="relative z-10">
-                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-white shadow-sm">
-                    <Check className="w-8 h-8 text-green-600" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-green-800 mb-2">Thank You!</h3>
-                  <p className="text-green-700 text-lg">Your support means the world to us and helps continue our mission.</p>
-                </div>
-              </motion.div>
-            )}
-
-            {/* M-Pesa Paybill Form */}
-            <motion.form
+            <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.3 }}
-              onSubmit={handleContribute}
               className="space-y-6"
             >
-              <div>
-                <label htmlFor="mpesa-amount" className="block text-sm font-medium text-gray-700 mb-2">Contribution Amount (KES)</label>
-                <div className="relative group">
-                  <input type="number" id="mpesa-amount" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="Enter amount" className="w-full px-6 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 text-lg transition-all duration-300 group-hover:bg-white" required />
-                  <div className="absolute inset-y-0 right-0 flex items-center pr-6 pointer-events-none">
-                    <span className="text-gray-500 font-medium">KES</span>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <label htmlFor="mpesa-phone" className="block text-sm font-medium text-gray-700 mb-2">M-Pesa Phone Number</label>
-                <div className="relative group">
-                  <div className="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none border-r border-gray-200 pr-4">
-                    <span className="text-gray-500 font-medium">+254</span>
-                  </div>
-                  <input type="tel" id="mpesa-phone" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} placeholder="700 000 000" className="w-full pl-24 px-6 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 text-lg transition-all duration-300 group-hover:bg-white" required />
-                </div>
-              </div>
-
-              {/* Paybill Details */}
+              {/* Payment Details */}
               <div className="bg-green-50 border border-green-100 rounded-2xl p-5">
                 <h4 className="font-bold text-green-900 mb-3 flex items-center gap-2">
                   <Building2 className="w-5 h-5" />
-                  Pay via M-Pesa Paybill
+                  Payment Details
                 </h4>
-                <ol className="text-xs text-green-700 space-y-1.5 list-decimal list-inside mb-4">
-                  <li>Go to <strong>M-Pesa</strong> → <strong>Lipa na M-Pesa</strong> → <strong>Paybill</strong></li>
-                  <li>Enter Paybill and Account Number below</li>
-                  <li>Enter the amount and your M-Pesa PIN to confirm</li>
-                </ol>
                 <div className="bg-white rounded-xl overflow-hidden border border-green-200">
                   <div className="flex items-center justify-between px-4 py-2.5 border-b border-green-100">
                     <div>
-                      <p className="text-[10px] text-gray-500 uppercase tracking-wider">Paybill</p>
+                      <p className="text-[10px] text-gray-500 uppercase tracking-wider">Till Number</p>
                       <p className="text-base font-bold text-gray-900 font-mono">542542</p>
                     </div>
-                    <button type="button" onClick={() => handleCopy('542542', 'paybill')} className="p-1.5 hover:bg-green-50 rounded-lg transition-colors">
-                      {copiedField === 'paybill' ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4 text-gray-400" />}
-                    </button>
-                  </div>
-                  <div className="flex items-center justify-between px-4 py-2.5 border-b border-green-100">
-                    <div>
-                      <p className="text-[10px] text-gray-500 uppercase tracking-wider">Account No.</p>
-                      <p className="text-base font-bold text-gray-900 font-mono">0310848627615</p>
-                    </div>
-                    <button type="button" onClick={() => handleCopy('0310848627615', 'account')} className="p-1.5 hover:bg-green-50 rounded-lg transition-colors">
-                      {copiedField === 'account' ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4 text-gray-400" />}
+                    <button type="button" onClick={() => handleCopy('542542', 'till')} className="p-1.5 hover:bg-green-50 rounded-lg transition-colors">
+                      {copiedField === 'till' ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4 text-gray-400" />}
                     </button>
                   </div>
                   <div className="px-4 py-2.5">
@@ -249,18 +179,10 @@ const ContributePage = () => {
 
               <div className="bg-yellow-50 border border-yellow-100 rounded-xl p-4">
                 <p className="text-xs text-yellow-800">
-                  <strong>Note:</strong> After completing payment, send the M-Pesa confirmation to <strong>info@misscultureglobalkenya.com</strong> or WhatsApp <strong>+254 721 706983</strong> for your receipt.
+                  <strong>Note:</strong> After completing payment, send the confirmation to <strong>info@misscultureglobalkenya.com</strong> or WhatsApp <strong>+254 721 706983</strong> for your receipt.
                 </p>
               </div>
-
-              <button type="submit" disabled={isProcessing} className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-5 px-8 rounded-xl text-lg transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-3">
-                {isProcessing ? (
-                  <><svg className="animate-spin h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><span>Processing...</span></>
-                ) : (
-                  <><Smartphone className="w-5 h-5" /><span>Contribute via M-Pesa</span></>
-                )}
-              </button>
-            </motion.form>
+            </motion.div>
           </motion.div>
         </div>
       </section>
