@@ -86,7 +86,6 @@ const GalleryPage = () => {
     date: getItemDate(photo),
     location: photo.location || '',
     caption: photo.caption || photo.description || '',
-    likes: photo.likes || 0,
     featured: photo.featured || false
   })
 
@@ -187,14 +186,41 @@ const GalleryPage = () => {
     }
   }
 
-  const handlePhotoDownload = (e: React.MouseEvent<HTMLButtonElement>, photo: any) => {
+  const handlePhotoDownload = async (e: React.MouseEvent<HTMLButtonElement>, photo: any) => {
     e.stopPropagation()
-    const link = document.createElement('a')
-    link.href = photo.image
-    link.download = `${photo.title || 'missculture-photo'}.jpg`
-    document.body.appendChild(link)
-    link.click()
-    link.remove()
+    const url = String(photo?.image || '')
+    if (!url) return
+
+    const safeBaseName = String(photo?.title || 'missculture-photo')
+      .trim()
+      .replace(/[\\/:*?"<>|]+/g, '-')
+      .slice(0, 80)
+
+    const extMatch = (() => {
+      try {
+        return new URL(url).pathname.match(/\.[a-zA-Z0-9]+$/)?.[0]
+      } catch {
+        return null
+      }
+    })()
+
+    const filename = `${safeBaseName}${extMatch || '.jpg'}`
+
+    try {
+      const res = await fetch(url, { mode: 'cors' })
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      const blob = await res.blob()
+      const blobUrl = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = blobUrl
+      link.download = filename
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 1000)
+    } catch {
+      window.open(url, '_blank', 'noopener,noreferrer')
+    }
   }
 
   return (

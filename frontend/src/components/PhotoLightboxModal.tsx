@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Heart, Share2, Download, ArrowLeft, ArrowRight, X } from 'lucide-react'
+import { Share2, Download, ArrowLeft, ArrowRight, X } from 'lucide-react'
 import { useState } from 'react'
 
 interface Photo {
@@ -10,7 +10,6 @@ interface Photo {
   image: string
   photographer: string
   date: string
-  likes: number
   category: string
   description?: string
   event?: string
@@ -33,7 +32,6 @@ const PhotoLightboxModal = ({
   currentIndex, 
   onNavigate 
 }: PhotoLightboxModalProps) => {
-  const [isLiked, setIsLiked] = useState(false)
   const [shareMessage, setShareMessage] = useState<string>('')
   const currentPhoto = photos[currentIndex]
 
@@ -68,19 +66,38 @@ const PhotoLightboxModal = ({
     }
   }
 
-  const handleDownload = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleDownload = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation()
-    const link = document.createElement('a')
-    link.href = currentPhoto.image
-    link.download = `${currentPhoto.title || 'missculture-photo'}.jpg`
-    document.body.appendChild(link)
-    link.click()
-    link.remove()
-  }
+    const safeBaseName = (currentPhoto.title || 'missculture-photo')
+      .trim()
+      .replace(/[\\/:*?"<>|]+/g, '-')
+      .slice(0, 80)
 
-  const handleLike = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation()
-    setIsLiked(!isLiked)
+    const extMatch = (() => {
+      try {
+        return new URL(currentPhoto.image).pathname.match(/\.[a-zA-Z0-9]+$/)?.[0]
+      } catch {
+        return null
+      }
+    })()
+
+    const filename = `${safeBaseName}${extMatch || '.jpg'}`
+
+    try {
+      const res = await fetch(currentPhoto.image, { mode: 'cors' })
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      const blob = await res.blob()
+      const blobUrl = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = blobUrl
+      link.download = filename
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 1000)
+    } catch {
+      window.open(currentPhoto.image, '_blank', 'noopener,noreferrer')
+    }
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -177,17 +194,6 @@ const PhotoLightboxModal = ({
             {/* Action Buttons */}
             <div className="space-y-3">
               <div className="flex flex-wrap gap-3">
-                <button
-                  onClick={handleLike}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors duration-200 ${
-                    isLiked ? 'bg-red-500 text-white' : 'bg-white/20 text-white hover:bg-white/30'
-                  }`}
-                  title="Like this photo"
-                >
-                  <Heart className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} />
-                  <span>{currentPhoto.likes + (isLiked ? 1 : 0)}</span>
-                </button>
-
                 <button
                   onClick={handleShare}
                   className="flex-1 flex items-center justify-center space-x-2 px-4 py-2 bg-white/20 text-white hover:bg-white/30 rounded-lg transition-colors duration-200"
