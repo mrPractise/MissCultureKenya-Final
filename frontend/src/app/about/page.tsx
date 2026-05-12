@@ -106,6 +106,37 @@ const AboutPage = () => {
         </div>
       </section>
 
+      {/* Who We Are — Official Intro */}
+      <section className="py-20 bg-white relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-red-500/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-green-500/5 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center"
+          >
+            <span className="inline-block px-4 py-1 bg-red-50 text-red-600 rounded-full text-sm font-bold uppercase tracking-wider mb-6">
+              About Us
+            </span>
+            <p className="text-xl md:text-2xl text-gray-800 leading-relaxed mb-6 font-light">
+              Miss Culture Global Kenya is a <span className="font-semibold text-green-700">Cultural Diplomacy Platform</span>. We identify and nurture young Kenyan women to become global ambassadors who represent the soul of our nation&mdash;our culture, our diversity, and our untapped economic potential.
+            </p>
+            <p className="text-lg md:text-xl text-gray-600 leading-relaxed mb-8 font-light">
+              By blending &ldquo;The Beauty of Purpose&rdquo; with &ldquo;The Power of Culture,&rdquo; we create a stage where culture drives sustainable development and global unity.
+            </p>
+            <div className="inline-block border-t-2 border-red-600/30 pt-6 max-w-2xl">
+              <p className="text-lg md:text-xl text-gray-900 font-semibold italic leading-relaxed">
+                A platform that builds young women&apos;s confidence and purpose beyond words.
+              </p>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
       {/* 1. Mission & Vision */}
       <section className="py-24 bg-white relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
