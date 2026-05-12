@@ -26,7 +26,8 @@ from .serializers import (
     HomePageSettingsSerializer, KenyaPageSettingsSerializer, AmbassadorPageSettingsSerializer,
     EventsPageSettingsSerializer, GalleryPageSettingsSerializer, PartnershipPageSettingsSerializer,
     AboutPageSettingsSerializer,
-    VotingPageSettingsSerializer, ContactPageSettingsSerializer, FAQPageSettingsSerializer
+    VotingPageSettingsSerializer, ContactPageSettingsSerializer, FAQPageSettingsSerializer,
+    ContributePageSettingsSerializer, PrivacyPageSettingsSerializer, TermsPageSettingsSerializer
 )
 
 logger = logging.getLogger(__name__)
