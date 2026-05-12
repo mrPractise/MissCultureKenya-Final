@@ -26,7 +26,13 @@ export default function KenyaPage() {
         subtitle={settings.page_subtitle || "Our homeland, our culture, our global stage — one story told through photos."}
         backgroundImage={settings.hero_image_url || undefined}
       />
-      <KenyaUnified />
+      <KenyaUnified
+        showCulturalFacts={settings.show_cultural_facts}
+        showRegions={settings.show_regions}
+        showCommunities={settings.show_communities}
+        showHeritage={settings.show_heritage}
+        showAchievements={settings.show_achievements}
+      />
     </div>
   )
 }

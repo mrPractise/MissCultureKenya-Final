@@ -94,13 +94,12 @@ const PartnershipPage = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            <p className="text-sm sm:text-base uppercase tracking-[0.3em] text-yellow-400 mb-4 font-semibold">Brand Value Proposition</p>
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight drop-shadow-2xl tracking-tight">
-              Partner with <span className="text-red-600">Heritage</span>
+              {settings.page_title || 'Partnership'}
             </h1>
             <div className="w-24 h-1 bg-red-600 mx-auto mb-8 rounded-full" />
             <p className="text-lg sm:text-xl md:text-2xl text-gray-100 max-w-3xl mx-auto px-4 drop-shadow-lg font-light leading-relaxed">
-              Align your brand with Kenya&apos;s cultural diplomacy movement — gaining visibility across 50+ countries, meaningful CSR impact, and association with beauty that serves a higher purpose.
+              {settings.page_subtitle || 'Partner with us to make a difference'}
             </p>
           </motion.div>
         </div>

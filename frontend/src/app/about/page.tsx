@@ -114,12 +114,11 @@ const AboutPage = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <p className="text-sm sm:text-base uppercase tracking-[0.3em] text-green-400 mb-4 font-semibold">The Full Narrative</p>
             <h1 className="text-5xl md:text-7xl font-bold mb-6 text-white tracking-tight">
-              We Are the Keepers of <span className="text-red-600">Kenya&apos;s Story</span>
+              {settings.page_title || 'About Us'}
             </h1>
             <p className="text-xl md:text-2xl text-gray-200 max-w-3xl mx-auto font-light leading-relaxed">
-              Miss Culture Global Kenya is not just a pageant. It is a cultural preservation movement, a youth empowerment platform, and Kenya&apos;s voice in a global conversation spanning 50+ nations.
+              {settings.page_subtitle || 'Our story, mission, and values'}
             </p>
             <div className="mt-8 flex justify-center">
               <div className="h-1 w-24 bg-red-600 rounded-full" />

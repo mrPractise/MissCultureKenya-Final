@@ -18,6 +18,11 @@ interface KenyaPageSettings {
   hero_image_url: string | null
   page_title: string
   page_subtitle: string
+  show_cultural_facts: boolean
+  show_regions: boolean
+  show_communities: boolean
+  show_heritage: boolean
+  show_achievements: boolean
 }
 
 interface AmbassadorPageSettings {
@@ -26,6 +31,12 @@ interface AmbassadorPageSettings {
   page_subtitle: string
   profile_image_url: string | null
   video_url: string | null
+  show_story_arc: boolean
+  show_impact_stats: boolean
+  show_core_messages: boolean
+  show_gallery: boolean
+  show_videos: boolean
+  show_contact_cta: boolean
 }
 
 interface EventsPageSettings {
@@ -156,6 +167,11 @@ export function useKenyaPageSettings() {
     hero_image_url: null,
     page_title: 'Kenya',
     page_subtitle: 'Our homeland, our culture, our global stage.',
+    show_cultural_facts: true,
+    show_regions: true,
+    show_communities: true,
+    show_heritage: true,
+    show_achievements: true,
   })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -185,6 +201,12 @@ export function useAmbassadorPageSettings() {
     page_subtitle: 'Miss Culture Global Kenya Ambassador · Cultural diplomat · Youth champion',
     profile_image_url: null,
     video_url: null,
+    show_story_arc: true,
+    show_impact_stats: true,
+    show_core_messages: true,
+    show_gallery: true,
+    show_videos: true,
+    show_contact_cta: true,
   })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)

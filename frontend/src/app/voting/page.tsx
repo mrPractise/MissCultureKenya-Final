@@ -184,11 +184,7 @@ const VotingPage = () => {
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
             <p className="text-sm uppercase tracking-[0.3em] text-green-300 mb-3 font-semibold">Your Voice Shapes the Stage</p>
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 tracking-tight">
-              {(pageSettings.page_title || 'Vote') === 'Vote' ? (
-                <>Vote <span className="text-red-500">Now</span></>
-              ) : (
-                pageSettings.page_title
-              )}
+              {pageSettings.page_title || 'Vote'}
             </h1>
             <div className="w-20 h-1 bg-red-500 mx-auto mb-6 rounded-full" />
             <p className="text-lg text-gray-200 max-w-2xl mx-auto font-light">

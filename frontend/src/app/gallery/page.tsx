@@ -228,13 +228,12 @@ const GalleryPage = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            <p className="text-sm sm:text-base uppercase tracking-[0.3em] text-red-400 mb-4 font-semibold">The Mission in Motion</p>
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight drop-shadow-2xl tracking-tight">
-              See Every <span className="text-red-600">Moment</span>
+              {pageSettings.page_title || 'Gallery'}
             </h1>
             <div className="w-24 h-1 bg-red-600 mx-auto mb-8 rounded-full" />
             <p className="text-lg sm:text-xl md:text-2xl text-gray-100 max-w-3xl mx-auto px-4 drop-shadow-lg font-light leading-relaxed">
-              From pageant stages to community workshops, diplomatic forums to cultural celebrations — this is where words become images.
+              {pageSettings.page_subtitle || 'Photos and videos from our journey'}
             </p>
           </motion.div>
         </div>

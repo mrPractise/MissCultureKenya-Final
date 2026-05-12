@@ -67,6 +67,14 @@ type DiscoverPayload = {
   achievements: Achievement[]
 }
 
+type KenyaUnifiedProps = {
+  showCulturalFacts?: boolean
+  showRegions?: boolean
+  showCommunities?: boolean
+  showHeritage?: boolean
+  showAchievements?: boolean
+}
+
 /* ── helpers ── */
 const getImage = (item: { image?: string | null; image_url?: string | null }) =>
   item.image_url || item.image || ''
@@ -109,7 +117,13 @@ const CULTURAL_FACTS = [
 ]
 
 /* ── component ── */
-const KenyaUnified = () => {
+const KenyaUnified = ({
+  showCulturalFacts = true,
+  showRegions = true,
+  showCommunities = true,
+  showHeritage = true,
+  showAchievements = true,
+}: KenyaUnifiedProps) => {
   const settings = useSiteSettings()
   const [data, setData] = useState<DiscoverPayload | null>(null)
   const [loading, setLoading] = useState(true)
@@ -139,10 +153,10 @@ const KenyaUnified = () => {
   }, [])
 
   /* Use API data directly — show empty states when no data */
-  const regions = (data?.regions || []) as Region[]
-  const communities = (data?.communities || []) as Community[]
-  const heritage = (data?.heritage || []) as Heritage[]
-  const achievements = (data?.achievements || []) as Achievement[]
+  const regions = showRegions ? (data?.regions || []) as Region[] : []
+  const communities = showCommunities ? (data?.communities || []) as Community[] : []
+  const heritage = showHeritage ? (data?.heritage || []) as Heritage[] : []
+  const achievements = showAchievements ? (data?.achievements || []) as Achievement[] : []
 
   /* Build photo grid with captions from gallery photos */
   const galleryPhotos = useMemo(() => {
@@ -224,6 +238,7 @@ const KenyaUnified = () => {
       </div>
 
       {/* ===================== 2. CULTURAL FACTS STRIP ===================== */}
+      {showCulturalFacts && (
       <div className="py-14 sm:py-16 bg-green-900 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-black/20 rounded-full blur-3xl" />
@@ -252,6 +267,7 @@ const KenyaUnified = () => {
           </div>
         </div>
       </div>
+      )}
 
       {/* ===================== 3. PHOTO NARRATIVE GRID ===================== */}
       {galleryPhotos.length > 0 && (
@@ -307,6 +323,7 @@ const KenyaUnified = () => {
       )}
 
       {/* ===================== 4. WHO CARRIES THIS CULTURE ===================== */}
+      {showCommunities && (
       <div className="py-16 sm:py-20 bg-green-50/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div {...fadeInUp} className="text-center mb-6">
@@ -391,8 +408,10 @@ const KenyaUnified = () => {
           </div>
         </div>
       </div>
+      )}
 
       {/* ===================== 5. REGIONS ===================== */}
+      {showRegions && (
       <div className="py-16 sm:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div {...fadeInUp} className="text-center mb-6">
@@ -474,6 +493,7 @@ const KenyaUnified = () => {
           </div>
         </div>
       </div>
+      )}
 
       {/* ===================== 6. THE ARC: FROM SOIL TO STAGE ===================== */}
       <div className="py-16 sm:py-20 bg-green-900 relative overflow-hidden">
@@ -545,6 +565,7 @@ const KenyaUnified = () => {
       </div>
 
       {/* ===================== 7. HERITAGE & CEREMONIES ===================== */}
+      {showHeritage && (
       <div className="py-16 sm:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div {...fadeInUp} className="text-center mb-6">
@@ -672,6 +693,7 @@ const KenyaUnified = () => {
           </motion.div>
         </div>
       </div>
+      )}
 
       {/* ===================== 8. SWAHILI PHRASES ===================== */}
       <div className="py-14 sm:py-16 bg-green-50/30">

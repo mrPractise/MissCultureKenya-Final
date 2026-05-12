@@ -241,6 +241,7 @@ const Ambassador = () => {
       </div>
 
       {/* ===================== 2. STORY ARC ===================== */}
+      {settings.show_story_arc && (
       <div className="py-16 sm:py-20 bg-green-900 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-black/30 rounded-full blur-3xl" />
@@ -277,8 +278,10 @@ const Ambassador = () => {
           </div>
         </div>
       </div>
+      )}
 
       {/* ===================== 3. IMPACT SNAPSHOT ===================== */}
+      {settings.show_impact_stats && (
       <div className="py-14 sm:py-16 bg-white border-t border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div {...fadeInUp} className="text-center mb-10">
@@ -308,8 +311,10 @@ const Ambassador = () => {
           </div>
         </div>
       </div>
+      )}
 
       {/* ===================== 4. CORE MESSAGING CARDS ===================== */}
+      {settings.show_core_messages && (
       <div className="py-16 sm:py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div {...fadeInUp} className="text-center mb-12">
@@ -346,9 +351,10 @@ const Ambassador = () => {
           </div>
         </div>
       </div>
+      )}
 
       {/* ===================== 5. GALLERY PREVIEW ===================== */}
-      {ambassadorInfo.gallery.length > 0 && (
+      {settings.show_gallery && ambassadorInfo.gallery.length > 0 && (
         <div className="py-16 sm:py-20 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div {...fadeInUp} className="text-center mb-10">
@@ -388,7 +394,7 @@ const Ambassador = () => {
       )}
 
       {/* ===================== 6. VIDEOS ===================== */}
-      {ambassadorInfo.videos && ambassadorInfo.videos.length > 0 && (
+      {settings.show_videos && ambassadorInfo.videos && ambassadorInfo.videos.length > 0 && (
         <div className="py-16 sm:py-20 bg-gray-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div {...fadeInUp} className="text-center mb-10">
@@ -429,6 +435,7 @@ const Ambassador = () => {
       )}
 
       {/* ===================== 7. BRIDGE CTAs ===================== */}
+      {settings.show_contact_cta && (
       <div className="py-16 sm:py-20 bg-white">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div {...fadeInUp} className="text-center mb-10">
@@ -484,6 +491,7 @@ const Ambassador = () => {
           </div>
         </div>
       </div>
+      )}
 
       {/* Contact Modal */}
       <ContactModal

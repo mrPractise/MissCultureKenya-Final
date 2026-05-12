@@ -188,15 +188,11 @@ const EventsPage = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            <span className="inline-block px-4 py-1.5 rounded-full border border-white/30 bg-white/10 text-white text-xs sm:text-sm font-bold tracking-widest uppercase mb-6 backdrop-blur-sm">
-              Events & Appearances
-            </span>
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 leading-tight drop-shadow-2xl tracking-tight">
-              Where Culture Comes <span className="text-red-500">Alive</span>
+              {pageSettings.page_title || 'Events'}
             </h1>
             <p className="text-lg sm:text-xl text-gray-200 max-w-3xl mx-auto px-4 drop-shadow-lg font-light leading-relaxed">
-              From pageant nights to cultural workshops, from diplomatic conferences to fashion showcases — 
-              every event is an invitation to experience Kenya&apos;s heritage, not just read about it.
+              {pageSettings.page_subtitle || 'Upcoming events and past highlights'}
             </p>
           </motion.div>
         </div>
