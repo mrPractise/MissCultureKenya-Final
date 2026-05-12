@@ -10,28 +10,28 @@ import { usePartnershipPageSettings } from '@/lib/usePageSettings'
 
 const valuePropositions = [
   {
-    title: 'Targeted Visibility',
-    description: 'Your brand in front of culturally-engaged audiences — live events (500-1000+ attendees), social media (10K+ followers), and international forums.',
+    title: 'Targeted Brand Visibility',
+    description: 'Align your brand with values of integrity, diversity, and national pride — reaching a massive demographic of young achievers and cultural enthusiasts.',
     icon: Eye,
-    impact: 'Massive Demographic Reach'
+    impact: 'Brand Alignment'
   },
   {
-    title: 'Authentic CSR Alignment',
-    description: 'Support youth empowerment, heritage preservation, and artisan uplift — real impact you can feature in your sustainability reports.',
+    title: 'Corporate Social Responsibility',
+    description: 'Direct involvement in our community-led initiatives — from education and environmental conservation to women\u2019s economic empowerment.',
     icon: Heart,
-    impact: 'Meaningful CSR Impact'
+    impact: 'Community-Led Impact'
   },
   {
     title: 'Cross-Border Networking',
-    description: 'Connect with Kenya\'s franchise of a global movement spanning 50+ nations — diplomatic and business doors open through cultural partnership.',
+    description: 'Access to the Miss Culture Global international network — facilitating connections with global brands, embassies, and cultural institutions.',
     icon: Globe,
-    impact: 'Global Connections'
+    impact: 'International Network'
   },
   {
-    title: 'Content & Storytelling Rights',
-    description: 'Behind-the-scenes access, co-branded content, and story angles for your marketing — culture sells, and you get exclusive angles.',
+    title: 'Content & Storytelling',
+    description: "High-quality collaborative content that showcases your brand\u2019s commitment to Kenyan heritage and future-ready leadership.",
     icon: Camera,
-    impact: 'Exclusive Content'
+    impact: 'Collaborative Storytelling'
   }
 ]
 
