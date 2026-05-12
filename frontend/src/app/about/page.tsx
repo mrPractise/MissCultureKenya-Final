@@ -27,63 +27,35 @@ const AboutPage = () => {
     { title: '5. Excellence', description: 'We strive for quality, innovation, and continuous improvement in all our programs and partnerships.', icon: Award }
   ]
 
-  const currentLeadership = [
-    {
-      name: settings.leader_1_name || 'Susan Abongo',
-      title: settings.leader_1_title || 'Miss Culture Global Kenya',
-      bio: settings.leader_1_bio || 'A passionate cultural ambassador with over 5 years of experience promoting Kenyan heritage. Susan holds a degree in Cultural Studies and has represented Kenya in international cultural forums across 15+ countries.',
-      image: settings.leader_1_image_url || '',
-    },
-    {
-      name: settings.leader_2_name || 'Pacific Awuor Oriato',
-      title: settings.leader_2_title || 'Director of Operations',
-      bio: settings.leader_2_bio || 'Oversees all operational aspects of the organization with a focus on community engagement and event management. James has a background in event planning and cultural tourism.',
-      image: settings.leader_2_image_url || '',
-    },
-    {
-      name: settings.leader_3_name || 'Grace Njeri',
-      title: settings.leader_3_title || 'Community Outreach Coordinator',
-      bio: settings.leader_3_bio || 'Leads community engagement initiatives and works directly with local artisans and cultural groups. Grace has a Master\'s degree in Anthropology and extensive experience in grassroots organizing.',
-      image: settings.leader_3_image_url || '',
-    }
-  ]
-
-  const [apiLeaders, setApiLeaders] = useState<any[]>([])
-  const [leadersLoading, setLeadersLoading] = useState(true)
+  const [leadershipTeam, setLeadershipTeam] = useState<any[]>([])
+  const [committeeTeam, setCommitteeTeam] = useState<any[]>([])
+  const [teamLoading, setTeamLoading] = useState(true)
 
   useEffect(() => {
-    const fetchLeaders = async () => {
+    const fetchTeam = async () => {
       try {
-        setLeadersLoading(true)
-        const response = await apiClient.getTeamMembers({ team_type: 'leadership' })
+        setTeamLoading(true)
+        const response = await apiClient.getTeamMembers()
         const data = Array.isArray(response) ? response : (response.results || [])
-        if (data.length > 0) {
-          setApiLeaders(data.map((m: any) => ({
-            name: m.name,
-            title: m.title || '',
-            bio: m.bio || '',
-            image: m.image_url || '',
-          })))
-        }
+        const normalized = data.map((m: any) => ({
+          name: m.name,
+          title: m.title || '',
+          role: m.role || '',
+          bio: m.bio || '',
+          image: m.image_url || '',
+          team_type: m.team_type || '',
+        }))
+        setLeadershipTeam(normalized.filter((m: any) => m.team_type === 'leadership'))
+        setCommitteeTeam(normalized.filter((m: any) => m.team_type === 'committee'))
       } catch {
-        // Fall back to SiteSettings data
+        setLeadershipTeam([])
+        setCommitteeTeam([])
       } finally {
-        setLeadersLoading(false)
+        setTeamLoading(false)
       }
     }
-    fetchLeaders()
+    fetchTeam()
   }, [])
-
-  const displayLeaders = apiLeaders.length > 0 ? apiLeaders : currentLeadership
-
-  const organizingCommittee = [
-    { name: settings.committee_1_name || 'Robert Ochieng', role: settings.committee_1_role || 'Event Coordinator', bio: settings.committee_1_bio || 'Specializes in organizing cultural events and festivals across Kenya.' },
-    { name: settings.committee_2_name || 'Mary Atieno', role: settings.committee_2_role || 'Marketing Director', bio: settings.committee_2_bio || 'Leads digital marketing and brand awareness campaigns.' },
-    { name: settings.committee_3_name || 'David Kimani', role: settings.committee_3_role || 'Finance Manager', bio: settings.committee_3_bio || 'Manages budgeting and financial reporting for all programs.' },
-    { name: settings.committee_4_name || 'Sarah Akinyi', role: settings.committee_4_role || 'Volunteer Coordinator', bio: settings.committee_4_bio || 'Recruits and manages volunteers for all initiatives.' },
-    { name: settings.committee_5_name || 'Peter Kamau', role: settings.committee_5_role || 'International Relations', bio: settings.committee_5_bio || 'Handles partnerships with international cultural organizations.' },
-    { name: settings.committee_6_name || 'Esther Muthoni', role: settings.committee_6_role || 'Youth Programs Lead', bio: settings.committee_6_bio || 'Develops and implements youth engagement programs.' }
-  ]
 
   const impactHighlights = [
     { number: '500+', label: 'Artisans Supported', description: 'Providing sustainable income through cultural crafts' },
@@ -378,7 +350,7 @@ const AboutPage = () => {
           </motion.div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
-            {displayLeaders.map((leader, index) => (
+            {leadershipTeam.map((leader, index) => (
               <motion.div
                 key={leader.name}
                 initial={{ opacity: 0, y: 30 }}
@@ -409,6 +381,11 @@ const AboutPage = () => {
               </motion.div>
             ))}
           </div>
+          {!teamLoading && leadershipTeam.length === 0 && (
+            <p className="mt-10 text-center text-sm text-gray-500">
+              No leadership team members have been added yet.
+            </p>
+          )}
         </div>
       </section>
 
@@ -429,7 +406,7 @@ const AboutPage = () => {
           </motion.div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {organizingCommittee.map((member, index) => (
+            {committeeTeam.map((member, index) => (
               <motion.div
                 key={member.name}
                 initial={{ opacity: 0, y: 30 }}
@@ -439,11 +416,16 @@ const AboutPage = () => {
                 className="bg-white rounded-xl p-6 hover:shadow-lg transition-all duration-300 border border-gray-100 hover:border-green-100"
               >
                 <h3 className="text-lg font-bold text-gray-900">{member.name}</h3>
-                <p className="text-green-600 font-medium text-sm mb-2">{member.role}</p>
+                <p className="text-green-600 font-medium text-sm mb-2">{member.role || member.title}</p>
                 <p className="text-gray-600 text-sm">{member.bio}</p>
               </motion.div>
             ))}
           </div>
+          {!teamLoading && committeeTeam.length === 0 && (
+            <p className="mt-10 text-center text-sm text-gray-500">
+              No organizing committee members have been added yet.
+            </p>
+          )}
         </div>
       </section>
 
