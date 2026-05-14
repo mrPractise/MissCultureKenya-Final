@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Eye, Heart, Globe, Camera, ChevronRight } from 'lucide-react'
+import { Eye, Heart, Globe, Camera, ChevronRight, ExternalLink } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import ContactModal from '@/components/ContactModal'
@@ -51,7 +51,8 @@ const PartnershipPage = () => {
           name: partner.name,
           logo: partner.logo_url || partner.logo || '',
           description: partner.description || `Supporting ${partner.partner_type || 'our mission'}`,
-          since: partner.since || 'Partner'
+          since: partner.since || 'Partner',
+          website_url: partner.website_url || ''
         })))
       } catch (err) {
         console.error('Error fetching partners:', err)
@@ -179,27 +180,55 @@ const PartnershipPage = () => {
                   <p className="text-green-200/60 text-sm mt-2">Be the first to partner with us!</p>
                 </div>
               ) : (
-                sponsors.map((sponsor, index) => (
-                  <motion.div
-                    key={sponsor.name}
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                    viewport={{ once: true }}
-                    className="rounded-2xl bg-white/10 backdrop-blur-md border border-white/10 p-6 hover:bg-white/20 transition-all duration-300 group cursor-pointer text-center"
-                    title={sponsor.since || sponsor.description}
-                  >
-                    <div className="mb-4 h-28 flex items-center justify-center bg-white rounded-xl p-1 group-hover:scale-105 transition-transform duration-300 shadow-lg">
-                      {sponsor.logo ? (
-                        <img src={sponsor.logo} alt={sponsor.name} className="max-h-full max-w-full w-auto object-contain" />
+                sponsors.map((sponsor, index) => {
+                  const cardInner = (
+                    <>
+                      <div className="mb-4 h-28 flex items-center justify-center bg-white rounded-xl p-1 group-hover:scale-105 transition-transform duration-300 shadow-lg">
+                        {sponsor.logo ? (
+                          <img src={sponsor.logo} alt={sponsor.name} className="max-h-full max-w-full w-auto object-contain" />
+                        ) : (
+                          <span className="text-gray-500 font-semibold text-sm text-center">{sponsor.name}</span>
+                        )}
+                      </div>
+                      <h4 className="text-lg font-bold text-white mb-1 flex items-center justify-center gap-1.5">
+                        {sponsor.name}
+                        {sponsor.website_url && (
+                          <ExternalLink className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
+                        )}
+                      </h4>
+                      <p className="text-xs text-green-100 opacity-60 group-hover:opacity-100 transition-opacity duration-300">{sponsor.since || sponsor.description}</p>
+                    </>
+                  )
+
+                  const cardClasses = `rounded-2xl bg-white/10 backdrop-blur-md border border-white/10 p-6 hover:bg-white/20 transition-all duration-300 group text-center ${sponsor.website_url ? 'cursor-pointer block' : ''}`
+
+                  return (
+                    <motion.div
+                      key={sponsor.name}
+                      initial={{ opacity: 0, y: 30 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: index * 0.1 }}
+                      viewport={{ once: true }}
+                      title={sponsor.website_url ? `Visit ${sponsor.name}` : (sponsor.since || sponsor.description)}
+                    >
+                      {sponsor.website_url ? (
+                        <a
+                          href={sponsor.website_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={cardClasses}
+                          aria-label={`Visit ${sponsor.name} website (opens in new tab)`}
+                        >
+                          {cardInner}
+                        </a>
                       ) : (
-                        <span className="text-gray-500 font-semibold text-sm text-center">{sponsor.name}</span>
+                        <div className={cardClasses}>
+                          {cardInner}
+                        </div>
                       )}
-                    </div>
-                    <h4 className="text-lg font-bold text-white mb-1">{sponsor.name}</h4>
-                    <p className="text-xs text-green-100 opacity-60 group-hover:opacity-100 transition-opacity duration-300">{sponsor.since || sponsor.description}</p>
-                  </motion.div>
-                ))
+                    </motion.div>
+                  )
+                })
               )}
             </div>
 
