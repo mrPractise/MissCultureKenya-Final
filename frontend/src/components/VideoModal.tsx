@@ -38,6 +38,17 @@ const isYouTubeUrl = (url: string): boolean => {
   return !!getYouTubeEmbedUrl(url)
 }
 
+type SocialPlatform = { name: string; color: string; hoverColor: string } | null
+
+const detectSocialPlatform = (url: string): SocialPlatform => {
+  if (!url) return null
+  if (/tiktok\.com/i.test(url)) return { name: 'TikTok', color: 'bg-gray-900', hoverColor: 'hover:bg-black' }
+  if (/instagram\.com/i.test(url)) return { name: 'Instagram', color: 'bg-pink-600', hoverColor: 'hover:bg-pink-700' }
+  if (/(?:twitter\.com|x\.com)/i.test(url)) return { name: 'X', color: 'bg-gray-800', hoverColor: 'hover:bg-gray-900' }
+  if (/facebook\.com|fb\.watch/i.test(url)) return { name: 'Facebook', color: 'bg-blue-600', hoverColor: 'hover:bg-blue-700' }
+  return null
+}
+
 const VideoModal = ({ isOpen, onClose, video }: VideoModalProps) => {
   const [shareMsg, setShareMsg] = useState('')
 
@@ -63,6 +74,7 @@ const VideoModal = ({ isOpen, onClose, video }: VideoModalProps) => {
 
   const youtubeEmbedUrl = getYouTubeEmbedUrl(video.videoUrl)
   const isYT = isYouTubeUrl(video.videoUrl)
+  const socialPlatform = !isYT ? detectSocialPlatform(video.videoUrl) : null
 
   return (
     <div className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4" onClick={onClose}>
@@ -93,6 +105,27 @@ const VideoModal = ({ isOpen, onClose, video }: VideoModalProps) => {
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
               />
+            ) : socialPlatform ? (
+              /* Social media videos can't be embedded — show thumbnail + open-externally CTA */
+              <div className="relative w-full h-full flex items-center justify-center bg-gray-900">
+                {video.thumbnail ? (
+                  <img src={video.thumbnail} alt={video.title} className="w-full h-full object-cover opacity-60" />
+                ) : (
+                  <div className="absolute inset-0 bg-gradient-to-b from-gray-800 to-gray-900" />
+                )}
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 z-10">
+                  <a
+                    href={video.videoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`flex items-center gap-2 px-6 py-3 ${socialPlatform.color} ${socialPlatform.hoverColor} text-white rounded-full font-bold text-base shadow-lg transition-colors`}
+                  >
+                    <Play className="w-5 h-5" />
+                    Watch on {socialPlatform.name}
+                  </a>
+                  <p className="text-white/60 text-sm">Opens in a new tab</p>
+                </div>
+              </div>
             ) : video.videoUrl ? (
               <video
                 src={video.videoUrl}
@@ -153,15 +186,15 @@ const VideoModal = ({ isOpen, onClose, video }: VideoModalProps) => {
               {shareMsg && <span className="text-green-200 text-xs ml-1">{shareMsg}</span>}
             </button>
 
-            {isYT && video.videoUrl && (
+            {(isYT || socialPlatform) && video.videoUrl && (
               <a
                 href={video.videoUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold text-sm transition-colors"
+                className={`flex items-center gap-2 px-4 py-2 ${socialPlatform ? socialPlatform.color : 'bg-red-600'} ${socialPlatform ? socialPlatform.hoverColor : 'hover:bg-red-700'} text-white rounded-lg font-semibold text-sm transition-colors`}
               >
                 <ExternalLink className="w-4 h-4" />
-                <span>Watch on YouTube</span>
+                <span>Watch on {socialPlatform ? socialPlatform.name : 'YouTube'}</span>
               </a>
             )}
           </div>

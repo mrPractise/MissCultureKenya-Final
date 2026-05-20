@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { User, BookOpen, Award, Heart, Mail, ArrowRight, Globe, Sparkles, MapPin, ChevronRight, Camera, Calendar } from 'lucide-react'
+import { User, BookOpen, Award, Heart, Mail, ArrowRight, Globe, Sparkles, MapPin, ChevronRight, Camera, Calendar, Play, ExternalLink } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import ContactModal from '@/components/ContactModal'
@@ -18,6 +18,15 @@ const stagger = {
   initial: { opacity: 0, y: 20 },
   whileInView: { opacity: 1, y: 0 },
   viewport: { once: true },
+}
+
+const detectSocialPlatform = (url: string): { name: string; color: string; hoverColor: string } | null => {
+  if (!url) return null
+  if (/tiktok\.com/i.test(url)) return { name: 'TikTok', color: 'bg-gray-900', hoverColor: 'hover:bg-black' }
+  if (/instagram\.com/i.test(url)) return { name: 'Instagram', color: 'bg-pink-600', hoverColor: 'hover:bg-pink-700' }
+  if (/(?:twitter\.com|x\.com)/i.test(url)) return { name: 'X', color: 'bg-gray-800', hoverColor: 'hover:bg-gray-900' }
+  if (/facebook\.com|fb\.watch/i.test(url)) return { name: 'Facebook', color: 'bg-blue-600', hoverColor: 'hover:bg-blue-700' }
+  return null
 }
 
 const Ambassador = () => {
@@ -96,41 +105,41 @@ const Ambassador = () => {
   }, [])
 
   const impactStats = [
-    { number: '50+', label: 'Countries Represented', icon: Globe },
-    { number: '20+', label: 'Events Attended', icon: Calendar },
-    { number: '10K+', label: 'Lives Touched', icon: Heart },
-    { number: '5+', label: 'Causes Championed', icon: Sparkles },
+    { number: 'SDGs', label: 'Sustainable Development Goals Advocate', icon: Globe },
+    { number: 'MCG', label: 'Miss Culture Global Representative', icon: Calendar },
+    { number: '2025', label: 'Miss Culture Global Kenya 2025–2026', icon: Heart },
+    { number: 'CEO', label: 'Founder & CEO, The Misscomm Events', icon: Sparkles },
   ]
 
   const storyArc = [
     {
       step: '01',
       title: 'Where She Comes From',
-      desc: "Born in the heart of Kenya, Susan Abong'o grew up surrounded by the rich tapestry of our nation's diverse cultures. From a young age, she witnessed the power of cultural unity and the beauty of our traditions. Her roots run deep in community centres where she first volunteered to teach children about Kenyan heritage — a calling that would shape her life's direction.",
+      desc: "Susan Abong\u2019o comes from Siaya County, Kenya, and currently resides in Syokimau. She grew up appreciating Kenya\u2019s rich cultural diversity and developed a passion for youth empowerment and cultural preservation.",
       icon: MapPin,
     },
     {
       step: '02',
       title: 'Why She Stepped Forward',
-      desc: "Susan stepped forward to bridge tradition and modern life. She believes young Kenyans can embrace both their heritage and their ambitions.",
+      desc: "Susan stepped forward to bridge tradition and modern life, encouraging young people to embrace both their heritage and ambitions. Her journey in modelling and leadership inspired her passion for confidence building and community empowerment.",
       icon: User,
     },
     {
       step: '03',
       title: 'What She Stands For',
-      desc: "Susan promotes youth programs, preserves cultural heritage, and creates opportunities for artisans. She believes in the power of community and cultural pride.",
+      desc: "Susan is the current Miss Culture Global Kenya 2025\u20132026 and Co-National Director of Miss Culture Global Kenya. She proudly represented Kenya on the global stage, carrying the Kenyan flag high while promoting culture, youth empowerment, and the Sustainable Development Goals. She is also the Founder and CEO of The Misscomm Events and founder of the Shine Within Project, which mentors youth through creativity, confidence, and talent development.",
       icon: Heart,
     },
     {
       step: '04',
       title: 'Where She Has Gone',
-      desc: "Susan has represented Kenya at international events and community gatherings across multiple countries. She shares Kenya's story wherever she goes.",
+      desc: "Susan has represented Kenya at international events and cultural programs across different countries. She also participates in humanitarian work, including supporting girls\u2019 education through sanitary pad donations during World Menstrual Hygiene Day.",
       icon: Globe,
     },
     {
       step: '05',
       title: 'What Happens Next',
-      desc: "Susan continues her work in youth empowerment and cultural partnerships. She invites everyone to join this journey of cultural pride and community growth.",
+      desc: "Susan continues to inspire young people through creativity, modelling, animation, and mentorship. Her vision is to build a generation of confident, creative, and self-aware youth who use their talents to create positive change in society.",
       icon: ArrowRight,
     },
   ]
@@ -138,29 +147,29 @@ const Ambassador = () => {
   const coreMessages = [
     {
       title: 'Her Identity',
-      quote: "I am not just an ambassador. I am a mirror held up to Kenya — showing the world what we truly are.",
-      desc: "Susan represents Kenya with pride and dedication. Her work connects communities and shares our culture with the world.",
+      quote: "Susan Abong\u2019o is a creative leader, youth mentor, and the current Miss Culture Global Kenya 2025\u20132026.",
+      desc: "Originally from Siaya County and currently residing in Syokimau, she is passionate about culture, creativity, and empowering young people to believe in themselves and embrace their uniqueness.",
       icon: User,
       color: 'green',
     },
     {
       title: 'Her Mission',
-      quote: "Every appearance, every speech, every cultural showcase is an act of diplomacy — building bridges between Kenya and the world through shared humanity.",
-      desc: "This is not about looking good. This is about building understanding across continents. Through authentic storytelling and genuine connection, Susan bridges divides and creates pathways for cultural exchange.",
+      quote: "Susan\u2019s mission is to inspire and empower youth through creativity, mentorship, and cultural pride.",
+      desc: "Through The Misscomm Events and the Shine Within Project, she creates opportunities for young people to build confidence, discover their talents, and use their abilities to create positive impact in society.",
       icon: Globe,
       color: 'red',
     },
     {
       title: 'Her Call to Youth',
-      quote: "To every young Kenyan woman watching — your culture is your power. You do not have to leave who you are at the door to succeed globally.",
-      desc: "Susan encourages young women to embrace their cultural identity as a strength in pursuing their goals.",
+      quote: "Susan encourages young people to embrace who they are, stay confident, and never be afraid to dream big.",
+      desc: "She believes every young person has unique talents and the power to create change through creativity, discipline, and self-belief.",
       icon: Sparkles,
       color: 'yellow',
     },
     {
       title: 'Her Invitation',
-      quote: "Follow her journey, attend her events, and vote for the next generation of ambassadors who will carry this torch forward.",
-      desc: "Susan welcomes everyone to follow her journey, attend events, and support the cultural movement.",
+      quote: "Susan invites communities, organizations, and young people to join her journey in promoting culture and empowering youth.",
+      desc: "Building a generation that shines confidently while making meaningful change in society.",
       icon: Heart,
       color: 'green',
     },
@@ -286,7 +295,7 @@ const Ambassador = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div {...fadeInUp} className="text-center mb-10">
             <span className="inline-flex items-center gap-2 text-green-700 font-semibold tracking-wider uppercase text-sm mb-3">
-              <Award className="w-4 h-4" /> Has She Actually Done Anything?
+              <Award className="w-4 h-4" /> At a Glance
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">
               Impact, Not Just Words
@@ -404,16 +413,41 @@ const Ambassador = () => {
               <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">Watch & Listen</h2>
             </motion.div>
             <div className="grid md:grid-cols-2 gap-8">
-              {ambassadorInfo.videos.map((video: any, index: number) => (
+              {ambassadorInfo.videos.map((video: any, index: number) => {
+                const isYT = video.video_url && /youtube\.com|youtu\.be/i.test(video.video_url)
+                const social = !isYT ? detectSocialPlatform(video.video_url || '') : null
+
+                return (
                 <div key={index} className="relative overflow-hidden rounded-2xl shadow-2xl group">
-                  {video.video_url && video.video_url.includes('youtube') ? (
+                  {isYT ? (
                     <iframe
-                      src={video.video_url}
+                      src={video.video_url.replace(/watch\?v=/, 'embed/').replace(/youtu\.be\//, 'youtube.com/embed/')}
                       title={video.title || `Video ${index + 1}`}
                       className="w-full h-80 rounded-2xl"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen
                     />
+                  ) : social ? (
+                    <div className="relative w-full h-80 bg-gray-900 flex items-center justify-center">
+                      {video.thumbnail_url ? (
+                        <img src={video.thumbnail_url} alt={video.title || 'Video'} className="w-full h-full object-cover opacity-50 absolute inset-0" />
+                      ) : (
+                        <div className="absolute inset-0 bg-gradient-to-b from-gray-800 to-gray-900" />
+                      )}
+                      <div className="relative z-10 flex flex-col items-center gap-3">
+                        <a
+                          href={video.video_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={`flex items-center gap-2 px-6 py-3 ${social.color} ${social.hoverColor} text-white rounded-full font-bold text-base shadow-lg transition-colors`}
+                        >
+                          <Play className="w-5 h-5" />
+                          Watch on {social.name}
+                        </a>
+                        <p className="text-white/60 text-sm">Opens in a new tab</p>
+                        {video.title && <p className="text-white/80 text-sm font-medium mt-1">{video.title}</p>}
+                      </div>
+                    </div>
                   ) : video.video_url ? (
                     <video
                       src={video.video_url}
@@ -428,7 +462,8 @@ const Ambassador = () => {
                     </div>
                   )}
                 </div>
-              ))}
+                )
+              })}
             </div>
           </div>
         </div>
