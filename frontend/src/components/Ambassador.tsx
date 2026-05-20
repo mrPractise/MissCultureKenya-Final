@@ -231,9 +231,11 @@ const Ambassador = () => {
                 She does not just wear the crown — she carries an entire nation&apos;s story in everything she does. 
                 Meet the woman behind the mission.
               </p>
-              <p className="text-lg text-gray-600 leading-relaxed mb-8">
-                {ambassadorInfo.bio}
-              </p>
+              <div className="space-y-4 mb-8">
+                {ambassadorInfo.bio.split('\n\n').map((paragraph: string, pIdx: number) => (
+                  <p key={pIdx} className="text-lg text-gray-600 leading-relaxed">{paragraph}</p>
+                ))}
+              </div>
               <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg border border-gray-100 relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-1.5 h-full bg-red-600" />
                 <h4 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
