@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 import {
   MapPin, Users, Landmark, Music, Palette, ChevronDown,
   Volume2, Camera, BookOpen, Sparkles, ArrowRight, Crown, Heart,
-  Globe, Calendar, ChevronRight, Play, Headphones
+  Globe, Calendar, ChevronRight, Play, Headphones, Trophy
 } from 'lucide-react'
 import Link from 'next/link'
 import apiClient from '@/lib/api'
@@ -695,7 +695,75 @@ const KenyaUnified = ({
       </div>
       )}
 
-      {/* ===================== 8. SWAHILI PHRASES ===================== */}
+      {/* ===================== 8. ACHIEVEMENTS ===================== */}
+      {showAchievements && (
+      <div className="py-16 sm:py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div {...fadeInUp} className="text-center mb-6">
+            <span className="inline-flex items-center gap-2 text-red-600 font-semibold tracking-wider uppercase text-sm mb-3">
+              <Trophy className="w-4 h-4" /> Global Footprints
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">
+              Kenya&apos;s Achievements
+            </h2>
+          </motion.div>
+          <motion.div {...fadeInUp} className="text-center mb-14">
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Stories of excellence, innovation, culture, and impact that carry Kenya&apos;s name beyond our borders.
+            </p>
+          </motion.div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {achievements.length > 0 ? (
+              achievements.map((achievement, idx) => {
+                const img = getImage(achievement)
+                return (
+                  <motion.div
+                    key={achievement.id}
+                    {...stagger}
+                    transition={{ duration: 0.4, delay: idx * 0.06 }}
+                    className="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow duration-300 group"
+                  >
+                    <div className="h-48 overflow-hidden relative bg-red-50">
+                      {img ? (
+                        <img
+                          src={img}
+                          alt={achievement.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <Trophy className="w-12 h-12 text-red-200" />
+                        </div>
+                      )}
+                      <div className="absolute top-3 left-3 flex items-center gap-2">
+                        <span className="bg-white/90 backdrop-blur-sm text-red-600 text-xs font-bold px-2.5 py-1 rounded-full">
+                          {achievement.year}
+                        </span>
+                        <span className="bg-green-700/90 backdrop-blur-sm text-white text-xs font-semibold px-2.5 py-1 rounded-full capitalize">
+                          {achievement.achievement_type}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="p-5">
+                      <h4 className="font-bold text-gray-900 text-lg leading-snug">{achievement.title}</h4>
+                      <p className="mt-2 text-sm text-gray-600 leading-relaxed">{achievement.description}</p>
+                    </div>
+                  </motion.div>
+                )
+              })
+            ) : (
+              <div className="col-span-full text-center py-12">
+                <Trophy className="w-10 h-10 text-red-200 mx-auto mb-3" />
+                <p className="text-gray-500">No achievements added yet. Add them in Django admin.</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+      )}
+
+      {/* ===================== 9. SWAHILI PHRASES ===================== */}
       <div className="py-14 sm:py-16 bg-green-50/30">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div {...fadeInUp} className="text-center mb-10">
@@ -734,7 +802,7 @@ const KenyaUnified = ({
         </div>
       </div>
 
-      {/* ===================== 9. BRIDGE CTAS ===================== */}
+      {/* ===================== 10. BRIDGE CTAS ===================== */}
       <div className="py-16 sm:py-20 bg-white">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div {...fadeInUp} className="text-center mb-10">
