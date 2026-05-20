@@ -29,6 +29,13 @@ const detectSocialPlatform = (url: string): { name: string; color: string; hover
   return null
 }
 
+const splitIntoParagraphs = (text: string) =>
+  text
+    .replace(/\r\n/g, '\n')
+    .split(/\n+/)
+    .map((paragraph) => paragraph.trim())
+    .filter(Boolean)
+
 const Ambassador = () => {
   const { settings, loading } = useAmbassadorPageSettings()
   const [isContactModalOpen, setIsContactModalOpen] = useState(false)
@@ -232,7 +239,7 @@ const Ambassador = () => {
                 Meet the woman behind the mission.
               </p>
               <div className="space-y-4 mb-8">
-                {ambassadorInfo.bio.split('\n\n').map((paragraph: string, pIdx: number) => (
+                {splitIntoParagraphs(ambassadorInfo.bio).map((paragraph: string, pIdx: number) => (
                   <p key={pIdx} className="text-lg text-gray-600 leading-relaxed">{paragraph}</p>
                 ))}
               </div>
