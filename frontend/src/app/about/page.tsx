@@ -477,7 +477,7 @@ const AboutPage = () => {
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
+          <div className="grid items-start md:grid-cols-2 lg:grid-cols-3 gap-10">
             {displayLeadershipTeam.map((leader, index) => (
               <motion.div
                 key={leader.name}
@@ -485,7 +485,7 @@ const AboutPage = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="bg-white rounded-2xl shadow-elegant overflow-hidden hover:shadow-elegant-lg transition-all duration-300 group flex h-full flex-col"
+                className="bg-white rounded-2xl shadow-elegant overflow-hidden hover:shadow-elegant-lg transition-all duration-300 group flex min-h-[560px] flex-col"
               >
                 {leader.image ? (
                   <div className="h-80 overflow-hidden relative">
