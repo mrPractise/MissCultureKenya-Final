@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 import {
   MapPin, Users, Landmark, Music, Palette, ChevronDown,
   Volume2, Camera, BookOpen, Sparkles, ArrowRight, Crown, Heart,
-  Globe, Calendar, ChevronRight, Play, Headphones, Trophy
+  Globe, Calendar, ChevronRight, Play, Headphones, Trophy, X
 } from 'lucide-react'
 import Link from 'next/link'
 import apiClient from '@/lib/api'
@@ -96,6 +96,11 @@ const getGalleryImages = (item: { gallery_photos?: GalleryPhoto[] }) =>
 const getGalleryPhotos = (item: { gallery_photos?: GalleryPhoto[] }) =>
   (item.gallery_photos || []).filter(p => p.image_url)
 
+const getUniqueImages = (images: string[]) =>
+  Array.from(new Set(images.filter(Boolean)))
+
+const shouldClampText = (text: string) => text.trim().length > 170
+
 const fadeInUp = {
   initial: { opacity: 0, y: 30 },
   whileInView: { opacity: 1, y: 0 },
@@ -130,6 +135,9 @@ const KenyaUnified = ({
   const [error, setError] = useState<string | null>(null)
   const [expandedRegion, setExpandedRegion] = useState<number | null>(null)
   const [expandedCommunity, setExpandedCommunity] = useState<number | null>(null)
+  const [selectedCommunityImages, setSelectedCommunityImages] = useState<Record<number, string>>({})
+  const [activeCommunityModal, setActiveCommunityModal] = useState<Community | null>(null)
+  const [expandedAchievements, setExpandedAchievements] = useState<Record<number, boolean>>({})
 
   useEffect(() => {
     const fetchData = async () => {
@@ -346,18 +354,20 @@ const KenyaUnified = ({
               communities.map((community, idx) => {
               const img = getImage(community)
               const gallery = getGalleryImages(community)
+              const communityImages = getUniqueImages([img, ...gallery])
+              const selectedImg = selectedCommunityImages[community.id] || img
               const isExpanded = expandedCommunity === community.id
               return (
                 <motion.div
                   key={community.id}
                   {...stagger}
                   transition={{ duration: 0.5, delay: idx * 0.08 }}
-                  className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 group"
+                  className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 group relative"
                 >
                   <div className="h-48 overflow-hidden relative">
-                    {img ? (
+                    {selectedImg ? (
                       <img
-                        src={img}
+                        src={selectedImg}
                         alt={community.name}
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                       />
@@ -374,26 +384,53 @@ const KenyaUnified = ({
                   </div>
                   <div className="p-5">
                     <h4 className="font-bold text-gray-900 text-lg">{community.name}</h4>
-                    <p className="mt-2 text-sm text-gray-600 leading-relaxed line-clamp-2">{community.description}</p>
-                    {gallery.length > 0 && (
-                      <button
-                        onClick={(e) => { e.stopPropagation(); setExpandedCommunity(isExpanded ? null : community.id) }}
-                        className="mt-3 inline-flex items-center gap-1 text-xs text-green-600 hover:text-green-800 transition-colors font-medium"
-                      >
-                        <ChevronDown className={`w-3 h-3 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
-                        {gallery.length} photo{gallery.length > 1 ? 's' : ''}
-                      </button>
-                    )}
+                    <p className="mt-2 text-sm text-gray-600 leading-relaxed line-clamp-3">{community.description}</p>
+                    <div className="mt-3 flex flex-wrap items-center gap-3">
+                      {communityImages.length > 1 && (
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setExpandedCommunity(isExpanded ? null : community.id) }}
+                          className="inline-flex items-center gap-1 text-xs text-green-600 hover:text-green-800 transition-colors font-medium"
+                        >
+                          <ChevronDown className={`w-3 h-3 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                          {communityImages.length} photo{communityImages.length > 1 ? 's' : ''}
+                        </button>
+                      )}
+                      {shouldClampText(community.description) && (
+                        <button
+                          type="button"
+                          onClick={() => setActiveCommunityModal(community)}
+                          className="inline-flex md:hidden text-xs font-bold text-red-600 hover:text-red-700 transition-colors"
+                        >
+                          Read more
+                        </button>
+                      )}
+                    </div>
                   </div>
-                  {isExpanded && gallery.length > 0 && (
+                  {isExpanded && communityImages.length > 1 && (
                     <div className="px-5 pb-5">
-                      <div className="grid grid-cols-3 gap-2">
-                        {gallery.slice(0, 3).map((src, gi) => (
-                          <div key={gi} className="rounded-lg overflow-hidden">
+                      <div className="grid grid-cols-4 gap-2">
+                        {communityImages.slice(0, 4).map((src, gi) => (
+                          <button
+                            key={src}
+                            type="button"
+                            onClick={() => setSelectedCommunityImages((current) => ({
+                              ...current,
+                              [community.id]: src,
+                            }))}
+                            className={`rounded-lg overflow-hidden border-2 transition-colors ${selectedImg === src ? 'border-red-600' : 'border-transparent hover:border-green-500'}`}
+                            aria-label={`Show ${community.name} image ${gi + 1}`}
+                          >
                             <img src={src} alt={`${community.name} ${gi + 1}`} className="w-full h-20 object-cover" />
-                          </div>
+                          </button>
                         ))}
                       </div>
+                    </div>
+                  )}
+                  {shouldClampText(community.description) && (
+                    <div className="absolute inset-0 z-20 hidden md:flex flex-col justify-end bg-green-950/95 p-6 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                      <p className="text-xs font-bold uppercase tracking-widest text-yellow-300 mb-2">{community.region}</p>
+                      <h4 className="text-xl font-bold mb-3">{community.name}</h4>
+                      <p className="text-sm leading-relaxed text-green-50">{community.description}</p>
                     </div>
                   )}
                 </motion.div>
@@ -408,6 +445,30 @@ const KenyaUnified = ({
           </div>
         </div>
       </div>
+      )}
+
+      {activeCommunityModal && (
+        <div className="fixed inset-0 z-50 flex items-end bg-black/60 p-4 md:hidden">
+          <div className="w-full rounded-2xl bg-white shadow-2xl max-h-[85vh] overflow-y-auto">
+            <div className="sticky top-0 flex items-start justify-between gap-4 border-b border-gray-100 bg-white p-5">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-widest text-green-700">{activeCommunityModal.region}</p>
+                <h3 className="text-xl font-bold text-gray-900">{activeCommunityModal.name}</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActiveCommunityModal(null)}
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-gray-600"
+                aria-label="Close community details"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="p-5">
+              <p className="text-gray-600 leading-relaxed">{activeCommunityModal.description}</p>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* ===================== 5. REGIONS ===================== */}
@@ -713,23 +774,24 @@ const KenyaUnified = ({
             </p>
           </motion.div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid items-start sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {achievements.length > 0 ? (
               achievements.map((achievement, idx) => {
                 const img = getImage(achievement)
+                const isExpanded = Boolean(expandedAchievements[achievement.id])
                 return (
                   <motion.div
                     key={achievement.id}
                     {...stagger}
                     transition={{ duration: 0.4, delay: idx * 0.06 }}
-                    className="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow duration-300 group"
+                    className="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow duration-300 group flex min-h-[480px] flex-col"
                   >
-                    <div className="h-48 overflow-hidden relative bg-red-50">
+                    <div className="h-64 sm:h-72 overflow-hidden relative bg-red-50">
                       {img ? (
                         <img
                           src={img}
                           alt={achievement.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          className="w-full h-full object-contain p-2 group-hover:scale-[1.02] transition-transform duration-500"
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
@@ -745,9 +807,24 @@ const KenyaUnified = ({
                         </span>
                       </div>
                     </div>
-                    <div className="p-5">
+                    <div className="p-5 flex flex-1 flex-col">
                       <h4 className="font-bold text-gray-900 text-lg leading-snug">{achievement.title}</h4>
-                      <p className="mt-2 text-sm text-gray-600 leading-relaxed">{achievement.description}</p>
+                      <p className={`mt-2 text-sm text-gray-600 leading-relaxed ${isExpanded ? '' : 'max-h-24 overflow-hidden'}`}>
+                        {achievement.description}
+                      </p>
+                      {shouldClampText(achievement.description) && (
+                        <button
+                          type="button"
+                          onClick={() => setExpandedAchievements((current) => ({
+                            ...current,
+                            [achievement.id]: !current[achievement.id],
+                          }))}
+                          className="mt-4 self-start text-sm font-bold text-red-600 hover:text-red-700 transition-colors"
+                          aria-expanded={isExpanded}
+                        >
+                          {isExpanded ? 'See less' : 'See more'}
+                        </button>
+                      )}
                     </div>
                   </motion.div>
                 )
