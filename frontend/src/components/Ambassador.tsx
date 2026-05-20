@@ -115,31 +115,31 @@ const Ambassador = () => {
     {
       step: '01',
       title: 'Where She Comes From',
-      desc: "Susan Abong\u2019o comes from Siaya County, Kenya, and currently resides in Syokimau. She grew up appreciating Kenya\u2019s rich cultural diversity and developed a passion for youth empowerment and cultural preservation.",
+      desc: "Susan Abong\u2019o comes from Siaya County, Kenya, and currently resides in Syokimau.\n\nShe grew up appreciating Kenya\u2019s rich cultural diversity and developed a passion for youth empowerment and cultural preservation.",
       icon: MapPin,
     },
     {
       step: '02',
       title: 'Why She Stepped Forward',
-      desc: "Susan stepped forward to bridge tradition and modern life, encouraging young people to embrace both their heritage and ambitions. Her journey in modelling and leadership inspired her passion for confidence building and community empowerment.",
+      desc: "Susan stepped forward to bridge tradition and modern life, encouraging young people to embrace both their heritage and ambitions.\n\nHer journey in modelling and leadership inspired her passion for confidence building and community empowerment.",
       icon: User,
     },
     {
       step: '03',
       title: 'What She Stands For',
-      desc: "Susan is the current Miss Culture Global Kenya 2025\u20132026 and Co-National Director of Miss Culture Global Kenya. She proudly represented Kenya on the global stage, carrying the Kenyan flag high while promoting culture, youth empowerment, and the Sustainable Development Goals. She is also the Founder and CEO of The Misscomm Events and founder of the Shine Within Project, which mentors youth through creativity, confidence, and talent development.",
+      desc: "Susan is the current Miss Culture Global Kenya 2025\u20132026 and Co-National Director of Miss Culture Global Kenya. She proudly represented Kenya on the global stage, carrying the Kenyan flag high while promoting culture, youth empowerment, and the Sustainable Development Goals.\n\nShe is also the Founder and CEO of The Misscomm Events and founder of the Shine Within Project, which mentors youth through creativity, confidence, and talent development.",
       icon: Heart,
     },
     {
       step: '04',
       title: 'Where She Has Gone',
-      desc: "Susan has represented Kenya at international events and cultural programs across different countries. She also participates in humanitarian work, including supporting girls\u2019 education through sanitary pad donations during World Menstrual Hygiene Day.",
+      desc: "Susan has represented Kenya at international events and cultural programs across different countries.\n\nShe also participates in humanitarian work, including supporting girls\u2019 education through sanitary pad donations during World Menstrual Hygiene Day.",
       icon: Globe,
     },
     {
       step: '05',
       title: 'What Happens Next',
-      desc: "Susan continues to inspire young people through creativity, modelling, animation, and mentorship. Her vision is to build a generation of confident, creative, and self-aware youth who use their talents to create positive change in society.",
+      desc: "Susan continues to inspire young people through creativity, modelling, animation, and mentorship.\n\nHer vision is to build a generation of confident, creative, and self-aware youth who use their talents to create positive change in society.",
       icon: ArrowRight,
     },
   ]
@@ -280,7 +280,11 @@ const Ambassador = () => {
                 </div>
                 <div className="flex-1">
                   <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">{item.title}</h3>
-                  <p className="text-green-100 leading-relaxed text-sm sm:text-base">{item.desc}</p>
+                  <div className="space-y-2">
+                    {item.desc.split('\n\n').map((paragraph, pIdx) => (
+                      <p key={pIdx} className="text-green-100 leading-relaxed text-sm sm:text-base">{paragraph}</p>
+                    ))}
+                  </div>
                 </div>
               </motion.div>
             ))}
@@ -354,7 +358,11 @@ const Ambassador = () => {
                 <blockquote className="text-lg font-medium text-gray-800 leading-relaxed mb-4 border-l-4 border-green-600 pl-4 italic">
                   &ldquo;{card.quote}&rdquo;
                 </blockquote>
-                <p className="text-gray-600 leading-relaxed text-sm">{card.desc}</p>
+                <p className="text-gray-600 leading-relaxed text-sm">
+                  {card.desc.split('\n\n').map((paragraph, pIdx) => (
+                    <span key={pIdx} className={pIdx > 0 ? 'block mt-2' : ''}>{paragraph}</span>
+                  ))}
+                </p>
               </motion.div>
             ))}
           </div>
