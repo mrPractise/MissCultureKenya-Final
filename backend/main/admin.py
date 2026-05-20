@@ -4,7 +4,7 @@ from django.http import HttpResponseRedirect
 import cloudinary
 from .models import (
     Ambassador, CulturalCommunity, CulturalHeritage, KenyaRegion,
-    Achievement, Partner, KenyaGalleryPhoto, SiteSettings,
+    Achievement, Partner, KenyaGalleryPhoto, SiteSettings, TeamMember,
     HomePageSettings, KenyaPageSettings, AmbassadorPageSettings,
     EventsPageSettings, GalleryPageSettings, PartnershipPageSettings, AboutPageSettings,
     VotingPageSettings, ContactPageSettings, FAQPageSettings,
@@ -82,6 +82,27 @@ class PartnerAdmin(admin.ModelAdmin):
     list_filter = ['partner_type', 'featured', 'created_at']
     search_fields = ['name', 'description']
     list_editable = ['featured']
+
+
+@admin.register(TeamMember)
+class TeamMemberAdmin(admin.ModelAdmin):
+    list_display = ['name', 'title', 'role', 'team_type', 'order', 'featured', 'updated_at']
+    list_filter = ['team_type', 'featured', 'created_at']
+    search_fields = ['name', 'title', 'role', 'bio']
+    list_editable = ['team_type', 'order', 'featured']
+    readonly_fields = ['created_at', 'updated_at']
+    fieldsets = (
+        ('Profile', {
+            'fields': ('name', 'title', 'role', 'bio', 'image')
+        }),
+        ('Display', {
+            'fields': ('team_type', 'order', 'featured')
+        }),
+        ('Metadata', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
 
 
 @admin.register(SiteSettings)
@@ -374,6 +395,18 @@ class AboutPageSettingsAdmin(admin.ModelAdmin):
         }),
         ('Leader 3', {
             'fields': ('leader_3_image', 'leader_3_name', 'leader_3_title', 'leader_3_bio'),
+            'classes': ('collapse',)
+        }),
+        ('Leader 4', {
+            'fields': ('leader_4_image', 'leader_4_name', 'leader_4_title', 'leader_4_bio'),
+            'classes': ('collapse',)
+        }),
+        ('Leader 5', {
+            'fields': ('leader_5_image', 'leader_5_name', 'leader_5_title', 'leader_5_bio'),
+            'classes': ('collapse',)
+        }),
+        ('Leader 6', {
+            'fields': ('leader_6_image', 'leader_6_name', 'leader_6_title', 'leader_6_bio'),
             'classes': ('collapse',)
         }),
         ('Committee Members', {

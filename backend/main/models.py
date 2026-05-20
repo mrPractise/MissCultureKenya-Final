@@ -234,6 +234,21 @@ class AboutPageSettings(models.Model):
     leader_3_name = models.CharField(max_length=100, blank=True, default='')
     leader_3_title = models.CharField(max_length=200, blank=True, default='')
     leader_3_bio = models.TextField(blank=True, default='')
+
+    leader_4_image = cloudinary.models.CloudinaryField('leader_4', folder='missculture/pages/about/leaders', blank=True, null=True)
+    leader_4_name = models.CharField(max_length=100, blank=True, default='')
+    leader_4_title = models.CharField(max_length=200, blank=True, default='')
+    leader_4_bio = models.TextField(blank=True, default='')
+
+    leader_5_image = cloudinary.models.CloudinaryField('leader_5', folder='missculture/pages/about/leaders', blank=True, null=True)
+    leader_5_name = models.CharField(max_length=100, blank=True, default='')
+    leader_5_title = models.CharField(max_length=200, blank=True, default='')
+    leader_5_bio = models.TextField(blank=True, default='')
+
+    leader_6_image = cloudinary.models.CloudinaryField('leader_6', folder='missculture/pages/about/leaders', blank=True, null=True)
+    leader_6_name = models.CharField(max_length=100, blank=True, default='')
+    leader_6_title = models.CharField(max_length=200, blank=True, default='')
+    leader_6_bio = models.TextField(blank=True, default='')
     
     committee_1_name = models.CharField(max_length=100, blank=True, default='')
     committee_1_role = models.CharField(max_length=200, blank=True, default='')

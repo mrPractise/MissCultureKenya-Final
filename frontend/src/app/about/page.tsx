@@ -7,6 +7,30 @@ import Link from 'next/link'
 import { useAboutPageSettings } from '@/lib/usePageSettings'
 import apiClient from '@/lib/api'
 
+type AboutTeamMember = {
+  name: string
+  title: string
+  role: string
+  bio: string
+  image: string
+  team_type: string
+}
+
+const mergeTeamMembers = (primary: AboutTeamMember[], secondary: AboutTeamMember[]) => {
+  const seen = new Set<string>()
+
+  return [...primary, ...secondary].filter((member) => {
+    const name = member.name.trim()
+    if (!name) return false
+
+    const key = name.toLowerCase()
+    if (seen.has(key)) return false
+
+    seen.add(key)
+    return true
+  })
+}
+
 const AboutPage = () => {
   const { settings, loading } = useAboutPageSettings()
 
@@ -34,8 +58,8 @@ const AboutPage = () => {
     { title: '4. Sustainable Tourism Advocacy', description: 'To partner with stakeholders in the travel industry to highlight Kenya\'s "Hidden Gems" — promoting eco-tourism and community-based travel.', icon: Landmark }
   ]
 
-  const [leadershipTeam, setLeadershipTeam] = useState<any[]>([])
-  const [committeeTeam, setCommitteeTeam] = useState<any[]>([])
+  const [leadershipTeam, setLeadershipTeam] = useState<AboutTeamMember[]>([])
+  const [committeeTeam, setCommitteeTeam] = useState<AboutTeamMember[]>([])
   const [teamLoading, setTeamLoading] = useState(true)
 
   useEffect(() => {
@@ -52,8 +76,8 @@ const AboutPage = () => {
           image: m.image_url || '',
           team_type: m.team_type || '',
         }))
-        setLeadershipTeam(normalized.filter((m: any) => m.team_type === 'leadership'))
-        setCommitteeTeam(normalized.filter((m: any) => m.team_type === 'committee'))
+        setLeadershipTeam(normalized.filter((m: AboutTeamMember) => m.team_type === 'leadership'))
+        setCommitteeTeam(normalized.filter((m: AboutTeamMember) => m.team_type === 'committee'))
       } catch {
         setLeadershipTeam([])
         setCommitteeTeam([])
@@ -63,6 +87,27 @@ const AboutPage = () => {
     }
     fetchTeam()
   }, [])
+
+  const settingsLeadershipTeam: AboutTeamMember[] = [
+    { name: settings.leader_1_name, title: settings.leader_1_title, role: '', bio: settings.leader_1_bio, image: settings.leader_1_image_url || '', team_type: 'leadership' },
+    { name: settings.leader_2_name, title: settings.leader_2_title, role: '', bio: settings.leader_2_bio, image: settings.leader_2_image_url || '', team_type: 'leadership' },
+    { name: settings.leader_3_name, title: settings.leader_3_title, role: '', bio: settings.leader_3_bio, image: settings.leader_3_image_url || '', team_type: 'leadership' },
+    { name: settings.leader_4_name, title: settings.leader_4_title, role: '', bio: settings.leader_4_bio, image: settings.leader_4_image_url || '', team_type: 'leadership' },
+    { name: settings.leader_5_name, title: settings.leader_5_title, role: '', bio: settings.leader_5_bio, image: settings.leader_5_image_url || '', team_type: 'leadership' },
+    { name: settings.leader_6_name, title: settings.leader_6_title, role: '', bio: settings.leader_6_bio, image: settings.leader_6_image_url || '', team_type: 'leadership' },
+  ]
+
+  const settingsCommitteeTeam: AboutTeamMember[] = [
+    { name: settings.committee_1_name, title: '', role: settings.committee_1_role, bio: settings.committee_1_bio, image: '', team_type: 'committee' },
+    { name: settings.committee_2_name, title: '', role: settings.committee_2_role, bio: settings.committee_2_bio, image: '', team_type: 'committee' },
+    { name: settings.committee_3_name, title: '', role: settings.committee_3_role, bio: settings.committee_3_bio, image: '', team_type: 'committee' },
+    { name: settings.committee_4_name, title: '', role: settings.committee_4_role, bio: settings.committee_4_bio, image: '', team_type: 'committee' },
+    { name: settings.committee_5_name, title: '', role: settings.committee_5_role, bio: settings.committee_5_bio, image: '', team_type: 'committee' },
+    { name: settings.committee_6_name, title: '', role: settings.committee_6_role, bio: settings.committee_6_bio, image: '', team_type: 'committee' },
+  ]
+
+  const displayLeadershipTeam = mergeTeamMembers(settingsLeadershipTeam, leadershipTeam)
+  const displayCommitteeTeam = mergeTeamMembers(settingsCommitteeTeam, committeeTeam)
 
   const impactHighlights = [
     { number: '500+', label: 'Artisans Supported', description: 'Providing sustainable income through cultural crafts' },
@@ -430,7 +475,7 @@ const AboutPage = () => {
           </motion.div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
-            {leadershipTeam.map((leader, index) => (
+            {displayLeadershipTeam.map((leader, index) => (
               <motion.div
                 key={leader.name}
                 initial={{ opacity: 0, y: 30 }}
@@ -461,7 +506,7 @@ const AboutPage = () => {
               </motion.div>
             ))}
           </div>
-          {!teamLoading && leadershipTeam.length === 0 && (
+          {!teamLoading && !loading && displayLeadershipTeam.length === 0 && (
             <p className="mt-10 text-center text-sm text-gray-500">
               No leadership team members have been added yet.
             </p>
@@ -486,7 +531,7 @@ const AboutPage = () => {
           </motion.div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {committeeTeam.map((member, index) => (
+            {displayCommitteeTeam.map((member, index) => (
               <motion.div
                 key={member.name}
                 initial={{ opacity: 0, y: 30 }}
@@ -501,7 +546,7 @@ const AboutPage = () => {
               </motion.div>
             ))}
           </div>
-          {!teamLoading && committeeTeam.length === 0 && (
+          {!teamLoading && !loading && displayCommitteeTeam.length === 0 && (
             <p className="mt-10 text-center text-sm text-gray-500">
               No organizing committee members have been added yet.
             </p>

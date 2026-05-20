@@ -105,7 +105,7 @@ const AmbassadorSpotlight = () => {
             <div className="relative bg-gray-50 rounded-3xl p-8 sm:p-10 border border-gray-100">
               <Quote className="w-10 h-10 text-red-200 mb-4" />
               <blockquote className="text-xl sm:text-2xl text-gray-800 font-medium leading-relaxed mb-6">
-                &ldquo;I believe in the power of heritage to transform lives. When we celebrate our culture, we don&apos;t just preserve the past — we build the future.&rdquo;
+                &ldquo;I believe in the power of animation and modelling to transform lives. When people embrace self-acceptance and love who they are, they build confidence, inspire others, and create a future filled with purpose and individuality.&rdquo;
               </blockquote>
               <div className="flex items-center gap-4 mb-8">
                 <div className="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center">
@@ -117,7 +117,7 @@ const AmbassadorSpotlight = () => {
                 </div>
               </div>
               <p className="text-gray-600 leading-relaxed mb-8">
-                A passionate advocate for Kenya&apos;s cultural heritage, Susan represents the beauty and diversity of our nation on the global stage. Through authentic storytelling and genuine connection, she bridges divides and builds understanding across continents.
+                A passionate advocate for youth empowerment, creativity, and cultural pride, Susan uses animation, modelling, and mentorship to inspire confidence and self-acceptance among young people. Through authentic storytelling and genuine connection, she empowers individuals to embrace their uniqueness, believe in themselves, and create positive change in their communities and beyond.
               </p>
               <Link
                 href="/ambassador"

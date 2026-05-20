@@ -271,6 +271,9 @@ class AboutPageSettingsSerializer(serializers.ModelSerializer):
     leader_1_image_url = serializers.SerializerMethodField()
     leader_2_image_url = serializers.SerializerMethodField()
     leader_3_image_url = serializers.SerializerMethodField()
+    leader_4_image_url = serializers.SerializerMethodField()
+    leader_5_image_url = serializers.SerializerMethodField()
+    leader_6_image_url = serializers.SerializerMethodField()
     
     class Meta:
         model = AboutPageSettings
@@ -280,6 +283,9 @@ class AboutPageSettingsSerializer(serializers.ModelSerializer):
             'leader_1_image', 'leader_1_image_url', 'leader_1_name', 'leader_1_title', 'leader_1_bio',
             'leader_2_image', 'leader_2_image_url', 'leader_2_name', 'leader_2_title', 'leader_2_bio',
             'leader_3_image', 'leader_3_image_url', 'leader_3_name', 'leader_3_title', 'leader_3_bio',
+            'leader_4_image', 'leader_4_image_url', 'leader_4_name', 'leader_4_title', 'leader_4_bio',
+            'leader_5_image', 'leader_5_image_url', 'leader_5_name', 'leader_5_title', 'leader_5_bio',
+            'leader_6_image', 'leader_6_image_url', 'leader_6_name', 'leader_6_title', 'leader_6_bio',
             'committee_1_name', 'committee_1_role', 'committee_1_bio',
             'committee_2_name', 'committee_2_role', 'committee_2_bio',
             'committee_3_name', 'committee_3_role', 'committee_3_bio',
@@ -303,6 +309,15 @@ class AboutPageSettingsSerializer(serializers.ModelSerializer):
     
     def get_leader_3_image_url(self, obj):
         return _cloudinary_url(obj.leader_3_image)
+
+    def get_leader_4_image_url(self, obj):
+        return _cloudinary_url(obj.leader_4_image)
+
+    def get_leader_5_image_url(self, obj):
+        return _cloudinary_url(obj.leader_5_image)
+
+    def get_leader_6_image_url(self, obj):
+        return _cloudinary_url(obj.leader_6_image)
 
 
 class VotingPageSettingsSerializer(serializers.ModelSerializer):

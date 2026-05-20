@@ -68,6 +68,18 @@ interface AboutPageSettings {
   leader_3_title: string
   leader_3_bio: string
   leader_3_image_url: string | null
+  leader_4_name: string
+  leader_4_title: string
+  leader_4_bio: string
+  leader_4_image_url: string | null
+  leader_5_name: string
+  leader_5_title: string
+  leader_5_bio: string
+  leader_5_image_url: string | null
+  leader_6_name: string
+  leader_6_title: string
+  leader_6_bio: string
+  leader_6_image_url: string | null
   committee_1_name: string
   committee_1_role: string
   committee_1_bio: string
@@ -301,6 +313,18 @@ export function useAboutPageSettings() {
     leader_3_title: '',
     leader_3_bio: '',
     leader_3_image_url: null,
+    leader_4_name: '',
+    leader_4_title: '',
+    leader_4_bio: '',
+    leader_4_image_url: null,
+    leader_5_name: '',
+    leader_5_title: '',
+    leader_5_bio: '',
+    leader_5_image_url: null,
+    leader_6_name: '',
+    leader_6_title: '',
+    leader_6_bio: '',
+    leader_6_image_url: null,
     committee_1_name: '',
     committee_1_role: '',
     committee_1_bio: '',
