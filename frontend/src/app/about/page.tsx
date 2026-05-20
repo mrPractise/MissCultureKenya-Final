@@ -31,6 +31,8 @@ const mergeTeamMembers = (primary: AboutTeamMember[], secondary: AboutTeamMember
   })
 }
 
+const shouldClampBio = (bio: string) => bio.trim().length > 180
+
 const AboutPage = () => {
   const { settings, loading } = useAboutPageSettings()
 
@@ -61,6 +63,7 @@ const AboutPage = () => {
   const [leadershipTeam, setLeadershipTeam] = useState<AboutTeamMember[]>([])
   const [committeeTeam, setCommitteeTeam] = useState<AboutTeamMember[]>([])
   const [teamLoading, setTeamLoading] = useState(true)
+  const [expandedLeadershipBios, setExpandedLeadershipBios] = useState<Record<string, boolean>>({})
 
   useEffect(() => {
     const fetchTeam = async () => {
@@ -482,7 +485,7 @@ const AboutPage = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="bg-white rounded-2xl shadow-elegant overflow-hidden hover:shadow-elegant-lg transition-all duration-300 group"
+                className="bg-white rounded-2xl shadow-elegant overflow-hidden hover:shadow-elegant-lg transition-all duration-300 group flex h-full flex-col"
               >
                 {leader.image ? (
                   <div className="h-80 overflow-hidden relative">
@@ -494,14 +497,29 @@ const AboutPage = () => {
                     />
                   </div>
                 ) : (
-                  <div className="h-32 bg-gradient-to-br from-green-600 to-green-800 flex items-center justify-center">
+                  <div className="h-80 bg-gradient-to-br from-green-600 to-green-800 flex items-center justify-center">
                     <span className="text-5xl font-bold text-white/80">{leader.name.split(' ').map((n: string) => n[0]).join('')}</span>
                   </div>
                 )}
-                <div className="p-8">
+                <div className="p-8 flex flex-1 flex-col">
                   <h3 className="text-2xl font-bold text-gray-900 mb-1">{leader.name}</h3>
                   <p className="text-green-600 font-medium mb-4">{leader.title}</p>
-                  <p className="text-gray-600 mb-6 leading-relaxed text-sm">{leader.bio}</p>
+                  <p className={`text-gray-600 leading-relaxed text-sm ${expandedLeadershipBios[leader.name] ? '' : 'max-h-24 overflow-hidden'}`}>
+                    {leader.bio}
+                  </p>
+                  {shouldClampBio(leader.bio) && (
+                    <button
+                      type="button"
+                      onClick={() => setExpandedLeadershipBios((current) => ({
+                        ...current,
+                        [leader.name]: !current[leader.name],
+                      }))}
+                      className="mt-4 self-start text-sm font-bold text-red-600 hover:text-red-700 transition-colors"
+                      aria-expanded={Boolean(expandedLeadershipBios[leader.name])}
+                    >
+                      {expandedLeadershipBios[leader.name] ? 'See less' : 'See more'}
+                    </button>
+                  )}
                 </div>
               </motion.div>
             ))}
