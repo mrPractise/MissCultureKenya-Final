@@ -104,7 +104,7 @@ export default function EventCheckoutSuccessPage() {
             paymentStatus === 'failed' ? 'text-red-900' : 'text-blue-900'
           }`}>
             {paymentStatus === 'successful' ? 'Payment Successful!' : 
-             paymentStatus === 'failed' ? 'Payment Failed' : 'M-Pesa Prompt Sent'}
+             paymentStatus === 'failed' ? 'Payment Failed' : 'Confirming Payment'}
           </h1>
           
           <p className={`mt-2 text-sm ${
@@ -113,7 +113,7 @@ export default function EventCheckoutSuccessPage() {
           }`}>
             {paymentStatus === 'successful' ? 'Your tickets have been issued. You can view them below.' :
              paymentStatus === 'failed' ? (error || 'The payment could not be completed. Please try again.') :
-             'Complete the prompt on your phone by entering your M-Pesa PIN. Your ticket(s) will be issued automatically after payment confirmation.'}
+             'We are waiting for IntaSend confirmation. Your ticket(s) will be issued automatically after payment confirmation.'}
           </p>
 
           {paymentStatus === 'successful' && issuedTickets.length > 0 && (

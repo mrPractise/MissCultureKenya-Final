@@ -180,12 +180,12 @@ const PaymentModal = ({ isOpen, onClose, event, ticketQuantities, totalPrice, to
         ticket_breakdown: breakdown,
       })
 
-      if (result.success) {
+      if (result.success && result.checkout_url) {
         setCheckoutId(result.checkout_request_id || '')
         setPaymentId(result.payment_id || null)
-        setCurrentStep('processing')
+        window.location.href = result.checkout_url
       } else {
-        setError(result.error || 'Failed to initiate payment. Please try again.')
+        setError(result.error || 'Failed to open IntaSend checkout. Please try again.')
       }
     } catch (err) {
       const apiErr = err as ApiError
@@ -214,7 +214,7 @@ const PaymentModal = ({ isOpen, onClose, event, ticketQuantities, totalPrice, to
 
   const totalAmount = totalPrice === 0 ? 'Free' : `KSh ${totalPrice.toLocaleString()}`
 
-  // Don't show STK Push for free tickets
+  // Don't show payment checkout for free tickets
   if (totalPrice === 0) {
     return null
   }
@@ -242,7 +242,7 @@ const PaymentModal = ({ isOpen, onClose, event, ticketQuantities, totalPrice, to
             )}
             <div>
               <h2 className="text-xl font-bold text-gray-900">
-                {currentStep === 'summary' ? 'Complete Your Purchase' : currentStep === 'pay' ? 'Pay with M-Pesa' : 'M-Pesa Prompt Sent'}
+                {currentStep === 'summary' ? 'Complete Your Purchase' : currentStep === 'pay' ? 'Pay with IntaSend' : 'Confirming Payment'}
               </h2>
               <p className="text-sm text-gray-500">{event.title}</p>
             </div>
@@ -283,12 +283,12 @@ const PaymentModal = ({ isOpen, onClose, event, ticketQuantities, totalPrice, to
                 <div className="flex items-center space-x-4">
                   <MpesaLogo size="md" />
                   <div className="flex-1">
-                    <h4 className="font-semibold text-gray-900">M-Pesa Till Number</h4>
-                    <p className="text-sm font-bold text-green-700">4766976</p>
+                    <h4 className="font-semibold text-gray-900">Secure IntaSend Checkout</h4>
+                    <p className="text-sm font-bold text-green-700">M-Pesa supported</p>
                     <p className="text-xs text-gray-500">The Misscomm Events</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs text-gray-500">STK Push</p>
+                    <p className="text-xs text-gray-500">Checkout</p>
                     <CheckCircle className="w-5 h-5 text-green-600 inline-block" />
                   </div>
                 </div>
@@ -309,7 +309,7 @@ const PaymentModal = ({ isOpen, onClose, event, ticketQuantities, totalPrice, to
               {/* Info banner */}
               <div className="bg-green-50 border border-green-200 rounded-xl p-4">
                 <p className="text-sm text-green-800 font-medium">
-                  Enter your details below. An M-Pesa prompt will be sent directly to your phone.
+                  Enter your details below, then continue to secure IntaSend checkout.
                 </p>
                 <p className="text-xs text-green-600 mt-1">
                   Amount: <span className="font-bold">KSh {totalPrice.toLocaleString()}</span> for {totalTickets} ticket{totalTickets > 1 ? 's' : ''}
@@ -369,7 +369,7 @@ const PaymentModal = ({ isOpen, onClose, event, ticketQuantities, totalPrice, to
                     className="flex-1 px-3 py-3 border border-gray-300 rounded-r-xl focus:ring-2 focus:ring-green-500 focus:border-green-500"
                   />
                 </div>
-                <p className="text-xs text-gray-500 mt-1">The M-Pesa prompt will be sent to this number</p>
+                <p className="text-xs text-gray-500 mt-1">This number will be used for M-Pesa checkout</p>
               </div>
 
               {/* Summary */}
@@ -418,7 +418,7 @@ const PaymentModal = ({ isOpen, onClose, event, ticketQuantities, totalPrice, to
                 {submitting ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    Sending M-Pesa Prompt...
+                    Opening Checkout...
                   </>
                 ) : (
                   <>
@@ -430,7 +430,7 @@ const PaymentModal = ({ isOpen, onClose, event, ticketQuantities, totalPrice, to
             </div>
           )}
 
-          {/* Step 3: STK Push Sent / Processing */}
+          {/* Step 3: Payment Processing */}
           {currentStep === 'processing' && (
             <div className="p-6 space-y-5 text-center">
               <motion.div
@@ -459,7 +459,7 @@ const PaymentModal = ({ isOpen, onClose, event, ticketQuantities, totalPrice, to
                 <p className="text-gray-600">
                   {paymentStatus === 'successful' ? 'Your tickets have been issued successfully.' :
                    paymentStatus === 'failed' ? (error || 'The payment could not be completed.') :
-                   `A payment request has been sent to your phone (+254${phone}).`}
+                   `We are waiting for IntaSend to confirm your payment (+254${phone}).`}
                 </p>
               </div>
 
@@ -467,8 +467,8 @@ const PaymentModal = ({ isOpen, onClose, event, ticketQuantities, totalPrice, to
                 <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-left space-y-2">
                   <p className="text-sm text-blue-800 font-medium">What to do next:</p>
                   <ol className="text-sm text-blue-700 space-y-1.5 list-decimal list-inside">
-                    <li>Check your phone for the M-Pesa prompt</li>
-                    <li>Enter your M-Pesa PIN to authorize the payment</li>
+                    <li>Complete payment on IntaSend checkout</li>
+                    <li>Use M-Pesa when prompted</li>
                     <li>Keep this window open to receive your tickets</li>
                   </ol>
                 </div>

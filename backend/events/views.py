@@ -1,4 +1,5 @@
 import json
+import uuid
 from decimal import Decimal
 
 from rest_framework import viewsets, filters, status
@@ -13,7 +14,7 @@ from django.db.models import Sum, F, Q
 
 from .models import (
     Event, EventCategory,
-    TicketCategory, Contestant, GuestSpeaker, Payment, Ticket, VoteTransaction, AuditLog
+    TicketCategory, Contestant, GuestSpeaker, Payment, Contribution, Ticket, VoteTransaction, AuditLog
 )
 from .serializers import (
     EventSerializer, EventListSerializer,
@@ -24,6 +25,7 @@ from .serializers import (
     VoteTransactionSerializer, AuditLogSerializer,
     LiveResultSerializer, VoteVerifySerializer,
     STKPushRequestSerializer, STKPushTicketRequestSerializer, STKPushResponseSerializer,
+    ContributionCheckoutSerializer,
 )
 from .utils import (
     generate_ticket_code, calculate_vote_count, 
@@ -31,6 +33,26 @@ from .utils import (
 )
 from .ticket_pdf import generate_ticket_pdf
 from .daraja import initiate_stk_push, process_callback
+from .intasend import create_checkout, normalize_collection_payload, check_payment_status
+
+
+def _absolute_backend_url(request, path):
+    configured = getattr(settings, 'INTASEND_CALLBACK_URL', '')
+    if configured:
+        return configured
+    host = request.get_host()
+    scheme = 'https' if request.is_secure() else 'http'
+    return f"{scheme}://{host}{path}"
+
+
+def _frontend_url(path=''):
+    base = getattr(settings, 'FRONTEND_URL', 'http://localhost:3000').rstrip('/')
+    return f"{base}{path}"
+
+
+def _short_payment_reference(result, fallback=''):
+    reference = result.get('mpesa_reference') or result.get('invoice_id') or fallback or ''
+    return str(reference)[:20]
 
 
 # ── Event ViewSet ────────────────────────────────────────────────────────────
@@ -328,35 +350,30 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
             payment_type='vote',
         )
 
-        # Build callback URL
-        callback_url = getattr(settings, 'MPESA_CALLBACK_URL', '')
-        if not callback_url:
-            # Fallback: construct from request
-            host = request.get_host()
-            scheme = 'https' if request.is_secure() else 'http'
-            callback_url = f"{scheme}://{host}/api/mpesa-callback/"
-
-        # Initiate STK Push
-        stk_result = initiate_stk_push(
+        api_ref = f"MCK-VOTE-{payment.id}"
+        checkout_result = create_checkout(
+            email=f"vote-{payment.id}@misscultureglobalkenya.com",
+            amount=amount,
+            api_ref=api_ref,
+            comment=f"Vote for {contestant.name}",
             phone_number=phone_number,
-            amount=float(amount),
-            account_reference=f"VOTE{event.id}",
-            transaction_desc=f"Vote for {contestant.name}",
-            callback_url=callback_url,
+            name=contestant.name,
+            callback_url=_absolute_backend_url(request, '/api/events/intasend-callback/'),
+            redirect_url=_frontend_url('/voting'),
         )
 
-        # Update payment with STK details
-        payment.checkout_request_id = stk_result.get('checkout_request_id') or ''
-        payment.merchant_request_id = stk_result.get('merchant_request_id') or ''
-        payment.stk_response = stk_result
+        payment.checkout_request_id = checkout_result.get('invoice_id') or ''
+        payment.merchant_request_id = api_ref
+        payment.stk_response = checkout_result
         payment.save()
 
-        if stk_result.get('success'):
+        if checkout_result.get('success'):
             return Response({
                 'success': True,
                 'checkout_request_id': payment.checkout_request_id,
                 'merchant_request_id': payment.merchant_request_id,
-                'message': 'STK Push sent to your phone. Please enter your M-Pesa PIN to complete payment.',
+                'checkout_url': checkout_result.get('checkout_url'),
+                'message': 'Continue to IntaSend checkout to complete payment.',
                 'vote_count': vote_count,
                 'payment_id': payment.id,
             })
@@ -366,7 +383,7 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
             payment.save()
             return Response({
                 'success': False,
-                'error': stk_result.get('error', 'Failed to initiate STK Push.'),
+                'error': checkout_result.get('error', 'Failed to create IntaSend checkout.'),
                 'payment_id': payment.id,
             }, status=status.HTTP_502_BAD_GATEWAY)
 
@@ -415,31 +432,30 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
             ticket_quantity=total_qty,
         )
 
-        callback_url = getattr(settings, 'MPESA_CALLBACK_URL', '')
-        if not callback_url:
-            host = request.get_host()
-            scheme = 'https' if request.is_secure() else 'http'
-            callback_url = f"{scheme}://{host}/api/mpesa-callback/"
-
-        stk_result = initiate_stk_push(
+        api_ref = f"MCK-TICKET-{payment.id}"
+        checkout_result = create_checkout(
+            email=email,
+            amount=total_amount,
+            api_ref=api_ref,
+            comment=f"Tickets for {event.title}",
             phone_number=phone_number,
-            amount=float(total_amount),
-            account_reference=f"TICKET{event.id}",
-            transaction_desc=f"Tickets for {event.title}",
-            callback_url=callback_url,
+            name=full_name,
+            callback_url=_absolute_backend_url(request, '/api/events/intasend-callback/'),
+            redirect_url=_frontend_url(f'/events/{event.id}/checkout/success'),
         )
 
-        payment.checkout_request_id = stk_result.get('checkout_request_id') or ''
-        payment.merchant_request_id = stk_result.get('merchant_request_id') or ''
-        payment.stk_response = stk_result
+        payment.checkout_request_id = checkout_result.get('invoice_id') or ''
+        payment.merchant_request_id = api_ref
+        payment.stk_response = checkout_result
         payment.save()
 
-        if stk_result.get('success'):
+        if checkout_result.get('success'):
             return Response({
                 'success': True,
                 'checkout_request_id': payment.checkout_request_id,
                 'merchant_request_id': payment.merchant_request_id,
-                'message': 'STK Push sent to your phone. Please enter your M-Pesa PIN to complete payment.',
+                'checkout_url': checkout_result.get('checkout_url'),
+                'message': 'Continue to IntaSend checkout to complete payment.',
                 'payment_id': payment.id,
                 'ticket_count': total_qty,
                 'amount': str(total_amount),
@@ -448,7 +464,7 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
         payment.save()
         return Response({
             'success': False,
-            'error': stk_result.get('error', 'Failed to initiate STK Push.'),
+            'error': checkout_result.get('error', 'Failed to create IntaSend checkout.'),
             'payment_id': payment.id,
         }, status=status.HTTP_502_BAD_GATEWAY)
 
@@ -636,6 +652,27 @@ class PaymentViewSet(viewsets.ModelViewSet):
             return PaymentCreateSerializer
         return PaymentSerializer
 
+    def retrieve(self, request, *args, **kwargs):
+        payment = self.get_object()
+        if payment.status == 'pending' and payment.checkout_request_id:
+            try:
+                result = check_payment_status(payment.checkout_request_id)
+                payment.stk_response['intasend_status'] = result.get('raw', result)
+                if result.get('is_successful'):
+                    payment.status = 'successful'
+                    payment.mpesa_code = _short_payment_reference(result, payment.mpesa_code)
+                    payment.save()
+                    _process_successful_payment(payment)
+                elif result.get('is_failed'):
+                    payment.status = 'failed'
+                    payment.save()
+                else:
+                    payment.save()
+            except Exception:
+                pass
+        serializer = self.get_serializer(payment)
+        return Response(serializer.data)
+
     def perform_create(self, serializer):
         payment = serializer.save()
 
@@ -738,7 +775,7 @@ class TicketViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ticket.objects.all().select_related('event', 'ticket_category')
     serializer_class = TicketSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['event', 'ticket_category', 'is_used']
+    filterset_fields = ['event', 'ticket_category', 'payment', 'is_used']
     search_fields = ['ticket_code', 'full_name', 'email', 'phone']
     ordering_fields = ['issued_at', 'created_at']
     ordering = ['-issued_at']
@@ -840,6 +877,158 @@ def ticket_lookup(request):
             {'error': f'Ticket with code "{code}" not found.'},
             status=status.HTTP_404_NOT_FOUND
         )
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def initiate_contribution_payment(request):
+    serializer = ContributionCheckoutSerializer(data=request.data)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    data = serializer.validated_data
+    api_ref = f"MCK-CONTRIB-{uuid.uuid4().hex[:12].upper()}"
+    contribution = Contribution.objects.create(
+        full_name=data['full_name'],
+        email=data['email'],
+        phone_number=data.get('phone_number', ''),
+        amount=data['amount'],
+        intasend_api_ref=api_ref,
+    )
+
+    checkout_result = create_checkout(
+        email=contribution.email,
+        amount=contribution.amount,
+        api_ref=api_ref,
+        comment='Contribution to Miss Culture Global Kenya',
+        phone_number=contribution.phone_number,
+        name=contribution.full_name,
+        callback_url=_absolute_backend_url(request, '/api/events/intasend-callback/'),
+        redirect_url=_frontend_url('/contribute?payment=success'),
+    )
+
+    contribution.intasend_invoice_id = checkout_result.get('invoice_id') or None
+    contribution.intasend_response = checkout_result
+    if not checkout_result.get('success'):
+        contribution.status = 'failed'
+    contribution.save()
+
+    if checkout_result.get('success'):
+        return Response({
+            'success': True,
+            'checkout_url': checkout_result.get('checkout_url'),
+            'invoice_id': contribution.intasend_invoice_id,
+            'api_ref': contribution.intasend_api_ref,
+            'contribution_id': contribution.id,
+            'message': 'Continue to IntaSend checkout to complete your contribution.',
+        })
+
+    return Response({
+        'success': False,
+        'error': checkout_result.get('error', 'Failed to create IntaSend checkout.'),
+        'contribution_id': contribution.id,
+    }, status=status.HTTP_502_BAD_GATEWAY)
+
+
+def _process_successful_payment(payment):
+    event = payment.event
+    processor = EventViewSet()
+    if payment.payment_type == 'ticket':
+        if payment.tickets.exists():
+            return {'message': 'Tickets already issued.'}
+        return processor._process_ticket_payment(payment, event)
+    if payment.payment_type == 'vote':
+        if payment.vote_transactions.exists():
+            return {'message': 'Votes already counted.'}
+        return processor._process_vote_payment(payment, event, None)
+    return {}
+
+
+@api_view(['POST'])
+@authentication_classes([])
+@permission_classes([AllowAny])
+def intasend_callback(request):
+    """
+    IntaSend collection webhook endpoint.
+    IntaSend sends collection payloads whenever the payment state changes.
+    """
+    challenge = getattr(settings, 'INTASEND_WEBHOOK_CHALLENGE', '')
+    if challenge and request.data.get('challenge') != challenge:
+        return Response({'error': 'Invalid webhook challenge.'}, status=status.HTTP_403_FORBIDDEN)
+
+    result = normalize_collection_payload(request.data)
+    api_ref = result.get('api_ref')
+    invoice_id = result.get('invoice_id')
+
+    if not api_ref and not invoice_id:
+        return Response({'error': 'Missing IntaSend api_ref or invoice_id.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    payment = Payment.objects.filter(merchant_request_id=api_ref).first()
+    if not payment and invoice_id:
+        payment = Payment.objects.filter(checkout_request_id=invoice_id).first()
+
+    if payment:
+        payment.stk_response['intasend_callback'] = request.data
+        if invoice_id and not payment.checkout_request_id:
+            payment.checkout_request_id = invoice_id
+
+        processing = {}
+        if result.get('is_successful'):
+            if payment.status != 'successful':
+                payment.status = 'successful'
+                payment.mpesa_code = _short_payment_reference(result, payment.mpesa_code)
+                payment.save()
+                processing = _process_successful_payment(payment)
+            else:
+                payment.save()
+                processing = {'message': 'Payment already processed.'}
+        elif result.get('is_failed'):
+            payment.status = 'failed'
+            payment.save()
+        else:
+            payment.save()
+
+        if result.get('is_successful'):
+            AuditLog.objects.create(
+                action='payment_verified',
+                actor='system',
+                details=json.dumps({
+                    'payment_id': payment.id,
+                    'amount': str(payment.amount),
+                    'payment_type': payment.payment_type,
+                    'source': 'intasend_callback',
+                    'invoice_id': invoice_id,
+                    'api_ref': api_ref,
+                    'processing': processing,
+                }),
+                event=payment.event,
+            )
+
+        return Response({'status': 'success', 'processing': processing})
+
+    contribution = Contribution.objects.filter(intasend_api_ref=api_ref).first()
+    if not contribution and invoice_id:
+        contribution = Contribution.objects.filter(intasend_invoice_id=invoice_id).first()
+
+    if contribution:
+        contribution.intasend_response['intasend_callback'] = request.data
+        if invoice_id and not contribution.intasend_invoice_id:
+            contribution.intasend_invoice_id = invoice_id
+        if result.get('is_successful'):
+            contribution.status = 'successful'
+            send_telegram_message(
+                f"<b>New Contribution Confirmed</b>\n\n"
+                f"Name: {contribution.full_name}\n"
+                f"Amount: KES {contribution.amount}\n"
+                f"Phone: {contribution.phone_number or '-'}\n"
+                f"Invoice: {invoice_id or '-'}"
+            )
+        elif result.get('is_failed'):
+            contribution.status = 'failed'
+        contribution.save()
+        return Response({'status': 'success'})
+
+    return Response({'error': 'Matching payment or contribution not found.'}, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['POST'])

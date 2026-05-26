@@ -1,10 +1,11 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Check, Palette, GraduationCap, Globe2, Home, Building2, Copy } from 'lucide-react'
+import { AlertCircle, Check, GraduationCap, Globe2, Home, Loader2, Palette } from 'lucide-react'
 import { useState } from 'react'
-import Link from 'next/link'
 import { useContributePageSettings } from '@/lib/usePageSettings'
+import apiClient from '@/lib/api'
+import type { ApiError } from '@/lib/api'
 
 const impactAreas = [
   {
@@ -35,12 +36,49 @@ const impactAreas = [
 
 const ContributePage = () => {
   const { settings } = useContributePageSettings()
-  const [copiedField, setCopiedField] = useState<string | null>(null)
+  const [fullName, setFullName] = useState('')
+  const [email, setEmail] = useState('')
+  const [phone, setPhone] = useState('')
+  const [amount, setAmount] = useState('1000')
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState('')
 
-  const handleCopy = (text: string, field: string) => {
-    navigator.clipboard.writeText(text)
-    setCopiedField(field)
-    setTimeout(() => setCopiedField(null), 2000)
+  const handleSubmit = async () => {
+    const numericAmount = Number(amount)
+    if (!fullName.trim()) {
+      setError('Please enter your name.')
+      return
+    }
+    if (!email.trim()) {
+      setError('Please enter your email.')
+      return
+    }
+    if (!numericAmount || numericAmount < 1) {
+      setError('Please enter a valid contribution amount.')
+      return
+    }
+
+    setSubmitting(true)
+    setError('')
+    try {
+      const result = await apiClient.initiateContributionPayment({
+        full_name: fullName.trim(),
+        email: email.trim(),
+        phone_number: phone.trim(),
+        amount: numericAmount,
+      })
+
+      if (result?.success && result.checkout_url) {
+        window.location.href = result.checkout_url
+      } else {
+        setError(result?.error || 'Failed to open IntaSend checkout.')
+      }
+    } catch (err) {
+      const apiErr = err as ApiError
+      setError(apiErr.message || 'Failed to start contribution payment.')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -154,33 +192,62 @@ const ContributePage = () => {
               transition={{ duration: 0.3 }}
               className="space-y-6"
             >
-              {/* Payment Details */}
-              <div className="bg-green-50 border border-green-100 rounded-2xl p-5">
-                <h4 className="font-bold text-green-900 mb-3 flex items-center gap-2">
-                  <Building2 className="w-5 h-5" />
-                  Payment Details
-                </h4>
-                <div className="bg-white rounded-xl overflow-hidden border border-green-200">
-                  <div className="flex items-center justify-between px-4 py-2.5 border-b border-green-100">
-                    <div>
-                      <p className="text-[10px] text-gray-500 uppercase tracking-wider">Till Number</p>
-                      <p className="text-base font-bold text-gray-900 font-mono">542542</p>
-                    </div>
-                    <button type="button" onClick={() => handleCopy('542542', 'till')} className="p-1.5 hover:bg-green-50 rounded-lg transition-colors">
-                      {copiedField === 'till' ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4 text-gray-400" />}
-                    </button>
-                  </div>
-                  <div className="px-4 py-2.5">
-                    <p className="text-[10px] text-gray-500 uppercase tracking-wider">Account Name</p>
-                    <p className="text-base font-bold text-gray-900">The Misscomm Events</p>
-                  </div>
+              <div className="grid gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">Full Name</label>
+                  <input
+                    type="text"
+                    value={fullName}
+                    onChange={(e) => { setFullName(e.target.value); setError('') }}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  />
                 </div>
-              </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">Email</label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => { setEmail(e.target.value); setError('') }}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">M-Pesa Phone Number</label>
+                  <input
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => { setPhone(e.target.value.replace(/[^\d+]/g, '')); setError('') }}
+                    placeholder="0712345678"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">Amount (KES)</label>
+                  <input
+                    type="number"
+                    value={amount}
+                    min={1}
+                    onChange={(e) => { setAmount(e.target.value); setError('') }}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 text-lg font-bold"
+                  />
+                </div>
 
-              <div className="bg-yellow-50 border border-yellow-100 rounded-xl p-4">
-                <p className="text-xs text-yellow-800">
-                  <strong>Note:</strong> After completing payment, send the confirmation to <strong>info@misscultureglobalkenya.com</strong> or WhatsApp <strong>+254 721 706983</strong> for your receipt.
-                </p>
+                {error && (
+                  <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-xl">
+                    <AlertCircle className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />
+                    <p className="text-sm text-red-700">{error}</p>
+                  </div>
+                )}
+
+                <button
+                  type="button"
+                  onClick={handleSubmit}
+                  disabled={submitting}
+                  className="w-full bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white py-3.5 rounded-xl font-bold transition-colors flex items-center justify-center gap-2"
+                >
+                  {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                  Continue to IntaSend Checkout
+                </button>
               </div>
             </motion.div>
           </motion.div>

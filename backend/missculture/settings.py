@@ -304,6 +304,14 @@ MPESA_PASSKEY = config('MPESA_PASSKEY', default='bfb279f9aa9bdbcf158e97dd71a467c
 MPESA_ENVIRONMENT = config('MPESA_ENVIRONMENT', default='sandbox')  # 'sandbox' or 'production'
 MPESA_CALLBACK_URL = config('MPESA_CALLBACK_URL', default='')
 
+# IntaSend Configuration
+INTASEND_PUBLISHABLE_KEY = config('INTASEND_PUBLISHABLE_KEY', default='')
+INTASEND_SECRET_KEY = config('INTASEND_SECRET_KEY', default='')
+INTASEND_TEST_MODE = config('INTASEND_TEST_MODE', default=DEBUG, cast=bool)
+INTASEND_CALLBACK_URL = config('INTASEND_CALLBACK_URL', default='')
+INTASEND_WEBHOOK_CHALLENGE = config('INTASEND_WEBHOOK_CHALLENGE', default='')
+FRONTEND_URL = config('FRONTEND_URL', default='http://localhost:3000')
+
 # Tag-based folder prefixes for organized uploads
 CLOUDINARY_UPLOAD_FOLDERS = {
     'ambassador': 'missculture/ambassador',

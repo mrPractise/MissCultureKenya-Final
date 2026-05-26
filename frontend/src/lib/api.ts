@@ -243,14 +243,19 @@ const apiClient = {
     return handle(client.post('/api/events/payments/', data))
   },
 
-  // Initiate Daraja STK Push for voting
+  // Initiate IntaSend checkout for voting
   initiateVotePayment(eventId: number | string, data: { phone_number: string; amount: number; contestant_id: number }) {
     return handle(client.post(`/api/events/events/${eventId}/initiate_vote_payment/`, data))
   },
 
-  // Initiate Daraja STK Push for ticket purchase
+  // Initiate IntaSend checkout for ticket purchase
   initiateTicketPayment(eventId: number | string, data: { phone_number: string; full_name: string; email: string; ticket_breakdown: Record<string, number> }) {
     return handle(client.post(`/api/events/events/${eventId}/initiate_ticket_payment/`, data))
+  },
+
+  // Initiate IntaSend checkout for public contributions
+  initiateContributionPayment(data: { full_name: string; email: string; phone_number?: string; amount: number }) {
+    return handle(client.post('/api/events/contributions/initiate/', data))
   },
 
   // Ticket categories for an event

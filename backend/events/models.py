@@ -292,6 +292,36 @@ class Payment(models.Model):
         return f"{self.mpesa_code} – {self.amount} KES ({self.status})"
 
 
+class Contribution(models.Model):
+    """Model for public contribution payments collected through IntaSend."""
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('successful', 'Successful'),
+        ('failed', 'Failed'),
+        ('cancelled', 'Cancelled'),
+        ('reversed', 'Reversed'),
+    ]
+
+    full_name = models.CharField(max_length=200)
+    email = models.EmailField()
+    phone_number = models.CharField(max_length=20, blank=True)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    intasend_invoice_id = models.CharField(max_length=50, unique=True, null=True, blank=True)
+    intasend_api_ref = models.CharField(max_length=80, unique=True)
+    intasend_response = models.JSONField(default=dict, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Events - Contribution"
+        verbose_name_plural = "Events - Contributions"
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.full_name} – {self.amount} KES ({self.status})"
+
+
 class Ticket(models.Model):
     """Model for event tickets with structured unique codes"""
     event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='tickets')

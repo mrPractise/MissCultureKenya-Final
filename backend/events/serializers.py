@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.db.models import Sum, Count
 from .models import (
     Event, EventCategory,
-    TicketCategory, ContestantCategory, Contestant, GuestSpeaker, Payment, Ticket, VoteTransaction, AuditLog
+    TicketCategory, ContestantCategory, Contestant, GuestSpeaker, Payment, Contribution, Ticket, VoteTransaction, AuditLog
 )
 import cloudinary
 
@@ -229,9 +229,10 @@ class PaymentSerializer(serializers.ModelSerializer):
             'full_name', 'email',
             'phone_number', 'mpesa_code', 'amount', 'status', 'payment_type',
             'checkout_request_id', 'merchant_request_id',
+            'stk_response',
             'verified_by', 'verified_by_name', 'verified_at', 'created_at', 'updated_at',
         ]
-        read_only_fields = ['verified_by', 'verified_at', 'checkout_request_id', 'merchant_request_id']
+        read_only_fields = ['verified_by', 'verified_at', 'checkout_request_id', 'merchant_request_id', 'stk_response']
 
 
 class PaymentCreateSerializer(serializers.ModelSerializer):
@@ -432,6 +433,23 @@ class STKPushTicketRequestSerializer(serializers.Serializer):
                 raise serializers.ValidationError("Ticket quantities must be at least 1.")
             cleaned[category_id] = qty
         return cleaned
+
+
+class ContributionCheckoutSerializer(serializers.Serializer):
+    full_name = serializers.CharField(max_length=200, required=True)
+    email = serializers.EmailField(required=True)
+    phone_number = serializers.CharField(max_length=20, required=False, allow_blank=True)
+    amount = serializers.DecimalField(max_digits=10, decimal_places=2, required=True, min_value=1)
+
+
+class ContributionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Contribution
+        fields = [
+            'id', 'full_name', 'email', 'phone_number', 'amount', 'status',
+            'intasend_invoice_id', 'intasend_api_ref', 'created_at', 'updated_at',
+        ]
+        read_only_fields = fields
 
 
 class STKPushResponseSerializer(serializers.Serializer):

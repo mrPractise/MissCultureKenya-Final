@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams } from 'next/navigation'
 import { ArrowLeft, Building2, Copy, Check, Loader2, Smartphone, Ticket } from 'lucide-react'
 import apiClient from '@/lib/api'
 import type { ApiError } from '@/lib/api'
@@ -26,7 +26,6 @@ const storageKey = (eventId: number) => `checkout:event:${eventId}`
 
 export default function EventCheckoutPayPage() {
   const params = useParams()
-  const router = useRouter()
   const eventId = Number(params?.id)
 
   const [draft, setDraft] = useState<CheckoutDraft | null>(null)
@@ -37,7 +36,7 @@ export default function EventCheckoutPayPage() {
   const [copiedField, setCopiedField] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
-  const [stkSent, setStkSent] = useState(false)
+  const [checkoutStarted, setCheckoutStarted] = useState(false)
   const [checkoutId, setCheckoutId] = useState('')
 
   useEffect(() => {
@@ -106,7 +105,7 @@ export default function EventCheckoutPayPage() {
       return
     }
     if (!draft.phone) {
-      setError('Phone is required for M-Pesa STK push. Go back to checkout.')
+      setError('Phone is required for M-Pesa checkout. Go back to checkout.')
       return
     }
     const ticket_breakdown: Record<string, number> = {}
@@ -121,13 +120,13 @@ export default function EventCheckoutPayPage() {
         email: draft.email,
         ticket_breakdown,
       })
-      if (result?.success) {
-        setStkSent(true)
+      if (result?.success && result.checkout_url) {
+        setCheckoutStarted(true)
         setCheckoutId(result.checkout_request_id || '')
         sessionStorage.setItem(storageKey(eventId), JSON.stringify({ ...draft, payment_id: result?.payment_id, checkout_request_id: result?.checkout_request_id }))
-        router.push(`/events/${eventId}/checkout/success`)
+        window.location.href = result.checkout_url
       } else {
-        setError(result?.error || 'Failed to initiate STK Push.')
+        setError(result?.error || 'Failed to open IntaSend checkout.')
       }
     } catch (err: any) {
       const apiErr = err as ApiError
@@ -188,10 +187,10 @@ export default function EventCheckoutPayPage() {
             <div className="bg-green-50 border border-green-200 rounded-xl p-4">
               <h2 className="font-semibold text-green-900 flex items-center gap-2">
                 <Smartphone className="w-5 h-5" />
-                Pay with M-Pesa (STK Push)
+                Pay with IntaSend
               </h2>
               <p className="mt-2 text-sm text-green-800">
-                Tap the button below and an M-Pesa prompt will be sent to your phone. Enter your PIN to complete payment.
+                Tap the button below to continue to secure IntaSend checkout. You can complete payment with M-Pesa.
               </p>
               {draft.phone && (
                 <p className="mt-2 text-xs text-green-700">
@@ -249,7 +248,7 @@ export default function EventCheckoutPayPage() {
               className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl font-semibold text-sm bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white transition-colors"
             >
               {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-              {stkSent ? 'STK Sent' : 'Send M-Pesa Prompt'}
+              {checkoutStarted ? 'Opening Checkout...' : 'Continue to Pay'}
             </button>
           </div>
         </div>

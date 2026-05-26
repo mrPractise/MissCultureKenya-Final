@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.utils import timezone
 from .models import (
     Event, EventCategory,
-    TicketCategory, Contestant, ContestantCategory, GuestSpeaker, Payment, Ticket, VoteTransaction, AuditLog
+    TicketCategory, Contestant, ContestantCategory, GuestSpeaker, Payment, Contribution, Ticket, VoteTransaction, AuditLog
 )
 from .utils import generate_ticket_code, calculate_vote_count
 
@@ -286,6 +286,16 @@ class PaymentAdmin(admin.ModelAdmin):
             )
             updated += 1
         self.message_user(request, f'{updated} payment(s) marked as reversed.')
+
+
+@admin.register(Contribution)
+class ContributionAdmin(admin.ModelAdmin):
+    list_display = ['full_name', 'email', 'phone_number', 'amount', 'status', 'intasend_invoice_id', 'created_at']
+    list_filter = ['status', 'created_at']
+    search_fields = ['full_name', 'email', 'phone_number', 'intasend_invoice_id', 'intasend_api_ref']
+    readonly_fields = ['intasend_invoice_id', 'intasend_api_ref', 'intasend_response', 'created_at', 'updated_at']
+    ordering = ['-created_at']
+    date_hierarchy = 'created_at'
 
 
 # ── Ticket Admin ─────────────────────────────────────────────────────────────

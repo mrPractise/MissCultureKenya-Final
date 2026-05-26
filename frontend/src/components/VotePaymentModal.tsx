@@ -123,13 +123,13 @@ const VotePaymentModal = ({ isOpen, onClose, event, contestant }: VotePaymentMod
         contestant_id: contestant.id,
       })
 
-      if (result.success) {
+      if (result.success && result.checkout_url) {
         setCheckoutId(result.checkout_request_id)
         setPaymentId(result.payment_id || null)
         setSuccessMessage(result.message)
-        setStep(2)
+        window.location.href = result.checkout_url
       } else {
-        setError(result.error || 'Failed to initiate payment. Please try again.')
+        setError(result.error || 'Failed to open IntaSend checkout. Please try again.')
       }
     } catch (err) {
       const apiErr = err as ApiError
@@ -206,7 +206,7 @@ const VotePaymentModal = ({ isOpen, onClose, event, contestant }: VotePaymentMod
                     1 vote = KES {votePrice.toLocaleString()}
                   </p>
                   <p className="text-xs text-green-600 mt-1">
-                    Enter your phone number and amount. An M-Pesa prompt will be sent to your phone.
+                    Enter your phone number and amount, then continue to secure IntaSend checkout.
                   </p>
                 </div>
 
@@ -300,7 +300,7 @@ const VotePaymentModal = ({ isOpen, onClose, event, contestant }: VotePaymentMod
                   {submitting ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      Sending M-Pesa Prompt...
+                      Opening Checkout...
                     </>
                   ) : (
                     <>
@@ -312,7 +312,7 @@ const VotePaymentModal = ({ isOpen, onClose, event, contestant }: VotePaymentMod
               </div>
             )}
 
-            {/* Step 2: STK Push Sent / Processing */}
+            {/* Step 2: Payment Processing */}
             {step === 2 && (
               <div className="space-y-4 text-center">
                 <motion.div
@@ -340,15 +340,15 @@ const VotePaymentModal = ({ isOpen, onClose, event, contestant }: VotePaymentMod
                 <p className="text-sm text-gray-600">
                   {paymentStatus === 'successful' ? `Thank you for supporting ${contestant.name}! Your votes have been counted.` :
                    paymentStatus === 'failed' ? (error || 'The payment could not be completed.') :
-                   `A payment request has been sent to your phone (+254${phone}).`}
+                   `We are waiting for IntaSend to confirm your payment (+254${phone}).`}
                 </p>
 
                 {paymentStatus === 'pending' && (
                   <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-left space-y-2">
                     <p className="text-sm text-blue-800 font-medium">What to do next:</p>
                     <ol className="text-sm text-blue-700 space-y-1.5 list-decimal list-inside">
-                      <li>Check your phone for the M-Pesa prompt</li>
-                      <li>Enter your M-Pesa PIN to authorize the payment</li>
+                      <li>Complete payment on IntaSend checkout</li>
+                      <li>Use M-Pesa when prompted</li>
                       <li>Keep this window open to confirm your votes</li>
                     </ol>
                   </div>
