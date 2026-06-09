@@ -293,7 +293,7 @@ class Payment(models.Model):
 
 
 class Contribution(models.Model):
-    """Model for public contribution payments collected through IntaSend."""
+    """Model for public contribution payments (now via PesaPal; legacy IntaSend fields preserved)."""
     STATUS_CHOICES = [
         ('pending', 'Pending'),
         ('successful', 'Successful'),
@@ -307,9 +307,14 @@ class Contribution(models.Model):
     phone_number = models.CharField(max_length=20, blank=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    # Legacy IntaSend fields (kept for old records)
     intasend_invoice_id = models.CharField(max_length=50, unique=True, null=True, blank=True)
-    intasend_api_ref = models.CharField(max_length=80, unique=True)
+    intasend_api_ref = models.CharField(max_length=80, unique=True, null=True, blank=True)
     intasend_response = models.JSONField(default=dict, blank=True)
+    # PesaPal fields
+    pesapal_tracking_id = models.CharField(max_length=100, blank=True, default='')
+    pesapal_merchant_ref = models.CharField(max_length=100, blank=True, default='')
+    pesapal_response = models.JSONField(default=dict, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

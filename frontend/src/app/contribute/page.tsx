@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { AlertCircle, Check, GraduationCap, Globe2, Home, Loader2, Palette } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useContributePageSettings } from '@/lib/usePageSettings'
 import apiClient from '@/lib/api'
 import type { ApiError } from '@/lib/api'
@@ -43,6 +43,21 @@ const ContributePage = () => {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
 
+  const [successMsg, setSuccessMsg] = useState('')
+
+  // Handle payment return URL params
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const paymentStatus = params.get('payment')
+    if (paymentStatus === 'success') {
+      setSuccessMsg('Thank you! Your contribution was received successfully.')
+      window.history.replaceState({}, '', '/contribute')
+    } else if (paymentStatus === 'failed') {
+      setError('Payment was not completed. Please try again.')
+      window.history.replaceState({}, '', '/contribute')
+    }
+  }, [])
+
   const handleSubmit = async () => {
     const numericAmount = Number(amount)
     if (!fullName.trim()) {
@@ -68,10 +83,10 @@ const ContributePage = () => {
         amount: numericAmount,
       })
 
-      if (result?.success && result.checkout_url) {
-        window.location.href = result.checkout_url
+      if (result?.success && result.redirect_url) {
+        window.location.href = result.redirect_url
       } else {
-        setError(result?.error || 'Failed to open IntaSend checkout.')
+        setError(result?.error || 'Failed to start payment.')
       }
     } catch (err) {
       const apiErr = err as ApiError
@@ -232,6 +247,13 @@ const ContributePage = () => {
                   />
                 </div>
 
+                {successMsg && (
+                  <div className="flex items-start gap-2 p-3 bg-green-50 border border-green-200 rounded-xl">
+                    <Check className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                    <p className="text-sm text-green-700">{successMsg}</p>
+                  </div>
+                )}
+
                 {error && (
                   <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-xl">
                     <AlertCircle className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />
@@ -246,7 +268,7 @@ const ContributePage = () => {
                   className="w-full bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white py-3.5 rounded-xl font-bold transition-colors flex items-center justify-center gap-2"
                 >
                   {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
-                  Continue to IntaSend Checkout
+                  Continue to Secure Checkout
                 </button>
               </div>
             </motion.div>

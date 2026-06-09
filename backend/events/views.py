@@ -34,12 +34,20 @@ from .utils import (
 from .ticket_pdf import generate_ticket_pdf
 from .daraja import initiate_stk_push, process_callback
 from .intasend import create_checkout, normalize_collection_payload, check_payment_status
+from .pesapal import submit_order, get_transaction_status
 
 
 def _absolute_backend_url(request, path):
+    """Build a full backend URL for external callbacks.
+
+    If INTASEND_CALLBACK_URL is configured, derive the base (scheme + host)
+    from it so the *path* argument is always honoured.
+    """
     configured = getattr(settings, 'INTASEND_CALLBACK_URL', '')
     if configured:
-        return configured
+        from urllib.parse import urlparse
+        parsed = urlparse(configured)
+        return f"{parsed.scheme}://{parsed.netloc}{path}"
     host = request.get_host()
     scheme = 'https' if request.is_secure() else 'http'
     return f"{scheme}://{host}{path}"
@@ -887,47 +895,59 @@ def initiate_contribution_payment(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     data = serializer.validated_data
-    api_ref = f"MCK-CONTRIB-{uuid.uuid4().hex[:12].upper()}"
+    merchant_ref = f"MCK-CONTRIB-{uuid.uuid4().hex[:12].upper()}"
+
+    # Split full name into first/last for PesaPal billing
+    name_parts = data['full_name'].strip().split(maxsplit=1)
+    first_name = name_parts[0]
+    last_name = name_parts[1] if len(name_parts) > 1 else ''
+
     contribution = Contribution.objects.create(
         full_name=data['full_name'],
         email=data['email'],
         phone_number=data.get('phone_number', ''),
         amount=data['amount'],
-        intasend_api_ref=api_ref,
+        pesapal_merchant_ref=merchant_ref,
     )
 
-    checkout_result = create_checkout(
-        email=contribution.email,
+    ipn_id = getattr(settings, 'PESAPAL_IPN_ID', '')
+    callback_url = _absolute_backend_url(request, '/api/events/pesapal-redirect/')
+    frontend_success = _frontend_url('/contribute?payment=success')
+
+    result = submit_order(
+        order_id=merchant_ref,
         amount=contribution.amount,
-        api_ref=api_ref,
-        comment='Contribution to Miss Culture Global Kenya',
+        currency='KES',
+        description='Contribution to Miss Culture Global Kenya',
+        callback_url=callback_url,
+        notification_id=ipn_id,
+        first_name=first_name,
+        last_name=last_name,
+        email=contribution.email,
         phone_number=contribution.phone_number,
-        name=contribution.full_name,
-        callback_url=_absolute_backend_url(request, '/api/events/intasend-callback/'),
-        redirect_url=_frontend_url('/contribute?payment=success'),
     )
 
-    contribution.intasend_invoice_id = checkout_result.get('invoice_id') or None
-    contribution.intasend_response = checkout_result
-    if not checkout_result.get('success'):
+    contribution.pesapal_response = result.get('raw', {})
+    contribution.pesapal_tracking_id = result.get('order_tracking_id', '')
+
+    if not result.get('success'):
         contribution.status = 'failed'
-    contribution.save()
-
-    if checkout_result.get('success'):
+        contribution.save()
         return Response({
-            'success': True,
-            'checkout_url': checkout_result.get('checkout_url'),
-            'invoice_id': contribution.intasend_invoice_id,
-            'api_ref': contribution.intasend_api_ref,
+            'success': False,
+            'error': result.get('error', 'Failed to create PesaPal order.'),
             'contribution_id': contribution.id,
-            'message': 'Continue to IntaSend checkout to complete your contribution.',
-        })
+        }, status=status.HTTP_502_BAD_GATEWAY)
 
+    contribution.save()
     return Response({
-        'success': False,
-        'error': checkout_result.get('error', 'Failed to create IntaSend checkout.'),
+        'success': True,
+        'redirect_url': result.get('redirect_url'),
+        'order_tracking_id': contribution.pesapal_tracking_id,
+        'merchant_ref': contribution.pesapal_merchant_ref,
         'contribution_id': contribution.id,
-    }, status=status.HTTP_502_BAD_GATEWAY)
+        'message': 'Continue to PesaPal checkout to complete your contribution.',
+    })
 
 
 def _process_successful_payment(payment):
@@ -1194,3 +1214,113 @@ def _cloudinary_url(field_value, resource_type='image'):
     if url.startswith(('http://', 'https://')):
         return url
     return cd.CloudinaryResource(url, default_resource_type=resource_type).build_url()
+
+
+# ── PesaPal IPN + Redirect ────────────────────────────────────────────────────
+
+@api_view(['GET'])
+@authentication_classes([])
+@permission_classes([AllowAny])
+def pesapal_ipn_callback(request):
+    """
+    PesaPal IPN (Instant Payment Notification) endpoint.
+    PesaPal sends a GET request with OrderTrackingId and OrderMerchantReference
+    whenever the payment state changes.
+    """
+    tracking_id = request.query_params.get('OrderTrackingId') or request.query_params.get('order_tracking_id', '')
+    merchant_ref = request.query_params.get('OrderMerchantReference') or request.query_params.get('order_merchant_reference', '')
+
+    if not tracking_id and not merchant_ref:
+        return Response({'error': 'Missing OrderTrackingId or OrderMerchantReference.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Look up the contribution
+    contribution = None
+    if merchant_ref:
+        contribution = Contribution.objects.filter(pesapal_merchant_ref=merchant_ref).first()
+    if not contribution and tracking_id:
+        contribution = Contribution.objects.filter(pesapal_tracking_id=tracking_id).first()
+
+    if not contribution:
+        return Response({'error': 'Contribution not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+    # Verify status with PesaPal API
+    status_result = get_transaction_status(
+        order_tracking_id=tracking_id or contribution.pesapal_tracking_id,
+        merchant_reference=merchant_ref or contribution.pesapal_merchant_ref,
+    )
+    payment_status = status_result.get('payment_status', 'UNKNOWN')
+
+    contribution.pesapal_response['ipn_status'] = status_result.get('raw', {})
+
+    if payment_status == 'COMPLETED':
+        if contribution.status != 'successful':
+            contribution.status = 'successful'
+            contribution.save()
+            send_telegram_message(
+                f"<b>New Contribution Confirmed</b>\n\n"
+                f"Name: {contribution.full_name}\n"
+                f"Amount: KES {contribution.amount}\n"
+                f"Phone: {contribution.phone_number or '-'}\n"
+                f"Tracking: {tracking_id or '-'}"
+            )
+        else:
+            contribution.save()
+    elif payment_status in ('FAILED', 'INVALID'):
+        contribution.status = 'failed'
+        contribution.save()
+    else:
+        contribution.save()
+
+    return Response({'status': 'success'})
+
+
+@api_view(['GET'])
+@authentication_classes([])
+@permission_classes([AllowAny])
+def pesapal_payment_redirect(request):
+    """
+    PesaPal redirects the user's browser here after they complete (or abandon) payment.
+    Verifies the status and redirects to the frontend with a status param.
+    """
+    tracking_id = request.query_params.get('OrderTrackingId') or request.query_params.get('order_tracking_id', '')
+    merchant_ref = request.query_params.get('OrderMerchantReference') or request.query_params.get('order_merchant_reference', '')
+
+    frontend_url = getattr(settings, 'FRONTEND_URL', 'http://localhost:3000').rstrip('/')
+
+    # Try to verify with PesaPal API
+    if tracking_id or merchant_ref:
+        status_result = get_transaction_status(
+            order_tracking_id=tracking_id,
+            merchant_reference=merchant_ref,
+        )
+        payment_status = status_result.get('payment_status', 'UNKNOWN')
+
+        # Update contribution if found
+        contribution = None
+        if merchant_ref:
+            contribution = Contribution.objects.filter(pesapal_merchant_ref=merchant_ref).first()
+        if not contribution and tracking_id:
+            contribution = Contribution.objects.filter(pesapal_tracking_id=tracking_id).first()
+
+        if contribution:
+            if payment_status == 'COMPLETED' and contribution.status != 'successful':
+                contribution.status = 'successful'
+                contribution.pesapal_response['redirect_status'] = status_result.get('raw', {})
+                contribution.save()
+                send_telegram_message(
+                    f"<b>New Contribution Confirmed</b>\n\n"
+                    f"Name: {contribution.full_name}\n"
+                    f"Amount: KES {contribution.amount}\n"
+                    f"Phone: {contribution.phone_number or '-'}\n"
+                    f"Tracking: {tracking_id or '-'}"
+                )
+            elif payment_status in ('FAILED', 'INVALID'):
+                contribution.status = 'failed'
+                contribution.save()
+
+        if payment_status == 'COMPLETED':
+            from django.shortcuts import redirect
+            return redirect(f'{frontend_url}/contribute?payment=success')
+
+    from django.shortcuts import redirect as dj_redirect
+    return dj_redirect(f'{frontend_url}/contribute?payment=failed')

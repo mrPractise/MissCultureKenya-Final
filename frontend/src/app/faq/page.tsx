@@ -99,7 +99,7 @@ const faqCategories = [
       },
       {
         question: 'Can individuals donate?',
-        answer: 'Absolutely. Individual donations of any amount are welcome. You can contribute via M-Pesa (for local donors) or Visa/Mastercard (for international donors). Suggested amounts start at KES 500.'
+        answer: 'Absolutely. Individual donations of any amount are welcome. You can contribute via M-Pesa or card through our secure PesaPal checkout. Suggested amounts start at KES 500.'
       },
       {
         question: 'What are the partnership requirements?',

@@ -290,10 +290,10 @@ class PaymentAdmin(admin.ModelAdmin):
 
 @admin.register(Contribution)
 class ContributionAdmin(admin.ModelAdmin):
-    list_display = ['full_name', 'email', 'phone_number', 'amount', 'status', 'intasend_invoice_id', 'created_at']
+    list_display = ['full_name', 'email', 'phone_number', 'amount', 'status', 'pesapal_tracking_id', 'created_at']
     list_filter = ['status', 'created_at']
-    search_fields = ['full_name', 'email', 'phone_number', 'intasend_invoice_id', 'intasend_api_ref']
-    readonly_fields = ['intasend_invoice_id', 'intasend_api_ref', 'intasend_response', 'created_at', 'updated_at']
+    search_fields = ['full_name', 'email', 'phone_number', 'pesapal_tracking_id', 'pesapal_merchant_ref', 'intasend_invoice_id', 'intasend_api_ref']
+    readonly_fields = ['intasend_invoice_id', 'intasend_api_ref', 'intasend_response', 'pesapal_tracking_id', 'pesapal_merchant_ref', 'pesapal_response', 'created_at', 'updated_at']
     ordering = ['-created_at']
     date_hierarchy = 'created_at'
 

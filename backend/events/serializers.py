@@ -447,7 +447,9 @@ class ContributionSerializer(serializers.ModelSerializer):
         model = Contribution
         fields = [
             'id', 'full_name', 'email', 'phone_number', 'amount', 'status',
-            'intasend_invoice_id', 'intasend_api_ref', 'created_at', 'updated_at',
+            'intasend_invoice_id', 'intasend_api_ref',
+            'pesapal_tracking_id', 'pesapal_merchant_ref',
+            'created_at', 'updated_at',
         ]
         read_only_fields = fields
 

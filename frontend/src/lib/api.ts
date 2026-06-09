@@ -253,7 +253,8 @@ const apiClient = {
     return handle(client.post(`/api/events/events/${eventId}/initiate_ticket_payment/`, data))
   },
 
-  // Initiate IntaSend checkout for public contributions
+  // Initiate PesaPal checkout for public contributions
+  // Returns { success, redirect_url, order_tracking_id, merchant_ref, contribution_id, message }
   initiateContributionPayment(data: { full_name: string; email: string; phone_number?: string; amount: number }) {
     return handle(client.post('/api/events/contributions/initiate/', data))
   },

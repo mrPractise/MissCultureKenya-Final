@@ -310,6 +310,13 @@ INTASEND_SECRET_KEY = config('INTASEND_SECRET_KEY', default='')
 INTASEND_TEST_MODE = config('INTASEND_TEST_MODE', default=DEBUG, cast=bool)
 INTASEND_CALLBACK_URL = config('INTASEND_CALLBACK_URL', default='')
 INTASEND_WEBHOOK_CHALLENGE = config('INTASEND_WEBHOOK_CHALLENGE', default='')
+
+# PesaPal Configuration (contributions/donations)
+PESAPAL_CONSUMER_KEY = config('PESAPAL_CONSUMER_KEY', default='')
+PESAPAL_CONSUMER_SECRET = config('PESAPAL_CONSUMER_SECRET', default='')
+PESAPAL_BASE_URL = config('PESAPAL_BASE_URL', default='https://pay.pesapal.com/v3/api')
+PESAPAL_IPN_ID = config('PESAPAL_IPN_ID', default='')
+
 FRONTEND_URL = config('FRONTEND_URL', default='http://localhost:3000')
 
 # Tag-based folder prefixes for organized uploads
