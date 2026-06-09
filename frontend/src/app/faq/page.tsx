@@ -55,7 +55,7 @@ const faqCategories = [
       },
       {
         question: 'How is voting done?',
-        answer: 'Voting is done through our website. You can vote once per category per event. Voting is free and transparent — live vote counts are displayed so you can see real-time results.'
+        answer: 'Voting is done through our website using M-Pesa via PesaPal. Each vote has a set price (varies by event). You can vote as many times as you like — your votes are counted immediately after payment confirmation. Live vote counts may be displayed depending on the event\'s visibility settings.'
       }
     ]
   },

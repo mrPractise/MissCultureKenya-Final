@@ -162,10 +162,10 @@ class ContestantCategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Payment)
 class PaymentAdmin(admin.ModelAdmin):
-    list_display = ['mpesa_code', 'event', 'phone_number', 'amount', 'payment_type', 'status', 'verified_by', 'created_at']
+    list_display = ['mpesa_code', 'event', 'phone_number', 'amount', 'payment_type', 'status', 'pesapal_tracking_id', 'verified_by', 'created_at']
     list_filter = ['status', 'payment_type', 'event', 'created_at']
-    search_fields = ['mpesa_code', 'phone_number']
-    readonly_fields = ['created_at', 'updated_at', 'verified_at']
+    search_fields = ['mpesa_code', 'phone_number', 'pesapal_tracking_id', 'pesapal_merchant_ref']
+    readonly_fields = ['pesapal_tracking_id', 'pesapal_merchant_ref', 'pesapal_response', 'created_at', 'updated_at', 'verified_at']
     ordering = ['-created_at']
     date_hierarchy = 'created_at'
 
@@ -292,8 +292,8 @@ class PaymentAdmin(admin.ModelAdmin):
 class ContributionAdmin(admin.ModelAdmin):
     list_display = ['full_name', 'email', 'phone_number', 'amount', 'status', 'pesapal_tracking_id', 'created_at']
     list_filter = ['status', 'created_at']
-    search_fields = ['full_name', 'email', 'phone_number', 'pesapal_tracking_id', 'pesapal_merchant_ref', 'intasend_invoice_id', 'intasend_api_ref']
-    readonly_fields = ['intasend_invoice_id', 'intasend_api_ref', 'intasend_response', 'pesapal_tracking_id', 'pesapal_merchant_ref', 'pesapal_response', 'created_at', 'updated_at']
+    search_fields = ['full_name', 'email', 'phone_number', 'pesapal_tracking_id', 'pesapal_merchant_ref']
+    readonly_fields = ['pesapal_tracking_id', 'pesapal_merchant_ref', 'pesapal_response', 'created_at', 'updated_at']
     ordering = ['-created_at']
     date_hierarchy = 'created_at'
 

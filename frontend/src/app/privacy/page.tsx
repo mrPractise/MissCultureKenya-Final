@@ -68,8 +68,7 @@ export default function PrivacyPolicy() {
             
             <h2 className="text-xl font-bold text-gray-900 mt-8 mb-4">Payment Data</h2>
             <p className="text-gray-600 mb-4">
-              When you purchase tickets or vote, your payment is processed securely through
-              IntaSend. When you make a contribution (donation), your payment is processed securely
+              When you purchase tickets, vote, or make a contribution, your payment is processed securely
               through PesaPal. We do not store your M-Pesa PIN or full card
               details. We only store transaction references to verify your purchase and issue
               tickets or count votes.

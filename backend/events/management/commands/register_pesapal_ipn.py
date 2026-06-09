@@ -42,20 +42,16 @@ class Command(BaseCommand):
 
             ipn_url = getattr(settings, "PESAPAL_IPN_URL", "")
             if not ipn_url:
-                # Derive from FRONTEND_URL / BACKEND_URL
-                frontend = getattr(settings, "FRONTEND_URL", "")
-                backend_url = getattr(settings, "INTASEND_CALLBACK_URL", "")
-                if backend_url:
-                    # Replace the path portion
-                    base = backend_url.rsplit("/", 2)[0]  # strip /api/events/intasend-callback/
-                    ipn_url = f"{base}/api/events/pesapal-ipn/"
-                elif frontend:
-                    base = frontend.rstrip("/")
-                    ipn_url = f"{base}/api/events/pesapal-ipn/"
+                callback_url = getattr(settings, "PESAPAL_CALLBACK_URL", "")
+                if callback_url:
+                    from urllib.parse import urlparse
+
+                    parsed = urlparse(callback_url)
+                    ipn_url = f"{parsed.scheme}://{parsed.netloc}/api/events/pesapal-ipn/"
                 else:
                     raise CommandError(
                         "Could not determine IPN URL. Pass --url explicitly or set "
-                        "PESAPAL_IPN_URL / FRONTEND_URL in settings."
+                        "PESAPAL_IPN_URL or PESAPAL_CALLBACK_URL in settings."
                     )
 
         self.stdout.write(f"Registering IPN URL: {ipn_url}")

@@ -24,7 +24,7 @@ from .serializers import (
     TicketSerializer, TicketDetailSerializer,
     VoteTransactionSerializer, AuditLogSerializer,
     LiveResultSerializer, VoteVerifySerializer,
-    STKPushRequestSerializer, STKPushTicketRequestSerializer, STKPushResponseSerializer,
+    PesaPalVotePaymentRequestSerializer, PesaPalTicketPaymentRequestSerializer,
     ContributionCheckoutSerializer,
 )
 from .utils import (
@@ -32,18 +32,16 @@ from .utils import (
     send_telegram_message, send_ticket_email
 )
 from .ticket_pdf import generate_ticket_pdf
-from .daraja import initiate_stk_push, process_callback
-from .intasend import create_checkout, normalize_collection_payload, check_payment_status
 from .pesapal import submit_order, get_transaction_status
 
 
 def _absolute_backend_url(request, path):
     """Build a full backend URL for external callbacks.
 
-    If INTASEND_CALLBACK_URL is configured, derive the base (scheme + host)
-    from it so the *path* argument is always honoured.
+    If PESAPAL_CALLBACK_URL is configured, derive the base from it so the
+    path argument is always honoured.
     """
-    configured = getattr(settings, 'INTASEND_CALLBACK_URL', '')
+    configured = getattr(settings, 'PESAPAL_CALLBACK_URL', '')
     if configured:
         from urllib.parse import urlparse
         parsed = urlparse(configured)
@@ -59,7 +57,14 @@ def _frontend_url(path=''):
 
 
 def _short_payment_reference(result, fallback=''):
-    reference = result.get('mpesa_reference') or result.get('invoice_id') or fallback or ''
+    reference = (
+        result.get('confirmation_code')
+        or result.get('payment_reference')
+        or result.get('mpesa_reference')
+        or result.get('invoice_id')
+        or fallback
+        or ''
+    )
     return str(reference)[:20]
 
 
@@ -305,20 +310,23 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
         votes = VoteTransaction.objects.filter(
             event=event,
             phone_number__contains=phone[-9:] if len(phone) >= 9 else phone,
+            status='successful',
         ).select_related('contestant', 'event').order_by('-created_at')
 
         serializer = VoteVerifySerializer(votes, many=True)
+        total_votes = votes.aggregate(total=Sum('vote_count'))['total'] or 0
         return Response({
             'event': event.title,
             'total_transactions': votes.count(),
+            'total_votes': total_votes,
             'votes': serializer.data,
         })
 
     @action(detail=True, methods=['post'])
     def initiate_vote_payment(self, request, pk=None):
         """
-        Initiate an M-Pesa STK Push for voting.
-        Creates a pending Payment record and triggers STK Push to user's phone.
+        Initiate a PesaPal order for voting.
+        Creates a pending Payment record and returns the PesaPal redirect URL.
         """
         event = self.get_object()
 
@@ -328,7 +336,7 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        serializer = STKPushRequestSerializer(data=request.data)
+        serializer = PesaPalVotePaymentRequestSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -358,40 +366,45 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
             payment_type='vote',
         )
 
-        api_ref = f"MCK-VOTE-{payment.id}"
-        checkout_result = create_checkout(
-            email=f"vote-{payment.id}@misscultureglobalkenya.com",
+        merchant_ref = f"MCK-VOTE-{payment.id}"
+        payment.pesapal_merchant_ref = merchant_ref
+
+        ipn_id = getattr(settings, 'PESAPAL_IPN_ID', '')
+        callback_url = _absolute_backend_url(request, '/api/events/pesapal-redirect/')
+
+        result = submit_order(
+            order_id=merchant_ref,
             amount=amount,
-            api_ref=api_ref,
-            comment=f"Vote for {contestant.name}",
+            currency='KES',
+            description=f'Vote for {contestant.name}',
+            callback_url=callback_url,
+            notification_id=ipn_id,
+            first_name=contestant.name,
+            last_name='',
+            email=f'vote-{payment.id}@misscultureglobalkenya.com',
             phone_number=phone_number,
-            name=contestant.name,
-            callback_url=_absolute_backend_url(request, '/api/events/intasend-callback/'),
-            redirect_url=_frontend_url('/voting'),
         )
 
-        payment.checkout_request_id = checkout_result.get('invoice_id') or ''
-        payment.merchant_request_id = api_ref
-        payment.stk_response = checkout_result
-        payment.save()
+        payment.pesapal_tracking_id = result.get('order_tracking_id', '')
+        payment.pesapal_response = result.get('raw', {})
 
-        if checkout_result.get('success'):
+        if result.get('success'):
+            payment.save()
             return Response({
                 'success': True,
-                'checkout_request_id': payment.checkout_request_id,
-                'merchant_request_id': payment.merchant_request_id,
-                'checkout_url': checkout_result.get('checkout_url'),
-                'message': 'Continue to IntaSend checkout to complete payment.',
+                'redirect_url': result.get('redirect_url'),
+                'order_tracking_id': payment.pesapal_tracking_id,
+                'merchant_ref': merchant_ref,
+                'message': 'Continue to PesaPal checkout to complete payment.',
                 'vote_count': vote_count,
                 'payment_id': payment.id,
             })
         else:
-            # Mark payment as failed
             payment.status = 'failed'
             payment.save()
             return Response({
                 'success': False,
-                'error': checkout_result.get('error', 'Failed to create IntaSend checkout.'),
+                'error': result.get('error', 'Failed to create PesaPal order.'),
                 'payment_id': payment.id,
             }, status=status.HTTP_502_BAD_GATEWAY)
 
@@ -399,7 +412,7 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
     def initiate_ticket_payment(self, request, pk=None):
         event = self.get_object()
 
-        serializer = STKPushTicketRequestSerializer(data=request.data)
+        serializer = PesaPalTicketPaymentRequestSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -440,30 +453,41 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
             ticket_quantity=total_qty,
         )
 
-        api_ref = f"MCK-TICKET-{payment.id}"
-        checkout_result = create_checkout(
-            email=email,
+        merchant_ref = f"MCK-TICKET-{payment.id}"
+        payment.pesapal_merchant_ref = merchant_ref
+
+        # Split full name into first/last for PesaPal billing
+        name_parts = full_name.strip().split(maxsplit=1)
+        first_name = name_parts[0]
+        last_name = name_parts[1] if len(name_parts) > 1 else ''
+
+        ipn_id = getattr(settings, 'PESAPAL_IPN_ID', '')
+        callback_url = _absolute_backend_url(request, '/api/events/pesapal-redirect/')
+
+        result = submit_order(
+            order_id=merchant_ref,
             amount=total_amount,
-            api_ref=api_ref,
-            comment=f"Tickets for {event.title}",
+            currency='KES',
+            description=f'Tickets for {event.title}',
+            callback_url=callback_url,
+            notification_id=ipn_id,
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
             phone_number=phone_number,
-            name=full_name,
-            callback_url=_absolute_backend_url(request, '/api/events/intasend-callback/'),
-            redirect_url=_frontend_url(f'/events/{event.id}/checkout/success'),
         )
 
-        payment.checkout_request_id = checkout_result.get('invoice_id') or ''
-        payment.merchant_request_id = api_ref
-        payment.stk_response = checkout_result
-        payment.save()
+        payment.pesapal_tracking_id = result.get('order_tracking_id', '')
+        payment.pesapal_response = result.get('raw', {})
 
-        if checkout_result.get('success'):
+        if result.get('success'):
+            payment.save()
             return Response({
                 'success': True,
-                'checkout_request_id': payment.checkout_request_id,
-                'merchant_request_id': payment.merchant_request_id,
-                'checkout_url': checkout_result.get('checkout_url'),
-                'message': 'Continue to IntaSend checkout to complete payment.',
+                'redirect_url': result.get('redirect_url'),
+                'order_tracking_id': payment.pesapal_tracking_id,
+                'merchant_ref': merchant_ref,
+                'message': 'Continue to PesaPal checkout to complete payment.',
                 'payment_id': payment.id,
                 'ticket_count': total_qty,
                 'amount': str(total_amount),
@@ -472,7 +496,7 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
         payment.save()
         return Response({
             'success': False,
-            'error': checkout_result.get('error', 'Failed to create IntaSend checkout.'),
+            'error': result.get('error', 'Failed to create PesaPal order.'),
             'payment_id': payment.id,
         }, status=status.HTTP_502_BAD_GATEWAY)
 
@@ -662,16 +686,22 @@ class PaymentViewSet(viewsets.ModelViewSet):
 
     def retrieve(self, request, *args, **kwargs):
         payment = self.get_object()
-        if payment.status == 'pending' and payment.checkout_request_id:
+        # If payment is pending and has a PesaPal tracking ID, check status
+        if payment.status == 'pending' and payment.pesapal_tracking_id:
             try:
-                result = check_payment_status(payment.checkout_request_id)
-                payment.stk_response['intasend_status'] = result.get('raw', result)
-                if result.get('is_successful'):
+                status_result = get_transaction_status(
+                    order_tracking_id=payment.pesapal_tracking_id,
+                    merchant_reference=payment.pesapal_merchant_ref,
+                )
+                pesapal_status = status_result.get('payment_status', 'UNKNOWN')
+                payment.pesapal_response['poll_status'] = status_result.get('raw', {})
+                if pesapal_status == 'COMPLETED':
                     payment.status = 'successful'
-                    payment.mpesa_code = _short_payment_reference(result, payment.mpesa_code)
+                    raw = status_result.get('raw', {})
+                    payment.mpesa_code = _short_payment_reference(raw, payment.mpesa_code)
                     payment.save()
                     _process_successful_payment(payment)
-                elif result.get('is_failed'):
+                elif pesapal_status in ('FAILED', 'INVALID'):
                     payment.status = 'failed'
                     payment.save()
                 else:
@@ -854,14 +884,17 @@ def verify_votes_by_phone(request):
     # Search by last 9 digits for flexibility
     search_digits = phone[-9:] if len(phone) >= 9 else phone
     votes = VoteTransaction.objects.filter(
-        phone_number__contains=search_digits
+        phone_number__contains=search_digits,
+        status='successful',
     ).select_related('contestant', 'event').order_by('-created_at')
 
     from .utils import mask_phone_number
     serializer = VoteVerifySerializer(votes, many=True)
+    total_votes = votes.aggregate(total=Sum('vote_count'))['total'] or 0
     return Response({
         'phone_masked': mask_phone_number(phone),
         'total_transactions': votes.count(),
+        'total_votes': total_votes,
         'votes': serializer.data,
     })
 
@@ -964,91 +997,7 @@ def _process_successful_payment(payment):
     return {}
 
 
-@api_view(['POST'])
-@authentication_classes([])
-@permission_classes([AllowAny])
-def intasend_callback(request):
-    """
-    IntaSend collection webhook endpoint.
-    IntaSend sends collection payloads whenever the payment state changes.
-    """
-    challenge = getattr(settings, 'INTASEND_WEBHOOK_CHALLENGE', '')
-    if challenge and request.data.get('challenge') != challenge:
-        return Response({'error': 'Invalid webhook challenge.'}, status=status.HTTP_403_FORBIDDEN)
 
-    result = normalize_collection_payload(request.data)
-    api_ref = result.get('api_ref')
-    invoice_id = result.get('invoice_id')
-
-    if not api_ref and not invoice_id:
-        return Response({'error': 'Missing IntaSend api_ref or invoice_id.'}, status=status.HTTP_400_BAD_REQUEST)
-
-    payment = Payment.objects.filter(merchant_request_id=api_ref).first()
-    if not payment and invoice_id:
-        payment = Payment.objects.filter(checkout_request_id=invoice_id).first()
-
-    if payment:
-        payment.stk_response['intasend_callback'] = request.data
-        if invoice_id and not payment.checkout_request_id:
-            payment.checkout_request_id = invoice_id
-
-        processing = {}
-        if result.get('is_successful'):
-            if payment.status != 'successful':
-                payment.status = 'successful'
-                payment.mpesa_code = _short_payment_reference(result, payment.mpesa_code)
-                payment.save()
-                processing = _process_successful_payment(payment)
-            else:
-                payment.save()
-                processing = {'message': 'Payment already processed.'}
-        elif result.get('is_failed'):
-            payment.status = 'failed'
-            payment.save()
-        else:
-            payment.save()
-
-        if result.get('is_successful'):
-            AuditLog.objects.create(
-                action='payment_verified',
-                actor='system',
-                details=json.dumps({
-                    'payment_id': payment.id,
-                    'amount': str(payment.amount),
-                    'payment_type': payment.payment_type,
-                    'source': 'intasend_callback',
-                    'invoice_id': invoice_id,
-                    'api_ref': api_ref,
-                    'processing': processing,
-                }),
-                event=payment.event,
-            )
-
-        return Response({'status': 'success', 'processing': processing})
-
-    contribution = Contribution.objects.filter(intasend_api_ref=api_ref).first()
-    if not contribution and invoice_id:
-        contribution = Contribution.objects.filter(intasend_invoice_id=invoice_id).first()
-
-    if contribution:
-        contribution.intasend_response['intasend_callback'] = request.data
-        if invoice_id and not contribution.intasend_invoice_id:
-            contribution.intasend_invoice_id = invoice_id
-        if result.get('is_successful'):
-            contribution.status = 'successful'
-            send_telegram_message(
-                f"<b>New Contribution Confirmed</b>\n\n"
-                f"Name: {contribution.full_name}\n"
-                f"Amount: KES {contribution.amount}\n"
-                f"Phone: {contribution.phone_number or '-'}\n"
-                f"Invoice: {invoice_id or '-'}"
-            )
-        elif result.get('is_failed'):
-            contribution.status = 'failed'
-        contribution.save()
-        return Response({'status': 'success'})
-
-    return Response({'error': 'Matching payment or contribution not found.'}, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['POST'])
@@ -1056,152 +1005,10 @@ def intasend_callback(request):
 @permission_classes([AllowAny])
 def mpesa_callback(request):
     """
-    M-Pesa Daraja STK Push callback endpoint.
-    M-Pesa POSTs the transaction result here after the customer completes the PIN entry.
+    Legacy M-Pesa Daraja STK Push callback endpoint.
+    Kept for backward compatibility — all new payments use PesaPal.
     """
-    try:
-        result = process_callback(request.body)
-    except Exception as e:
-        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
-    checkout_request_id = result.get('checkout_request_id', '')
-
-    if not checkout_request_id:
-        return Response(
-            {'error': 'Missing CheckoutRequestID in callback'},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-
-    try:
-        payment = Payment.objects.get(checkout_request_id=checkout_request_id)
-    except Payment.DoesNotExist:
-        return Response(
-            {'error': f'Payment with CheckoutRequestID {checkout_request_id} not found.'},
-            status=status.HTTP_404_NOT_FOUND
-        )
-
-    # Update payment with callback data
-    payment.stk_response['callback'] = result
-    payment.save()
-
-    if result.get('success'):
-        if payment.status == 'successful':
-            return Response({'status': 'success', 'message': 'Payment already processed'})
-
-        payment.status = 'successful'
-        payment.mpesa_code = result.get('mpesa_receipt_number') or payment.mpesa_code
-        payment.phone_number = result.get('phone_number') or payment.phone_number
-        payment.save()
-
-        event = payment.event
-        processing = {}
-
-        if payment.payment_type == 'vote':
-            contestant = payment.contestant
-            if contestant and not payment.vote_transactions.exists():
-                vote_count = calculate_vote_count(payment.amount, event.vote_price)
-                if vote_count > 0:
-                    vote = VoteTransaction.objects.create(
-                        event=event,
-                        contestant=contestant,
-                        payment=payment,
-                        vote_count=vote_count,
-                        phone_number=payment.phone_number,
-                        mpesa_code=payment.mpesa_code or '',
-                        status='successful',
-                        ip_address=None,
-                    )
-                    processing = {'vote_id': vote.id, 'vote_count': vote_count, 'contestant': contestant.name}
-                    
-                    # Send Telegram notification
-                    telegram_msg = (
-                        f"🗳 <b>New Vote Confirmed!</b>\n\n"
-                        f"<b>Event:</b> {event.title}\n"
-                        f"<b>Contestant:</b> {contestant.name}\n"
-                        f"<b>Votes:</b> {vote_count}\n"
-                        f"<b>Amount:</b> KES {payment.amount}\n"
-                        f"<b>Phone:</b> {payment.phone_number}\n"
-                        f"<b>M-Pesa:</b> {payment.mpesa_code}"
-                    )
-                    send_telegram_message(telegram_msg)
-        elif payment.payment_type == 'ticket':
-            if not payment.tickets.exists():
-                ticket_category_ids = list((payment.ticket_breakdown or {}).keys())
-                categories = TicketCategory.objects.filter(event=event, id__in=ticket_category_ids)
-                categories_by_id = {c.id: c for c in categories}
-
-                issued = []
-                event_year = event.start_date.year
-                if payment.ticket_breakdown:
-                    for category_id, qty in payment.ticket_breakdown.items():
-                        category = categories_by_id.get(int(category_id))
-                        if not category:
-                            continue
-                        qty = max(1, int(qty))
-                        for _ in range(qty):
-                            code = generate_ticket_code(event.ticket_prefix, event_year)
-                            ticket = Ticket.objects.create(
-                                event=event,
-                                ticket_category=category,
-                                payment=payment,
-                                ticket_code=code,
-                                full_name=payment.full_name or payment.phone_number,
-                                email=payment.email or '',
-                                phone=payment.phone_number,
-                            )
-                            issued.append(ticket.ticket_code)
-                        category.available = max(0, int(category.available or 0) - qty)
-                        category.save(update_fields=['available'])
-                processing = {'ticket_codes': issued, 'ticket_count': len(issued)}
-
-                # Send Telegram notification
-                telegram_msg = (
-                    f"🎟 <b>Tickets Issued!</b>\n\n"
-                    f"<b>Event:</b> {event.title}\n"
-                    f"<b>Customer:</b> {payment.full_name}\n"
-                    f"<b>Amount:</b> KES {payment.amount}\n"
-                    f"<b>Tickets:</b> {len(issued)}\n"
-                    f"<b>Phone:</b> {payment.phone_number}\n"
-                    f"<b>M-Pesa:</b> {payment.mpesa_code}"
-                )
-                send_telegram_message(telegram_msg)
-
-                if payment.email and issued:
-                    send_mail(
-                        subject=f"Your Tickets — {event.title}",
-                        message=(
-                            f"Hello {payment.full_name or ''},\n\n"
-                            f"Your payment was received successfully.\n"
-                            f"Event: {event.title}\n"
-                            f"Tickets: {', '.join(issued)}\n\n"
-                            f"You can verify tickets here:\n"
-                            f"https://misscultureglobalkenya.com/events/{event.id}\n"
-                        ),
-                        from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', None),
-                        recipient_list=[payment.email],
-                        fail_silently=True,
-                    )
-
-        AuditLog.objects.create(
-            action='payment_verified',
-            actor='system',
-            details=json.dumps({
-                'payment_id': payment.id,
-                'mpesa_code': payment.mpesa_code,
-                'amount': str(payment.amount),
-                'payment_type': payment.payment_type,
-                'processing': processing,
-                'source': 'daraja_callback',
-            }),
-            event=event,
-        )
-
-        return Response({'status': 'success', 'message': 'Payment processed successfully', 'processing': processing})
-    else:
-        # Payment failed or cancelled
-        payment.status = 'failed'
-        payment.save()
-        return Response({'status': 'failed', 'message': result.get('result_desc', 'Payment failed')})
+    return Response({'status': 'deprecated', 'message': 'All payments now use PesaPal. Use /pesapal-ipn/ instead.'}, status=status.HTTP_410_GONE)
 
 
 # ── Helper ───────────────────────────────────────────────────────────────────
@@ -1226,6 +1033,12 @@ def pesapal_ipn_callback(request):
     PesaPal IPN (Instant Payment Notification) endpoint.
     PesaPal sends a GET request with OrderTrackingId and OrderMerchantReference
     whenever the payment state changes.
+
+    Handles both Contribution and Payment (vote/ticket) records.
+    The OrderMerchantReference encodes the type:
+      MCK-VOTE-{id}    → Payment with payment_type='vote'
+      MCK-TICKET-{id}  → Payment with payment_type='ticket'
+      MCK-CONTRIB-*    → Contribution
     """
     tracking_id = request.query_params.get('OrderTrackingId') or request.query_params.get('order_tracking_id', '')
     merchant_ref = request.query_params.get('OrderMerchantReference') or request.query_params.get('order_merchant_reference', '')
@@ -1233,45 +1046,107 @@ def pesapal_ipn_callback(request):
     if not tracking_id and not merchant_ref:
         return Response({'error': 'Missing OrderTrackingId or OrderMerchantReference.'}, status=status.HTTP_400_BAD_REQUEST)
 
-    # Look up the contribution
+    # ── Try Contribution first ─────────────────────────────────────────────
     contribution = None
     if merchant_ref:
         contribution = Contribution.objects.filter(pesapal_merchant_ref=merchant_ref).first()
     if not contribution and tracking_id:
         contribution = Contribution.objects.filter(pesapal_tracking_id=tracking_id).first()
 
-    if not contribution:
-        return Response({'error': 'Contribution not found.'}, status=status.HTTP_404_NOT_FOUND)
+    if contribution:
+        status_result = get_transaction_status(
+            order_tracking_id=tracking_id or contribution.pesapal_tracking_id,
+            merchant_reference=merchant_ref or contribution.pesapal_merchant_ref,
+        )
+        payment_status = status_result.get('payment_status', 'UNKNOWN')
 
-    # Verify status with PesaPal API
-    status_result = get_transaction_status(
-        order_tracking_id=tracking_id or contribution.pesapal_tracking_id,
-        merchant_reference=merchant_ref or contribution.pesapal_merchant_ref,
-    )
-    payment_status = status_result.get('payment_status', 'UNKNOWN')
+        contribution.pesapal_response['ipn_status'] = status_result.get('raw', {})
 
-    contribution.pesapal_response['ipn_status'] = status_result.get('raw', {})
-
-    if payment_status == 'COMPLETED':
-        if contribution.status != 'successful':
-            contribution.status = 'successful'
+        if payment_status == 'COMPLETED':
+            if contribution.status != 'successful':
+                contribution.status = 'successful'
+                contribution.save()
+                send_telegram_message(
+                    f"<b>New Contribution Confirmed</b>\n\n"
+                    f"Name: {contribution.full_name}\n"
+                    f"Amount: KES {contribution.amount}\n"
+                    f"Phone: {contribution.phone_number or '-'}\n"
+                    f"Tracking: {tracking_id or '-'}"
+                )
+            else:
+                contribution.save()
+        elif payment_status in ('FAILED', 'INVALID'):
+            contribution.status = 'failed'
             contribution.save()
-            send_telegram_message(
-                f"<b>New Contribution Confirmed</b>\n\n"
-                f"Name: {contribution.full_name}\n"
-                f"Amount: KES {contribution.amount}\n"
-                f"Phone: {contribution.phone_number or '-'}\n"
-                f"Tracking: {tracking_id or '-'}"
-            )
         else:
             contribution.save()
-    elif payment_status in ('FAILED', 'INVALID'):
-        contribution.status = 'failed'
-        contribution.save()
-    else:
-        contribution.save()
 
-    return Response({'status': 'success'})
+        return Response({'status': 'success'})
+
+    # ── Try Payment (vote / ticket) ─────────────────────────────────────────
+    payment = None
+    if merchant_ref:
+        payment = Payment.objects.filter(pesapal_merchant_ref=merchant_ref).first()
+    if not payment and tracking_id:
+        payment = Payment.objects.filter(pesapal_tracking_id=tracking_id).first()
+
+    if payment:
+        status_result = get_transaction_status(
+            order_tracking_id=tracking_id or payment.pesapal_tracking_id,
+            merchant_reference=merchant_ref or payment.pesapal_merchant_ref,
+        )
+        payment_status = status_result.get('payment_status', 'UNKNOWN')
+
+        payment.pesapal_response['ipn_status'] = status_result.get('raw', {})
+
+        if payment_status == 'COMPLETED':
+            if payment.status != 'successful':
+                payment.status = 'successful'
+                # Try to extract M-Pesa reference from PesaPal response
+                raw = status_result.get('raw', {})
+                payment.mpesa_code = _short_payment_reference(raw, payment.mpesa_code)
+                payment.save()
+                processing = _process_successful_payment(payment)
+
+                # Ticket processing already sends its own detailed Telegram message.
+                event = payment.event
+                if payment.payment_type == 'vote':
+                    contestant = payment.contestant
+                    vote_count = calculate_vote_count(payment.amount, event.vote_price)
+                    send_telegram_message(
+                        f"\U0001f5f3 <b>New Vote Confirmed!</b>\n\n"
+                        f"Event: {event.title}\n"
+                        f"Contestant: {contestant.name if contestant else '-'}\n"
+                        f"Votes: {vote_count}\n"
+                        f"Amount: KES {payment.amount}\n"
+                        f"Phone: {payment.phone_number}\n"
+                        f"Tracking: {tracking_id or '-'}"
+                    )
+                AuditLog.objects.create(
+                    action='payment_verified',
+                    actor='system',
+                    details=json.dumps({
+                        'payment_id': payment.id,
+                        'amount': str(payment.amount),
+                        'payment_type': payment.payment_type,
+                        'source': 'pesapal_ipn',
+                        'tracking_id': tracking_id,
+                        'merchant_ref': merchant_ref,
+                        'processing': processing,
+                    }),
+                    event=event,
+                )
+            else:
+                payment.save()
+        elif payment_status in ('FAILED', 'INVALID'):
+            payment.status = 'failed'
+            payment.save()
+        else:
+            payment.save()
+
+        return Response({'status': 'success'})
+
+    return Response({'error': 'Matching record not found.'}, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['GET'])
@@ -1281,6 +1156,11 @@ def pesapal_payment_redirect(request):
     """
     PesaPal redirects the user's browser here after they complete (or abandon) payment.
     Verifies the status and redirects to the frontend with a status param.
+
+    Routes:
+      Contribution → /contribute?payment=success|failed
+      Payment (vote) → /voting?payment=success|failed
+      Payment (ticket) → /events/{event_id}/checkout/success?payment=success|failed
     """
     tracking_id = request.query_params.get('OrderTrackingId') or request.query_params.get('order_tracking_id', '')
     merchant_ref = request.query_params.get('OrderMerchantReference') or request.query_params.get('order_merchant_reference', '')
@@ -1288,6 +1168,7 @@ def pesapal_payment_redirect(request):
     frontend_url = getattr(settings, 'FRONTEND_URL', 'http://localhost:3000').rstrip('/')
 
     # Try to verify with PesaPal API
+    payment_status = 'UNKNOWN'
     if tracking_id or merchant_ref:
         status_result = get_transaction_status(
             order_tracking_id=tracking_id,
@@ -1295,7 +1176,7 @@ def pesapal_payment_redirect(request):
         )
         payment_status = status_result.get('payment_status', 'UNKNOWN')
 
-        # Update contribution if found
+        # ── Try Contribution ───────────────────────────────────────────────
         contribution = None
         if merchant_ref:
             contribution = Contribution.objects.filter(pesapal_merchant_ref=merchant_ref).first()
@@ -1318,9 +1199,46 @@ def pesapal_payment_redirect(request):
                 contribution.status = 'failed'
                 contribution.save()
 
+        # ── Try Payment (vote / ticket) ──────────────────────────────────────
+        payment = None
+        if merchant_ref:
+            payment = Payment.objects.filter(pesapal_merchant_ref=merchant_ref).first()
+        if not payment and tracking_id:
+            payment = Payment.objects.filter(pesapal_tracking_id=tracking_id).first()
+
+        if payment:
+            if payment_status == 'COMPLETED' and payment.status != 'successful':
+                payment.status = 'successful'
+                raw = status_result.get('raw', {})
+                payment.mpesa_code = _short_payment_reference(raw, payment.mpesa_code)
+                payment.pesapal_response['redirect_status'] = status_result.get('raw', {})
+                payment.save()
+                _process_successful_payment(payment)
+            elif payment_status in ('FAILED', 'INVALID'):
+                payment.status = 'failed'
+                payment.save()
+
+        # ── Redirect to frontend ─────────────────────────────────────────────
         if payment_status == 'COMPLETED':
             from django.shortcuts import redirect
+            if payment:
+                if payment.payment_type == 'vote':
+                    return redirect(f'{frontend_url}/voting?payment=success')
+                elif payment.payment_type == 'ticket':
+                    return redirect(f'{frontend_url}/events/{payment.event_id}/checkout/success?payment=success')
+            # Default: contribution
             return redirect(f'{frontend_url}/contribute?payment=success')
 
     from django.shortcuts import redirect as dj_redirect
+    # On failure, try to route to the right page
+    payment = None
+    if merchant_ref:
+        payment = Payment.objects.filter(pesapal_merchant_ref=merchant_ref).first()
+    if not payment and tracking_id:
+        payment = Payment.objects.filter(pesapal_tracking_id=tracking_id).first()
+    if payment:
+        if payment.payment_type == 'vote':
+            return dj_redirect(f'{frontend_url}/voting?payment=failed')
+        elif payment.payment_type == 'ticket':
+            return dj_redirect(f'{frontend_url}/events/{payment.event_id}/checkout/success?payment=failed')
     return dj_redirect(f'{frontend_url}/contribute?payment=failed')

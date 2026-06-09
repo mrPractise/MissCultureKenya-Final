@@ -296,26 +296,13 @@ cloudinary.config(
     secure=True,
 )
 
-# Daraja / M-Pesa Configuration
-MPESA_CONSUMER_KEY = config('MPESA_CONSUMER_KEY', default='')
-MPESA_CONSUMER_SECRET = config('MPESA_CONSUMER_SECRET', default='')
-MPESA_SHORTCODE = config('MPESA_SHORTCODE', default='174379')  # Sandbox test shortcode
-MPESA_PASSKEY = config('MPESA_PASSKEY', default='bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919')
-MPESA_ENVIRONMENT = config('MPESA_ENVIRONMENT', default='sandbox')  # 'sandbox' or 'production'
-MPESA_CALLBACK_URL = config('MPESA_CALLBACK_URL', default='')
-
-# IntaSend Configuration
-INTASEND_PUBLISHABLE_KEY = config('INTASEND_PUBLISHABLE_KEY', default='')
-INTASEND_SECRET_KEY = config('INTASEND_SECRET_KEY', default='')
-INTASEND_TEST_MODE = config('INTASEND_TEST_MODE', default=DEBUG, cast=bool)
-INTASEND_CALLBACK_URL = config('INTASEND_CALLBACK_URL', default='')
-INTASEND_WEBHOOK_CHALLENGE = config('INTASEND_WEBHOOK_CHALLENGE', default='')
-
-# PesaPal Configuration (contributions/donations)
+# PesaPal Configuration (all payments: contributions, voting, ticketing)
 PESAPAL_CONSUMER_KEY = config('PESAPAL_CONSUMER_KEY', default='')
 PESAPAL_CONSUMER_SECRET = config('PESAPAL_CONSUMER_SECRET', default='')
 PESAPAL_BASE_URL = config('PESAPAL_BASE_URL', default='https://pay.pesapal.com/v3/api')
 PESAPAL_IPN_ID = config('PESAPAL_IPN_ID', default='')
+PESAPAL_CALLBACK_URL = config('PESAPAL_CALLBACK_URL', default='')
+PESAPAL_IPN_URL = config('PESAPAL_IPN_URL', default='')
 
 FRONTEND_URL = config('FRONTEND_URL', default='http://localhost:3000')
 

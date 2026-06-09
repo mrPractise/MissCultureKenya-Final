@@ -180,12 +180,12 @@ const PaymentModal = ({ isOpen, onClose, event, ticketQuantities, totalPrice, to
         ticket_breakdown: breakdown,
       })
 
-      if (result.success && result.checkout_url) {
-        setCheckoutId(result.checkout_request_id || '')
+      if (result.success && result.redirect_url) {
+        setCheckoutId(result.order_tracking_id || '')
         setPaymentId(result.payment_id || null)
-        window.location.href = result.checkout_url
+        window.location.href = result.redirect_url
       } else {
-        setError(result.error || 'Failed to open IntaSend checkout. Please try again.')
+        setError(result.error || 'Failed to open checkout. Please try again.')
       }
     } catch (err) {
       const apiErr = err as ApiError
@@ -242,7 +242,7 @@ const PaymentModal = ({ isOpen, onClose, event, ticketQuantities, totalPrice, to
             )}
             <div>
               <h2 className="text-xl font-bold text-gray-900">
-                {currentStep === 'summary' ? 'Complete Your Purchase' : currentStep === 'pay' ? 'Pay with IntaSend' : 'Confirming Payment'}
+                {currentStep === 'summary' ? 'Complete Your Purchase' : currentStep === 'pay' ? 'Pay with M-Pesa' : 'Confirming Payment'}
               </h2>
               <p className="text-sm text-gray-500">{event.title}</p>
             </div>
@@ -283,7 +283,7 @@ const PaymentModal = ({ isOpen, onClose, event, ticketQuantities, totalPrice, to
                 <div className="flex items-center space-x-4">
                   <MpesaLogo size="md" />
                   <div className="flex-1">
-                    <h4 className="font-semibold text-gray-900">Secure IntaSend Checkout</h4>
+                    <h4 className="font-semibold text-gray-900">Secure Checkout</h4>
                     <p className="text-sm font-bold text-green-700">M-Pesa supported</p>
                     <p className="text-xs text-gray-500">The Misscomm Events</p>
                   </div>
@@ -309,7 +309,7 @@ const PaymentModal = ({ isOpen, onClose, event, ticketQuantities, totalPrice, to
               {/* Info banner */}
               <div className="bg-green-50 border border-green-200 rounded-xl p-4">
                 <p className="text-sm text-green-800 font-medium">
-                  Enter your details below, then continue to secure IntaSend checkout.
+                  Enter your details below, then continue to secure checkout.
                 </p>
                 <p className="text-xs text-green-600 mt-1">
                   Amount: <span className="font-bold">KSh {totalPrice.toLocaleString()}</span> for {totalTickets} ticket{totalTickets > 1 ? 's' : ''}
@@ -459,7 +459,7 @@ const PaymentModal = ({ isOpen, onClose, event, ticketQuantities, totalPrice, to
                 <p className="text-gray-600">
                   {paymentStatus === 'successful' ? 'Your tickets have been issued successfully.' :
                    paymentStatus === 'failed' ? (error || 'The payment could not be completed.') :
-                   `We are waiting for IntaSend to confirm your payment (+254${phone}).`}
+                   `We are waiting for payment confirmation (+254${phone}).`}
                 </p>
               </div>
 
@@ -467,7 +467,7 @@ const PaymentModal = ({ isOpen, onClose, event, ticketQuantities, totalPrice, to
                 <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-left space-y-2">
                   <p className="text-sm text-blue-800 font-medium">What to do next:</p>
                   <ol className="text-sm text-blue-700 space-y-1.5 list-decimal list-inside">
-                    <li>Complete payment on IntaSend checkout</li>
+                    <li>Complete payment on the checkout page</li>
                     <li>Use M-Pesa when prompted</li>
                     <li>Keep this window open to receive your tickets</li>
                   </ol>

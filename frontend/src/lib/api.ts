@@ -243,12 +243,12 @@ const apiClient = {
     return handle(client.post('/api/events/payments/', data))
   },
 
-  // Initiate IntaSend checkout for voting
+  // Initiate PesaPal checkout for voting
   initiateVotePayment(eventId: number | string, data: { phone_number: string; amount: number; contestant_id: number }) {
     return handle(client.post(`/api/events/events/${eventId}/initiate_vote_payment/`, data))
   },
 
-  // Initiate IntaSend checkout for ticket purchase
+  // Initiate PesaPal checkout for ticket purchase
   initiateTicketPayment(eventId: number | string, data: { phone_number: string; full_name: string; email: string; ticket_breakdown: Record<string, number> }) {
     return handle(client.post(`/api/events/events/${eventId}/initiate_ticket_payment/`, data))
   },

@@ -68,6 +68,7 @@ const VotingPage = () => {
   // Verify votes state
   const [verifyPhone, setVerifyPhone] = useState('')
   const [voteRecords, setVoteRecords] = useState<VoteRecord[]>([])
+  const [voteSummary, setVoteSummary] = useState({ totalVotes: 0, totalTransactions: 0 })
   const [verifyLoading, setVerifyLoading] = useState(false)
   const [verifyError, setVerifyError] = useState('')
   const [showVerify, setShowVerify] = useState(false)
@@ -134,9 +135,14 @@ const VotingPage = () => {
     try {
       const data = await apiClient.verifyVotesByPhone(verifyPhone)
       setVoteRecords(data?.votes || [])
+      setVoteSummary({
+        totalVotes: Number(data?.total_votes || 0),
+        totalTransactions: Number(data?.total_transactions || 0),
+      })
     } catch (err) {
       const apiErr = err as ApiError
       setVerifyError(apiErr.message || 'Failed to verify votes')
+      setVoteSummary({ totalVotes: 0, totalTransactions: 0 })
     } finally {
       setVerifyLoading(false)
     }
@@ -423,7 +429,14 @@ const VotingPage = () => {
 
                   {voteRecords.length > 0 && (
                     <div className="space-y-3">
-                      <p className="text-sm font-medium text-gray-700">{voteRecords.length} vote transaction(s) found</p>
+                      <div className="bg-green-50 border border-green-100 rounded-xl p-3">
+                        <p className="text-sm font-semibold text-green-900">
+                          {voteSummary.totalVotes.toLocaleString()} total vote(s) bought
+                        </p>
+                        <p className="text-xs text-green-700 mt-0.5">
+                          Across {voteSummary.totalTransactions.toLocaleString()} successful vote transaction(s)
+                        </p>
+                      </div>
                       {voteRecords.map((record, i) => (
                         <div key={i} className="bg-gray-50 rounded-xl p-4 border border-gray-100">
                           <div className="flex items-center justify-between mb-2">

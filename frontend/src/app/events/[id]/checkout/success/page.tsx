@@ -13,6 +13,7 @@ type CheckoutDraft = {
   mpesa_code?: string
   payment_id?: number
   checkout_request_id?: string
+  order_tracking_id?: string
 }
 
 const storageKey = (eventId: number) => `checkout:event:${eventId}`
@@ -113,7 +114,7 @@ export default function EventCheckoutSuccessPage() {
           }`}>
             {paymentStatus === 'successful' ? 'Your tickets have been issued. You can view them below.' :
              paymentStatus === 'failed' ? (error || 'The payment could not be completed. Please try again.') :
-             'We are waiting for IntaSend confirmation. Your ticket(s) will be issued automatically after payment confirmation.'}
+             'We are waiting for payment confirmation. Your ticket(s) will be issued automatically after payment confirmation.'}
           </p>
 
           {paymentStatus === 'successful' && issuedTickets.length > 0 && (
@@ -153,10 +154,10 @@ export default function EventCheckoutSuccessPage() {
                 <span className="text-gray-500">Amount</span>
                 <span className="font-semibold text-gray-900">{draft.totalAmount === 0 ? 'Free' : `KES ${draft.totalAmount.toLocaleString()}`}</span>
               </div>
-              {draft.checkout_request_id && paymentStatus === 'pending' && (
+              {draft.order_tracking_id && paymentStatus === 'pending' && (
                 <div className="flex items-center justify-between text-sm mt-2">
                   <span className="text-gray-500">Reference</span>
-                  <span className="font-mono font-semibold text-gray-900">{draft.checkout_request_id.slice(-8)}</span>
+                  <span className="font-mono font-semibold text-gray-900">{draft.order_tracking_id.slice(-8)}</span>
                 </div>
               )}
             </div>

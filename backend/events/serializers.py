@@ -228,11 +228,10 @@ class PaymentSerializer(serializers.ModelSerializer):
             'ticket_breakdown',
             'full_name', 'email',
             'phone_number', 'mpesa_code', 'amount', 'status', 'payment_type',
-            'checkout_request_id', 'merchant_request_id',
-            'stk_response',
+            'pesapal_tracking_id', 'pesapal_merchant_ref',
             'verified_by', 'verified_by_name', 'verified_at', 'created_at', 'updated_at',
         ]
-        read_only_fields = ['verified_by', 'verified_at', 'checkout_request_id', 'merchant_request_id', 'stk_response']
+        read_only_fields = ['verified_by', 'verified_at', 'pesapal_tracking_id', 'pesapal_merchant_ref']
 
 
 class PaymentCreateSerializer(serializers.ModelSerializer):
@@ -384,10 +383,10 @@ class VoteVerifySerializer(serializers.Serializer):
     created_at = serializers.DateTimeField()
 
 
-# ── Daraja STK Push ──────────────────────────────────────────────────────────
+# ── PesaPal checkout requests ────────────────────────────────────────────────
 
-class STKPushRequestSerializer(serializers.Serializer):
-    """Serializer for initiating an STK Push payment for voting"""
+class PesaPalVotePaymentRequestSerializer(serializers.Serializer):
+    """Serializer for initiating a PesaPal payment for voting."""
     phone_number = serializers.CharField(max_length=20, required=True)
     amount = serializers.DecimalField(max_digits=10, decimal_places=2, required=True, min_value=1)
     contestant_id = serializers.IntegerField(required=True)
@@ -410,7 +409,8 @@ class STKPushRequestSerializer(serializers.Serializer):
             
         return data
 
-class STKPushTicketRequestSerializer(serializers.Serializer):
+class PesaPalTicketPaymentRequestSerializer(serializers.Serializer):
+    """Serializer for initiating a PesaPal payment for tickets."""
     phone_number = serializers.CharField(max_length=20, required=True)
     full_name = serializers.CharField(max_length=200, required=True)
     email = serializers.EmailField(required=True)
@@ -447,20 +447,9 @@ class ContributionSerializer(serializers.ModelSerializer):
         model = Contribution
         fields = [
             'id', 'full_name', 'email', 'phone_number', 'amount', 'status',
-            'intasend_invoice_id', 'intasend_api_ref',
             'pesapal_tracking_id', 'pesapal_merchant_ref',
             'created_at', 'updated_at',
         ]
         read_only_fields = fields
 
 
-class STKPushResponseSerializer(serializers.Serializer):
-    """Serializer for STK Push response"""
-    success = serializers.BooleanField()
-    checkout_request_id = serializers.CharField(allow_null=True)
-    merchant_request_id = serializers.CharField(allow_null=True)
-    response_code = serializers.CharField(allow_null=True)
-    response_description = serializers.CharField(allow_null=True)
-    error = serializers.CharField(allow_null=True)
-    vote_count = serializers.IntegerField(allow_null=True, help_text="Estimated vote count (informational)")
-    message = serializers.CharField(allow_null=True)

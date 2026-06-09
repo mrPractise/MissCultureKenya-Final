@@ -120,13 +120,13 @@ export default function EventCheckoutPayPage() {
         email: draft.email,
         ticket_breakdown,
       })
-      if (result?.success && result.checkout_url) {
+      if (result?.success && result.redirect_url) {
         setCheckoutStarted(true)
-        setCheckoutId(result.checkout_request_id || '')
-        sessionStorage.setItem(storageKey(eventId), JSON.stringify({ ...draft, payment_id: result?.payment_id, checkout_request_id: result?.checkout_request_id }))
-        window.location.href = result.checkout_url
+        setCheckoutId(result.order_tracking_id || '')
+        sessionStorage.setItem(storageKey(eventId), JSON.stringify({ ...draft, payment_id: result?.payment_id, order_tracking_id: result?.order_tracking_id }))
+        window.location.href = result.redirect_url
       } else {
-        setError(result?.error || 'Failed to open IntaSend checkout.')
+        setError(result?.error || 'Failed to open checkout.')
       }
     } catch (err: any) {
       const apiErr = err as ApiError
@@ -187,10 +187,10 @@ export default function EventCheckoutPayPage() {
             <div className="bg-green-50 border border-green-200 rounded-xl p-4">
               <h2 className="font-semibold text-green-900 flex items-center gap-2">
                 <Smartphone className="w-5 h-5" />
-                Pay with IntaSend
+                Pay with M-Pesa
               </h2>
               <p className="mt-2 text-sm text-green-800">
-                Tap the button below to continue to secure IntaSend checkout. You can complete payment with M-Pesa.
+                Tap the button below to continue to secure checkout. You can complete payment with M-Pesa.
               </p>
               {draft.phone && (
                 <p className="mt-2 text-xs text-green-700">

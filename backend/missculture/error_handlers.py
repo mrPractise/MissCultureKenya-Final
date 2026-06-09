@@ -205,15 +205,15 @@ def health_check(request):
     except Exception as e:
         health_data['checks']['cloudinary'] = f'error: {str(e)}'
     
-    # M-Pesa configuration
+    # PesaPal configuration
     try:
-        health_data['checks']['mpesa'] = {
-            'configured': bool(settings.MPESA_CONSUMER_KEY and settings.MPESA_CONSUMER_SECRET),
-            'environment': settings.MPESA_ENVIRONMENT,
-            'shortcode': settings.MPESA_SHORTCODE if settings.DEBUG else '***'
+        health_data['checks']['pesapal'] = {
+            'configured': bool(settings.PESAPAL_CONSUMER_KEY and settings.PESAPAL_CONSUMER_SECRET),
+            'base_url': settings.PESAPAL_BASE_URL if settings.DEBUG else '***',
+            'ipn_configured': bool(settings.PESAPAL_IPN_ID),
         }
     except Exception as e:
-        health_data['checks']['mpesa'] = f'error: {str(e)}'
+        health_data['checks']['pesapal'] = f'error: {str(e)}'
     
     status_code = 200 if health_data['status'] == 'healthy' else 503
     return Response(health_data, status=status_code)
@@ -235,7 +235,7 @@ def debug_info(request):
         'features': {
             'email_enabled': bool(settings.RESEND_API_KEY),
             'cloudinary_enabled': bool(settings.CLOUDINARY_STORAGE.get('CLOUD_NAME')),
-            'mpesa_enabled': bool(settings.MPESA_CONSUMER_KEY),
+            'pesapal_enabled': bool(settings.PESAPAL_CONSUMER_KEY),
             'telegram_enabled': bool(getattr(settings, 'TELEGRAM_BOT_TOKEN', None)),
         },
         'endpoints': {
@@ -279,10 +279,11 @@ def admin_debug_info(request):
             'admin_email': settings.ADMIN_EMAIL,
         },
         'storage': settings.CLOUDINARY_STORAGE,
-        'mpesa': {
-            'consumer_key': '***' if settings.MPESA_CONSUMER_KEY else 'Not configured',
-            'environment': settings.MPESA_ENVIRONMENT,
-            'shortcode': settings.MPESA_SHORTCODE,
+        'pesapal': {
+            'consumer_key': '***' if settings.PESAPAL_CONSUMER_KEY else 'Not configured',
+            'base_url': settings.PESAPAL_BASE_URL,
+            'ipn_id': '***' if settings.PESAPAL_IPN_ID else 'Not configured',
+            'callback_url': settings.PESAPAL_CALLBACK_URL or 'Not configured',
         },
         'request_info': {
             'path': request.path,
