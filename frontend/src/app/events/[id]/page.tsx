@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Calendar, Clock, MapPin, Users, ExternalLink, Share2, ArrowLeft, Vote, Ticket, AlertCircle, Loader2, Mail, Phone, User, CreditCard } from 'lucide-react'
+import { Calendar, Clock, MapPin, Users, ExternalLink, Share2, ArrowLeft, Vote, Check, Ticket, AlertCircle, Loader2, Mail, Phone, User, CreditCard } from 'lucide-react'
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
@@ -746,55 +746,58 @@ const EventDetailPage = () => {
                       Vote Now
                     </Link>
                   ) : (
-                    <button
-                      type="button"
-                      disabled
-                {/* Per-event vote verification UI */}
-                <div className="mt-4 border-t pt-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Check Your Votes for this Event</label>
-                  <div className="flex gap-2">
-                    <input
-                      type="tel"
-                      value={verifyPhone}
-                      onChange={(e) => { setVerifyPhone(e.target.value.replace(/\D/g, '')); setVerifyError('') }}
-                      placeholder="712345678"
-                      className="flex-1 px-3 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500"
-                    />
-                    <button
-                      onClick={handleVerifyForEvent}
-                      disabled={verifyLoading}
-                      className="px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold"
-                    >
-                      {verifyLoading ? 'Checking…' : 'Check My Votes'}
-                    </button>
-                  </div>
-                  {verifyError && <p className="text-sm text-red-700 mt-2">{verifyError}</p>}
-                  {verifyResults && (
-                    <div className="mt-3 bg-white border border-gray-100 rounded-xl p-3">
-                      <p className="text-xs text-gray-500">Results</p>
-                      <p className="text-sm font-semibold text-gray-900">Total Votes: {verifyTotalVotes ?? 0} · Transactions: {verifyTotalTransactions ?? 0}</p>
-                      <div className="mt-2 space-y-2">
-                        {verifyResults.length === 0 ? (
-                          <p className="text-sm text-gray-500">No matching vote transactions found.</p>
-                        ) : (
-                          verifyResults.map((v: any) => (
-                            <div key={v.id} className="flex items-center justify-between text-sm bg-green-50/30 p-2 rounded-md">
-                              <div>
-                                <p className="font-semibold text-gray-900">{v.contestant_name || 'Contestant'}</p>
-                                <p className="text-xs text-gray-600">Votes: {v.vote_count} · {new Date(v.created_at).toLocaleString()}</p>
-                              </div>
-                              <div className="text-xs text-gray-700">Ref: {v.mpesa_code || (v.payment ? v.payment.pesapal_tracking_id : '') || '—'}</div>
+                    <>
+                      <button
+                        type="button"
+                        disabled
+                        className="bg-gray-200 text-gray-500 px-5 py-2.5 rounded-xl font-semibold text-sm cursor-not-allowed"
+                      >
+                        Vote Closed
+                      </button>
+
+                      {/* Per-event vote verification UI */}
+                      <div className="mt-4 border-t pt-4">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Check Your Votes for this Event</label>
+                        <div className="flex gap-2">
+                          <input
+                            type="tel"
+                            value={verifyPhone}
+                            onChange={(e) => { setVerifyPhone(e.target.value.replace(/\D/g, '')); setVerifyError('') }}
+                            placeholder="712345678"
+                            className="flex-1 px-3 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500"
+                          />
+                          <button
+                            onClick={handleVerifyForEvent}
+                            disabled={verifyLoading}
+                            className="px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold"
+                          >
+                            {verifyLoading ? 'Checking…' : 'Check My Votes'}
+                          </button>
+                        </div>
+                        {verifyError && <p className="text-sm text-red-700 mt-2">{verifyError}</p>}
+                        {verifyResults && (
+                          <div className="mt-3 bg-white border border-gray-100 rounded-xl p-3">
+                            <p className="text-xs text-gray-500">Results</p>
+                            <p className="text-sm font-semibold text-gray-900">Total Votes: {verifyTotalVotes ?? 0} · Transactions: {verifyTotalTransactions ?? 0}</p>
+                            <div className="mt-2 space-y-2">
+                              {verifyResults.length === 0 ? (
+                                <p className="text-sm text-gray-500">No matching vote transactions found.</p>
+                              ) : (
+                                verifyResults.map((v: any) => (
+                                  <div key={v.id} className="flex items-center justify-between text-sm bg-green-50/30 p-2 rounded-md">
+                                    <div>
+                                      <p className="font-semibold text-gray-900">{v.contestant_name || 'Contestant'}</p>
+                                      <p className="text-xs text-gray-600">Votes: {v.vote_count} · {new Date(v.created_at).toLocaleString()}</p>
+                                    </div>
+                                    <div className="text-xs text-gray-700">Ref: {v.mpesa_code || (v.payment ? v.payment.pesapal_tracking_id : '') || '—'}</div>
+                                  </div>
+                                ))
+                              )}
                             </div>
-                          ))
+                          </div>
                         )}
                       </div>
-                    </div>
-                  )}
-                </div>
-                      className="bg-gray-200 text-gray-500 px-5 py-2.5 rounded-xl font-semibold text-sm cursor-not-allowed"
-                    >
-                      Vote Closed
-                    </button>
+                    </>
                   )}
                 </div>
               </div>
