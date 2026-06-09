@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { CheckCircle, Ticket, Loader2, AlertCircle, Copy, Check } from 'lucide-react'
+import { CheckCircle, Ticket, Loader2, AlertCircle, Check } from 'lucide-react'
 import apiClient from '@/lib/api'
 
 type CheckoutDraft = {

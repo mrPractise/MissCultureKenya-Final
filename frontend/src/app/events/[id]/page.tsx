@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Calendar, Clock, MapPin, Users, ExternalLink, Share2, ArrowLeft, Vote, Copy, Check, Ticket, AlertCircle, Loader2, Mail, Phone, User } from 'lucide-react'
+import { Calendar, Clock, MapPin, Users, ExternalLink, Share2, ArrowLeft, Vote, Ticket, AlertCircle, Loader2, Mail, Phone, User, CreditCard } from 'lucide-react'
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
@@ -93,11 +93,17 @@ const EventDetailPage = () => {
   const [regName, setRegName] = useState('')
   const [regEmail, setRegEmail] = useState('')
   const [regPhone, setRegPhone] = useState('')
-  const [regMpesaCode, setRegMpesaCode] = useState('')
   const [regSubmitting, setRegSubmitting] = useState(false)
   const [regError, setRegError] = useState('')
   const [regSuccess, setRegSuccess] = useState<any>(null)
-  const [copiedField, setCopiedField] = useState<string | null>(null)
+
+  // Vote verification (per-event)
+  const [verifyPhone, setVerifyPhone] = useState('')
+  const [verifyLoading, setVerifyLoading] = useState(false)
+  const [verifyError, setVerifyError] = useState('')
+  const [verifyResults, setVerifyResults] = useState<any[] | null>(null)
+  const [verifyTotalVotes, setVerifyTotalVotes] = useState<number | null>(null)
+  const [verifyTotalTransactions, setVerifyTotalTransactions] = useState<number | null>(null)
 
   useEffect(() => {
     if (!eventId) return
@@ -181,11 +187,26 @@ const EventDetailPage = () => {
     }
   }, [event])
 
-  const handleCopy = (text: string, field: string) => {
-    navigator.clipboard.writeText(text).then(() => {
-      setCopiedField(field)
-      setTimeout(() => setCopiedField(null), 2000)
-    })
+  const handleVerifyForEvent = async () => {
+    if (!event) return
+    if (!verifyPhone.trim()) {
+      setVerifyError('Enter a phone number to check')
+      return
+    }
+    setVerifyLoading(true)
+    setVerifyError('')
+    setVerifyResults(null)
+    try {
+      const data = await apiClient.verifyVotesByEvent(event.id, verifyPhone.trim())
+      setVerifyResults(data.votes || [])
+      setVerifyTotalVotes(data.total_votes ?? 0)
+      setVerifyTotalTransactions(data.total_transactions ?? 0)
+    } catch (err: any) {
+      const apiErr = err as any
+      setVerifyError(apiErr.message || 'Failed to verify votes')
+    } finally {
+      setVerifyLoading(false)
+    }
   }
 
   const selectedItems = ticketCategories
@@ -281,38 +302,19 @@ const EventDetailPage = () => {
     setRegSubmitting(true)
     setRegError('')
     try {
-      if (requiresPayment) {
-        const breakdown: Record<string, number> = {}
-        for (const item of selectedItems) breakdown[String(item.tc.id)] = item.qty
-
-        const payment = await apiClient.createPayment({
-          event: Number(eventId),
-          phone_number: `+254${regPhone}`,
-          mpesa_code: regMpesaCode.trim().toUpperCase(),
-          amount: totalAmount,
-          status: 'pending',
-          payment_type: 'ticket',
-          ticket_breakdown: breakdown,
-          ticket_quantity: totalTickets,
-          full_name: regName,
-          email: regEmail,
-        })
-        setRegSuccess({ payment_pending: true, payment })
-      } else {
-        const ticketCodes: string[] = []
-        for (const item of selectedItems) {
-          for (let i = 0; i < item.qty; i += 1) {
-            const result = await apiClient.registerFreeTicket(Number(eventId), {
-              full_name: regName,
-              email: regEmail,
-              phone: regPhone ? `+254${regPhone}` : '',
-              ticket_category: item.tc.id,
-            })
-            if (result?.ticket_code) ticketCodes.push(result.ticket_code)
-          }
+      const ticketCodes: string[] = []
+      for (const item of selectedItems) {
+        for (let i = 0; i < item.qty; i += 1) {
+          const result = await apiClient.registerFreeTicket(Number(eventId), {
+            full_name: regName,
+            email: regEmail,
+            phone: regPhone ? `+254${regPhone}` : '',
+            ticket_category: item.tc.id,
+          })
+          if (result?.ticket_code) ticketCodes.push(result.ticket_code)
         }
-        setRegSuccess({ ticket_codes: ticketCodes })
       }
+      setRegSuccess({ ticket_codes: ticketCodes })
     } catch (err) {
       const apiErr = err as ApiError
       setRegError(apiErr.message || 'Failed to register ticket')
@@ -747,6 +749,48 @@ const EventDetailPage = () => {
                     <button
                       type="button"
                       disabled
+                {/* Per-event vote verification UI */}
+                <div className="mt-4 border-t pt-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Check Your Votes for this Event</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="tel"
+                      value={verifyPhone}
+                      onChange={(e) => { setVerifyPhone(e.target.value.replace(/\D/g, '')); setVerifyError('') }}
+                      placeholder="712345678"
+                      className="flex-1 px-3 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500"
+                    />
+                    <button
+                      onClick={handleVerifyForEvent}
+                      disabled={verifyLoading}
+                      className="px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold"
+                    >
+                      {verifyLoading ? 'Checking…' : 'Check My Votes'}
+                    </button>
+                  </div>
+                  {verifyError && <p className="text-sm text-red-700 mt-2">{verifyError}</p>}
+                  {verifyResults && (
+                    <div className="mt-3 bg-white border border-gray-100 rounded-xl p-3">
+                      <p className="text-xs text-gray-500">Results</p>
+                      <p className="text-sm font-semibold text-gray-900">Total Votes: {verifyTotalVotes ?? 0} · Transactions: {verifyTotalTransactions ?? 0}</p>
+                      <div className="mt-2 space-y-2">
+                        {verifyResults.length === 0 ? (
+                          <p className="text-sm text-gray-500">No matching vote transactions found.</p>
+                        ) : (
+                          verifyResults.map((v: any) => (
+                            <div key={v.id} className="flex items-center justify-between text-sm bg-green-50/30 p-2 rounded-md">
+                              <div>
+                                <p className="font-semibold text-gray-900">{v.contestant_name || 'Contestant'}</p>
+                                <p className="text-xs text-gray-600">Votes: {v.vote_count} · {new Date(v.created_at).toLocaleString()}</p>
+                              </div>
+                              <div className="text-xs text-gray-700">Ref: {v.mpesa_code || (v.payment ? v.payment.pesapal_tracking_id : '') || '—'}</div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
                       className="bg-gray-200 text-gray-500 px-5 py-2.5 rounded-xl font-semibold text-sm cursor-not-allowed"
                     >
                       Vote Closed
@@ -789,7 +833,7 @@ const EventDetailPage = () => {
                   </p>
                 ) : (
                   <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-3">
-                    This is a paid ticket. Pay via M-Pesa, then enter your M-Pesa code below to submit for verification.
+                    This is a paid ticket. You'll be redirected to PesaPal for secure payment when you continue.
                   </p>
                 )}
 
@@ -856,21 +900,7 @@ const EventDetailPage = () => {
                   </div>
                 </div>
 
-                {requiresPayment && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">M-Pesa Code *</label>
-                    <input
-                      type="text"
-                      value={regMpesaCode}
-                      onChange={(e) => { setRegMpesaCode(e.target.value); setRegError('') }}
-                      placeholder="e.g. QWE12ABC3D"
-                      className="w-full px-3 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                    />
-                    <p className="mt-1 text-xs text-gray-500">
-                      Enter the transaction code from your M-Pesa message after paying.
-                    </p>
-                  </div>
-                )}
+                {/* Paid tickets redirect to PesaPal; manual M-Pesa codes are no longer required */}
 
                 {regError && (
                   <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-xl">
@@ -892,7 +922,7 @@ const EventDetailPage = () => {
                     className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white py-2.5 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2"
                   >
                     {regSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Ticket className="w-4 h-4" />}
-                    {!requiresPayment ? 'Get Ticket' : 'Submit Payment'}
+                    {!requiresPayment ? 'Get Ticket' : 'Continue to PesaPal'}
                   </button>
                 </div>
               </div>
@@ -968,20 +998,13 @@ const EventDetailPage = () => {
 
             {/* Payment Info */}
             <div className="bg-green-50 rounded-xl p-5 border border-green-100">
-              <h3 className="font-semibold text-green-900 mb-3">Payment Info</h3>
-              <p className="text-sm text-green-800 mb-3">Pay via M-Pesa Till Number:</p>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-[10px] text-green-600 uppercase tracking-wider font-medium">Till Number</p>
-                    <p className="text-lg font-bold text-gray-900 font-mono">{event.till_number || '4766976'}</p>
-                  </div>
-                  <button onClick={() => handleCopy(event.till_number || '4766976', 'till')} className="p-1.5 rounded-lg hover:bg-green-100 transition-colors">
-                    {copiedField === 'till' ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4 text-green-500" />}
-                  </button>
-                </div>
-                <p className="text-xs text-green-700 pt-1">{event.account_name || 'The Misscomm Events'}</p>
-              </div>
+              <h3 className="font-semibold text-green-900 mb-3 flex items-center gap-2">
+                <CreditCard className="w-4 h-4" />
+                Payment Info
+              </h3>
+              <p className="text-sm text-green-800">
+                Paid tickets and votes are completed through secure PesaPal checkout.
+              </p>
             </div>
 
             {/* Event Status */}

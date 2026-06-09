@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { ArrowLeft, Building2, Copy, Check, Loader2, Smartphone, Ticket } from 'lucide-react'
+import { ArrowLeft, Loader2, CreditCard, Ticket } from 'lucide-react'
 import apiClient from '@/lib/api'
 import type { ApiError } from '@/lib/api'
 
@@ -33,7 +33,6 @@ export default function EventCheckoutPayPage() {
   const [ticketCategories, setTicketCategories] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
-  const [copiedField, setCopiedField] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [checkoutStarted, setCheckoutStarted] = useState(false)
@@ -61,9 +60,6 @@ export default function EventCheckoutPayPage() {
         setEvent({
           id: data.id,
           title: data.title || data.name,
-          till_number: data.till_number || '4766976',
-          account_name: data.account_name || 'The Misscomm Events',
-          payment_method: data.payment_method || 'till_number',
         })
 
         try {
@@ -92,20 +88,14 @@ export default function EventCheckoutPayPage() {
     })
   }, [draft, ticketCategories])
 
-  const handleCopy = (text: string, field: string) => {
-    navigator.clipboard.writeText(text)
-    setCopiedField(field)
-    setTimeout(() => setCopiedField(null), 1500)
-  }
-
-  const handleSendStk = async () => {
+  const handleOpenCheckout = async () => {
     if (!draft) return
     if (!draft.full_name || !draft.email) {
       setError('Missing buyer details. Go back to checkout.')
       return
     }
     if (!draft.phone) {
-      setError('Phone is required for M-Pesa checkout. Go back to checkout.')
+      setError('Phone is required for secure checkout. Go back to checkout.')
       return
     }
     const ticket_breakdown: Record<string, number> = {}
@@ -186,11 +176,11 @@ export default function EventCheckoutPayPage() {
 
             <div className="bg-green-50 border border-green-200 rounded-xl p-4">
               <h2 className="font-semibold text-green-900 flex items-center gap-2">
-                <Smartphone className="w-5 h-5" />
-                Pay with M-Pesa
+                <CreditCard className="w-5 h-5" />
+                Secure PesaPal Checkout
               </h2>
               <p className="mt-2 text-sm text-green-800">
-                Tap the button below to continue to secure checkout. You can complete payment with M-Pesa.
+                Tap the button below to continue to the PesaPal payment page.
               </p>
               {draft.phone && (
                 <p className="mt-2 text-xs text-green-700">
@@ -198,33 +188,6 @@ export default function EventCheckoutPayPage() {
                   {checkoutId ? <span className="text-green-600"> · Ref: {checkoutId.slice(-8)}</span> : null}
                 </p>
               )}
-            </div>
-
-            <div className="bg-white border-2 border-gray-200 rounded-xl overflow-hidden">
-              <div className="bg-gray-900 text-white px-4 py-3 flex items-center gap-2">
-                <Building2 className="w-5 h-5" />
-                <span className="font-semibold">Payment Details</span>
-              </div>
-              <div className="divide-y divide-gray-100">
-                <div className="flex items-center justify-between px-4 py-3">
-                  <div>
-                    <p className="text-xs text-gray-500 uppercase tracking-wider font-medium">Till Number</p>
-                    <p className="text-lg font-bold text-gray-900 font-mono">{event?.till_number || '4766976'}</p>
-                  </div>
-                  <button onClick={() => handleCopy(event?.till_number || '4766976', 'till')} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                    {copiedField === 'till' ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4 text-gray-400" />}
-                  </button>
-                </div>
-                <div className="flex items-center justify-between px-4 py-3">
-                  <div>
-                    <p className="text-xs text-gray-500 uppercase tracking-wider font-medium">Account Name</p>
-                    <p className="text-lg font-bold text-gray-900">{event?.account_name || 'The Misscomm Events'}</p>
-                  </div>
-                  <button onClick={() => handleCopy(event?.account_name || 'The Misscomm Events', 'name')} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                    {copiedField === 'name' ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4 text-gray-400" />}
-                  </button>
-                </div>
-              </div>
             </div>
 
             {error && (
@@ -243,7 +206,7 @@ export default function EventCheckoutPayPage() {
             </Link>
             <button
               type="button"
-              onClick={handleSendStk}
+              onClick={handleOpenCheckout}
               disabled={submitting || loading}
               className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl font-semibold text-sm bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white transition-colors"
             >

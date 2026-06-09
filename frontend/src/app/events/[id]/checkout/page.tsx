@@ -2,8 +2,10 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
-import { useParams, useRouter } from 'next/navigation'
-import { ArrowLeft, Ticket, User, Mail, Phone } from 'lucide-react'
+import { useParams } from 'next/navigation'
+import { ArrowLeft, Ticket, User, Mail, Phone, Loader2 } from 'lucide-react'
+import apiClient from '@/lib/api'
+import type { ApiError } from '@/lib/api'
 
 type CheckoutItem = {
   ticket_category_id: number
@@ -24,7 +26,6 @@ const storageKey = (eventId: number) => `checkout:event:${eventId}`
 
 export default function EventCheckoutPage() {
   const params = useParams()
-  const router = useRouter()
   const eventId = Number(params?.id)
 
   const [draft, setDraft] = useState<CheckoutDraft | null>(null)
@@ -32,6 +33,7 @@ export default function EventCheckoutPage() {
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
   const [error, setError] = useState('')
+  const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
     if (!eventId || !Number.isFinite(eventId)) return
@@ -56,14 +58,14 @@ export default function EventCheckoutPage() {
     return true
   }, [draft, email, fullName, phone])
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (!draft) return
     if (!fullName.trim() || !email.trim()) {
       setError('Full name and email are required')
       return
     }
     if (draft.totalAmount > 0 && !phone.trim()) {
-      setError('Phone is required for M-Pesa payment')
+      setError('Phone is required for secure checkout')
       return
     }
     const next: CheckoutDraft = {
@@ -73,7 +75,38 @@ export default function EventCheckoutPage() {
       phone: phone ? `+254${phone}` : '',
     }
     sessionStorage.setItem(storageKey(eventId), JSON.stringify(next))
-    router.push(`/events/${eventId}/checkout/pay`)
+
+    const ticket_breakdown: Record<string, number> = {}
+    for (const item of next.items) {
+      ticket_breakdown[String(item.ticket_category_id)] = item.quantity
+    }
+
+    setSubmitting(true)
+    setError('')
+    try {
+      const result = await apiClient.initiateTicketPayment(eventId, {
+        phone_number: next.phone || '',
+        full_name: next.full_name || '',
+        email: next.email || '',
+        ticket_breakdown,
+      })
+
+      if (result?.success && result.redirect_url) {
+        sessionStorage.setItem(storageKey(eventId), JSON.stringify({
+          ...next,
+          payment_id: result?.payment_id,
+          order_tracking_id: result?.order_tracking_id,
+        }))
+        window.location.href = result.redirect_url
+      } else {
+        setError(result?.error || 'Failed to open PesaPal checkout.')
+      }
+    } catch (err) {
+      const apiErr = err as ApiError
+      setError(apiErr.message || 'Failed to open PesaPal checkout.')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   if (!draft) {
@@ -175,10 +208,11 @@ export default function EventCheckoutPage() {
             <button
               type="button"
               onClick={handleContinue}
-              disabled={!canContinue}
-              className="px-6 py-2.5 rounded-xl font-semibold text-sm bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white transition-colors"
+              disabled={!canContinue || submitting}
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl font-semibold text-sm bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white transition-colors"
             >
-              Continue to Payment
+              {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+              {submitting ? 'Opening PesaPal...' : 'Continue to PesaPal'}
             </button>
           </div>
         </div>
