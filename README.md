@@ -1,286 +1,235 @@
 # Miss Culture Global Kenya
 
-Official digital platform for Miss Culture Global Kenya.
+Official digital platform for Miss Culture Global Kenya — a movement showcasing Kenya's heritage through pageants, community programs, and global partnerships.
 
-- description: 'Miss Culture Global Kenya is a movement showcasing Kenya's heritage through pageants, community programs, and global partnerships.',
-
-## 🌟 Project Overview
-
-Built with Next.js for the frontend and Django for the backend. The project includes:
-
-- **Main Website** (misscultureglobalkenya.com)
-- **Gallery Subdomain** (gallery.misscultureglobalkenya.com)
-- **Events Subdomain** (events.misscultureglobalkenya.com)
-- **Unified Social Media Content Strategy**
-
-## 🚀 Features
-
-### Main Website
-- **Hero Section**: Cinematic, full-screen presentation with cultural imagery
-- **Our Kenya**: Exploration of Kenya's regions and communities
-- **Our Culture**: Showcase of languages, traditions, and heritage
-- **Global Stage**: Kenya's achievements and international presence
-- **The Ambassador**: Susan's personal journey and mission
-- **Live Social Feed**: Instagram integration with latest posts
-- **Follow CTA**: Modern social media engagement
-
-### Gallery Subdomain
-- **Masonry Layout**: Modern photo grid with collections
-- **Filters**: Official Photoshoots, Cultural Events, Behind the Scenes, Community Work
-- **Lightbox Mode**: High-res image previews with navigation
-- **Social Sharing**: Quick share functionality
-- **Django Admin**: Easy content management
-
-### Events & Voting
-- **Interactive Calendar**: Past/upcoming events with hover previews
-- **Event Details**: Comprehensive event information with Google Maps
-- **Ticketing System**: Secure M-Pesa ticket purchases with automated issuance
-- **Voting System**: Real-time voting for contestants with M-Pesa integration
-- **Cookie Consent**: Browser banner that stores consent state locally
-- **Admin Control**: Full event, inquiry, and voting management
-
-## 🛠️ Technical Stack
-
-### Frontend
-- **Next.js 15** - React framework with App Router
-- **TypeScript** - Type safety and better development experience
-- **Tailwind CSS** - Utility-first CSS framework
-- **Framer Motion** - Animation and motion library
-- **Lucide React** - Beautiful icon library
-
-### Backend
-- **Django 5.2** - Python web framework
-- **Django REST Framework** - API development
-- **PostgreSQL** - Database (SQLite for development)
-- **Django CORS Headers** - Cross-origin resource sharing
-- **Django Filter** - Advanced filtering capabilities
-
-## 📁 Project Structure
-
-```
-miss-culture-global-kenya/
-├── frontend/                 # Next.js frontend application
-│   ├── src/
-│   │   ├── app/             # App Router pages
-│   │   ├── components/      # React components
-│   │   └── styles/          # Global styles
-│   ├── public/              # Static assets
-│   └── package.json
-├── backend/                 # Django backend application
-│   ├── missculture/         # Django project settings
-│   ├── main/                # Main app (ambassador, culture, etc.)
-│   ├── gallery/             # Gallery app
-│   ├── events/              # Events app
-│   └── manage.py
-└── README.md
-```
-
-## 🚀 Getting Started
-
-### Prerequisites
-- Node.js 18+ and npm
-- Python 3.8+
-- Git
-
-### Backend Setup
-
-1. Navigate to the backend directory:
-```bash
-cd backend
-```
-
-2. Create and activate a virtual environment:
-```bash
-python -m venv venv
-# On Windows
-venv\Scripts\activate
-# On macOS/Linux
-source venv/bin/activate
-```
-
-3. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
-
-4. Run migrations:
-```bash
-python manage.py migrate
-```
-
-5. Create a superuser:
-```bash
-python manage.py createsuperuser
-```
-
-6. Start the development server:
-```bash
-python manage.py runserver
-```
-
-The Django admin will be available at `http://localhost:8000/admin/`
-The API will be available at `http://localhost:8000/api/`
-
-### Frontend Setup
-
-1. Navigate to the frontend directory:
-```bash
-cd frontend
-```
-
-2. Install dependencies:
-```bash
-npm install
-```
-
-3. Start the development server:
-```bash
-npm run dev
-```
-
-The Next.js application will be available at `http://localhost:3000`
-
-## ⚙️ Production Configuration
-
-To go live, ensure the following environment variables are set in your hosting provider:
-
-### Backend (.env)
-- `DEBUG=False`
-- `SECRET_KEY`: A long, random string
-- `ALLOWED_HOSTS`: `yourdomain.com,api.yourdomain.com`
-- `CORS_ALLOWED_ORIGINS`: `https://yourdomain.com`
-- `MPESA_CONSUMER_KEY` & `MPESA_CONSUMER_SECRET`: From Safaricom Daraja
-- `MPESA_PASSKEY`: From Safaricom Daraja
-- `TELEGRAM_BOT_TOKEN` & `TELEGRAM_CHAT_ID`: For real-time payment alerts
-- `CLOUDINARY_URL`: For image storage
-
-### Frontend (.env.local)
-- `NEXT_PUBLIC_API_URL`: `https://api.yourdomain.com/api`
-
-## 📊 API Endpoints
-
-### Main App (`/api/main/`)
-- `GET /ambassador/` - Ambassador profile
-- `GET /communities/` - Cultural communities
-- `GET /heritage/` - Cultural heritage items
-- `GET /regions/` - Kenya regions
-- `GET /achievements/` - Global achievements
-- `GET /partners/` - Partners and sponsors
-- `GET /social-media/` - Social media posts
-
-### Gallery App (`/api/gallery/`)
-- `GET /collections/` - Photo collections
-- `GET /photos/` - Gallery photos
-- `GET /videos/` - Gallery videos
-- `GET /settings/` - Gallery settings
-
-### Events App (`/api/events/`)
-- `GET /events/` - All events
-- `GET /events/upcoming/` - Upcoming events
-- `GET /events/past/` - Past events
-- `GET /events/featured/` - Featured events
-- `POST /inquiries/` - Create event inquiry
-- `GET /categories/` - Event categories
-- `GET /settings/` - Event settings
-- `GET /contestants/` - Voting contestants
-
-## 📝 Admin-Frontend Mapping
-
-| Frontend Page | Admin Section to Update |
-| :--- | :--- |
-| **Home Page** | Main → Events (Featured), Site Settings |
-| **Ambassador** | Main → Ambassadors |
-| **Our Culture** | Main → Cultural Heritage, Communities |
-| **Gallery** | Gallery → Photos, Videos, Collections |
-| **Events** | Events → Events, Categories |
-| **Voting** | Events → Events (is_voting_active), Contestants |
-| **Legal** | (Static) `/terms` and `/privacy` |
-
-## 🎨 Design System
-
-### Colors
-- **Primary Green**: #10b981 (Kenya's natural beauty)
-- **Secondary Yellow**: #f59e0b (Sunshine and warmth)
-- **Accent Blue**: #3b82f6 (Sky and water)
-- **Neutral Gray**: #6b7280 (Text and backgrounds)
-
-### Typography
-- **Headings**: Inter font family
-- **Body**: System font stack
-- **Sizes**: Responsive typography scale
-
-### Components
-- **Navigation**: Fixed header with smooth scrolling
-- **Hero**: Full-screen immersive sections
-- **Cards**: Consistent shadow and hover effects
-- **Buttons**: Rounded corners with hover animations
-- **Forms**: Clean, accessible input styling
-
-## 🛡️ Privacy & Browser Storage
-- The frontend shows a cookie consent banner via `frontend/src/components/CookieConsent.tsx`.
-- Consent is stored in browser localStorage under `mcgk_cookie_consent`.
-- Checkout convenience data (phone, name, email) is also stored locally in `mcgk_user_info`.
-- Site settings are cached client-side in `frontend/src/lib/useSiteSettings.ts` and reused across requests.
-- API request caching is configured with SWR in `frontend/src/components/Providers.tsx` using deduping and stale revalidation.
-- Note: there is no dedicated backend cache-control or service worker caching configured in source control yet; for production, add CDN or cache headers for static assets and API responses.
-
-## 🌐 Deployment
-
-### Frontend (Vercel)
-1. Connect your GitHub repository to Vercel
-2. Configure build settings:
-   - Build Command: `npm run build`
-   - Output Directory: `.next`
-3. Set environment variables
-4. Deploy
-
-### Backend (Railway/Heroku)
-1. Create a new project
-2. Connect your GitHub repository
-3. Set environment variables:
-   - `SECRET_KEY`
-   - `DEBUG=False`
-   - `ALLOWED_HOSTS`
-   - Database URL
-4. Deploy
-
-### Domain Configuration
-- Main site: `misscultureglobalkenya.com`
-- Gallery: `gallery.misscultureglobalkenya.com`
-- Events: `events.misscultureglobalkenya.com`
-
-## 📱 Social Media Integration
-
-### Instagram API
-- Real-time post fetching
-- Automatic content updates
-- Social engagement tracking
-
-### Hashtag Strategy
-- Primary: `#MissCultureGlobalKenya`
-- Supporting: `#KenyaCulture`, `#CulturalAmbassador`, `#GlobalUnity`
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
-
-## 📄 License
-
-This project is proprietary and confidential. All rights reserved.
-
-## 📞 Support
-
-For technical support or questions:
-- Email: tech@misscultureglobalkenya.com
-- Phone: +254 700 000 000
+The site is a full-stack web application. A Next.js frontend serves the public website, gallery, events, voting, and contributions. A Django REST API powers content management, ticketing, voting, and payments. Administrators update most content through Django Admin without touching code.
 
 ---
 
-**Miss Culture Global Kenya** - Embodying the Spirit of Kenya, Celebrating Global Culture.
-#   M i s s C u l t u r e K e n y a - F i n a l 
- 
- 
+**Main website**
+
+The homepage presents the organization through a hero section, impact statistics, mission and vision, cultural impact highlights, core values, ambassador spotlight, support blocks, and social links. Content is loaded from the API and page-specific settings managed in the backend.
+
+**Kenya** (`/kenya`) — Regions, communities, and cultural heritage content. Includes a unified view of Kenya's diversity drawn from the `discover` API endpoint.
+
+**Ambassador** (`/ambassador`) — Profile, story, and media for the cultural ambassador.
+
+**About** (`/about`) — Organization background, leadership team, and committee members.
+
+**Partnership** (`/partnership`) — Partner and sponsor information with a dedicated contact flow.
+
+**Contact** (`/contact`) — Contact form that submits to the backend and triggers email notifications via Resend.
+
+**FAQ** (`/faq`) — Frequently asked questions managed through page settings.
+
+**Terms and Privacy** (`/terms`, `/privacy`) — Legal pages with content editable from the admin.
+
+---
+
+**Gallery** (`/gallery`)
+
+Photo and video gallery with collections, category filters (official photoshoots, cultural events, behind the scenes, community work, and more), and a lightbox for full-size viewing. Images are stored on Cloudinary. Gallery layout and hero content are configurable in Django Admin.
+
+---
+
+**Events** (`/events`)
+
+Event listing with upcoming, past, and featured events. Each event includes dates, venue, location coordinates, descriptions, media, and optional external registration or ticket URLs.
+
+**Event detail** (`/events/[id]`) — Full event information, ticket categories, and links to checkout or registration.
+
+**Ticketing**
+
+- Ticket categories with configurable pricing per event
+- Free ticket registration for events with no charge
+- Paid tickets through PesaPal checkout (M-Pesa and card)
+- Unique ticket codes in the format `PREFIX-RAND4#YY` (e.g. `FOS-WER3#26`)
+- PDF ticket generation and email delivery after successful payment
+- Ticket lookup by code at `/events/[id]/ticket/[ticketCode]`
+- Gate scanning support via an `is_used` flag on each ticket
+
+**Checkout flow** — `/events/[id]/checkout`, payment redirect, and success confirmation pages.
+
+---
+
+**Voting** (`/voting`)
+
+Public voting for pageant and cultural events when voting is enabled on an event.
+
+- Events can be set to draft, active, voting open, voting closed, or archived
+- Configurable vote price, voting window, and result visibility (full live totals, rankings only, hidden, or no public updates)
+- Contestant profiles with public pages at `/voting/[eventSlug]/[contestantSlug]`
+- Paid votes through PesaPal; vote count is calculated from payment amount and vote price on the backend
+- Live results endpoint for real-time standings
+- Vote verification by phone number, per event or across all events
+- Immutable vote transaction records and audit logging for admin actions
+
+---
+
+**Contributions** (`/contribute`)
+
+Public donation page for supporting cultural preservation, youth leadership, global ambassadorship, and community development. Donors initiate payment through PesaPal; the backend handles IPN callbacks and redirects back to the frontend.
+
+---
+
+**Content management**
+
+Most visual and textual content is managed in Django Admin:
+
+| Public page | Admin area |
+|---|---|
+| Home | Main → Home Page Settings, Events (featured) |
+| Kenya | Main → Regions, Communities, Heritage, Kenya Page Settings |
+| Ambassador | Main → Ambassador, Ambassador Page Settings |
+| About | Main → Team Members, About Page Settings |
+| Gallery | Gallery → Photos, Videos, Collections |
+| Events | Events → Events, Categories, Ticket Categories |
+| Voting | Events → Events (voting config), Contestants |
+| Contact, FAQ, Contribute, Legal | Respective Page Settings under Main |
+
+Site-wide logos and shared assets live in Site Settings. Page-specific settings expose hero images, copy, and layout content through dedicated API endpoints under `/api/main/settings/`.
+
+---
+
+**Payments and notifications**
+
+- **PesaPal** — Primary payment gateway for tickets, votes, and contributions
+- **Email** — Resend for contact messages, ticket delivery, and transactional email
+- **Telegram** — Optional payment alerts when `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` are configured
+- **Cloudinary** — Image and media storage for gallery, events, and site settings
+
+---
+
+**Privacy and client storage**
+
+The frontend shows a cookie consent banner. Consent is stored in `localStorage` under `mcgk_cookie_consent`. Checkout convenience data (phone, name, email) may be stored locally under `mcgk_user_info`. Site settings are cached client-side and fetched with SWR for deduplication and revalidation.
+
+---
+
+**Technical stack**
+
+Frontend: Next.js (App Router), React 19, TypeScript, Tailwind CSS, Framer Motion, Axios, SWR.
+
+Backend: Django 5.2, Django REST Framework, PostgreSQL in production (SQLite for local development), Cloudinary, PesaPal integration, Gunicorn, WhiteNoise.
+
+---
+
+**Project structure**
+
+```
+MissCultureKenya-Final-main/
+├── frontend/          Next.js application
+│   └── src/
+│       ├── app/       Pages and routes
+│       ├── components/
+│       └── lib/       API client and settings hooks
+├── backend/           Django application
+│   ├── missculture/   Project settings
+│   ├── main/          Site content, settings, contact
+│   ├── gallery/       Photos, videos, collections
+│   └── events/        Events, tickets, voting, payments
+└── README.md
+```
+
+---
+
+**Getting started**
+
+Prerequisites: Node.js 18+, Python 3.8+, Git.
+
+Backend:
+
+```bash
+cd backend
+python -m venv venv
+venv\Scripts\activate          # Windows
+# source venv/bin/activate     # macOS/Linux
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py createsuperuser
+python manage.py runserver
+```
+
+Admin: `http://localhost:8000/admin/`  
+API: `http://localhost:8000/api/`
+
+Frontend:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Site: `http://localhost:3000`
+
+Set `NEXT_PUBLIC_API_BASE_URL=http://localhost:8000` in `frontend/.env.local` so the frontend talks to the local backend.
+
+---
+
+**Environment variables**
+
+Backend (`.env` in `backend/`):
+
+| Variable | Purpose |
+|---|---|
+| `SECRET_KEY` | Django secret key |
+| `DEBUG` | `True` for local development |
+| `ALLOWED_HOSTS` | Comma-separated hostnames |
+| `DATABASE_URL` | PostgreSQL connection string (optional locally) |
+| `CORS_ALLOWED_ORIGINS` | Frontend origin(s), e.g. `http://localhost:3000` |
+| `CSRF_TRUSTED_ORIGINS` | Same as CORS for form submissions |
+| `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` | Media storage |
+| `PESAPAL_CONSUMER_KEY`, `PESAPAL_CONSUMER_SECRET` | Payment gateway |
+| `PESAPAL_IPN_ID`, `PESAPAL_CALLBACK_URL`, `PESAPAL_IPN_URL` | PesaPal callbacks |
+| `FRONTEND_URL` | Frontend base URL for payment redirects |
+| `RESEND_API_KEY`, `DEFAULT_FROM_EMAIL`, `ADMIN_EMAIL` | Email delivery |
+| `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` | Optional payment notifications |
+
+Frontend (`frontend/.env.local`):
+
+| Variable | Purpose |
+|---|---|
+| `NEXT_PUBLIC_API_BASE_URL` | Backend URL, e.g. `http://localhost:8000` |
+
+---
+
+**API overview**
+
+Main (`/api/main/`):
+
+- `GET /settings/` — Site-wide settings and logos
+- `GET /settings/{page}/` — Page-specific settings (home, kenya, ambassador, events, gallery, etc.)
+- `GET /ambassador/`, `/communities/`, `/heritage/`, `/regions/`, `/achievements/`, `/partners/`, `/team/`
+- `GET /discover/` — Combined Kenya content
+- `POST /contact/` — Contact form submission
+
+Gallery (`/api/gallery/`):
+
+- `GET /collections/`, `/photos/`, `/videos/`, `/settings/`
+
+Events (`/api/events/`):
+
+- `GET /events/`, `/events/upcoming/`, `/events/past/`, `/events/featured/`, `/events/voting_events/`
+- `GET /events/{id}/live_results/` — Voting standings
+- `POST /events/{id}/register_ticket/` — Free ticket registration
+- `POST /events/{id}/initiate_ticket_payment/` — Paid ticket checkout
+- `POST /events/{id}/initiate_vote_payment/` — Vote checkout
+- `GET /contestants/`, `/ticket-categories/`
+- `GET /verify-votes/?phone=` — Vote lookup by phone
+- `GET /ticket-lookup/?code=` — Ticket lookup by code
+- `POST /contributions/initiate/` — Donation checkout
+
+---
+
+**Deployment**
+
+The backend includes a `railway.json` config that runs migrations, ensures a superuser, collects static files, and starts Gunicorn. The frontend builds with `npm run build` and runs with `npm start`. Typical setup places the Next.js app on Vercel (or similar) and the Django API on Railway (or similar), with PostgreSQL, Cloudinary, and PesaPal configured in production environment variables.
+
+Production domains are intended to serve the main site, gallery, and events from the same codebase with path-based routing.
+
+---
+
+**License**
+
+Proprietary and confidential. All rights reserved.
