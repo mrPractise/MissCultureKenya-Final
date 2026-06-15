@@ -95,7 +95,13 @@ const GalleryPage = () => {
     category: collectionNames[getCollectionId(video)] || `Collection ${getCollectionId(video)}`,
     collectionId: getCollectionId(video),
     thumbnail: video.thumbnail_url || video.thumbnail || '',
-    videoUrl: video.video_url || video.videoUrl || video.url || '',
+    videoUrl: (() => {
+      const raw = video.video_url || video.videoUrl || video.url || ''
+      if (!raw) return ''
+      const trimmed = String(raw).trim()
+      if (/^https?:\/\//i.test(trimmed) || trimmed.startsWith('//')) return trimmed
+      return `https://${trimmed}`
+    })(),
     duration: video.duration || '0:00',
     views: video.views || '0',
     date: getItemDate(video),

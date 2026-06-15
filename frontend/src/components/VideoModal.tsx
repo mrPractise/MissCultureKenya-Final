@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion'
 import { Share2, Calendar, Eye, X, ExternalLink, Play } from 'lucide-react'
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 interface Video {
   id: number
@@ -40,6 +40,15 @@ const isYouTubeUrl = (url: string): boolean => {
 
 type SocialPlatform = { name: string; color: string; hoverColor: string } | null
 
+const normalizeExternalUrl = (url: string): string => {
+  if (!url) return ''
+  const trimmed = url.trim()
+  if (!trimmed) return ''
+  if (/^https?:\/\//i.test(trimmed)) return trimmed
+  if (trimmed.startsWith('//')) return `https:${trimmed}`
+  return `https://${trimmed}`
+}
+
 const detectSocialPlatform = (url: string): SocialPlatform => {
   if (!url) return null
   if (/tiktok\.com/i.test(url)) return { name: 'TikTok', color: 'bg-gray-900', hoverColor: 'hover:bg-black' }
@@ -52,12 +61,28 @@ const detectSocialPlatform = (url: string): SocialPlatform => {
 const VideoModal = ({ isOpen, onClose, video }: VideoModalProps) => {
   const [shareMsg, setShareMsg] = useState('')
 
+  useEffect(() => {
+    if (!isOpen) return
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose()
+    }
+
+    document.body.style.overflow = 'hidden'
+    window.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.body.style.overflow = 'unset'
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [isOpen, onClose])
+
   const handleShare = useCallback(async () => {
     if (!video) return
     const shareData = {
       title: video.title,
       text: video.caption || video.description || video.title,
-      url: video.videoUrl || window.location.href,
+      url: normalizeExternalUrl(video.videoUrl) || window.location.href,
     }
     try {
       if (navigator.share) {
@@ -70,78 +95,116 @@ const VideoModal = ({ isOpen, onClose, video }: VideoModalProps) => {
     } catch {}
   }, [video])
 
-  if (!isOpen || !video) return null
+  const handleClose = useCallback((event: React.MouseEvent) => {
+    event.stopPropagation()
+    onClose()
+  }, [onClose])
 
-  const youtubeEmbedUrl = getYouTubeEmbedUrl(video.videoUrl)
-  const isYT = isYouTubeUrl(video.videoUrl)
-  const socialPlatform = !isYT ? detectSocialPlatform(video.videoUrl) : null
+  const handleOpenExternal = useCallback((event: React.MouseEvent<HTMLAnchorElement>, url: string) => {
+    event.stopPropagation()
+    const normalizedUrl = normalizeExternalUrl(url)
+    if (!normalizedUrl) {
+      event.preventDefault()
+    }
+  }, [])
+
+  if (!video) return null
+
+  const externalUrl = normalizeExternalUrl(video.videoUrl)
+  const youtubeEmbedUrl = getYouTubeEmbedUrl(externalUrl)
+  const isYT = isYouTubeUrl(externalUrl)
+  const socialPlatform = !isYT ? detectSocialPlatform(externalUrl) : null
 
   return (
-    <div className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4" onClick={onClose}>
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.95 }}
-        transition={{ duration: 0.2 }}
-        className="bg-white w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Video Player - centered, 16:9 aspect ratio */}
-        <div className="relative bg-black w-full">
-          {/* Close button */}
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-label={video.title}
+        >
           <button
+            type="button"
+            aria-label="Close video modal"
+            className="absolute inset-0 bg-black/90 backdrop-blur-sm"
             onClick={onClose}
-            className="absolute top-3 right-3 z-10 p-2 bg-white/90 hover:bg-white rounded-full shadow-lg transition-colors"
-          >
-            <X className="w-5 h-5 text-gray-600" />
-          </button>
+          />
 
-          <div className="w-full aspect-video">
-            {isYT && youtubeEmbedUrl ? (
-              <iframe
-                src={youtubeEmbedUrl}
-                title={video.title}
-                className="w-full h-full"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
-            ) : socialPlatform ? (
-              /* Social media videos can't be embedded — show thumbnail + open-externally CTA */
-              <div className="relative w-full h-full flex items-center justify-center bg-gray-900">
-                {video.thumbnail ? (
-                  <img src={video.thumbnail} alt={video.title} className="w-full h-full object-cover opacity-60" />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+            className="relative z-10 bg-white w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close button — above iframe/overlays so clicks always register */}
+            <button
+              type="button"
+              onClick={handleClose}
+              aria-label="Close video"
+              className="absolute top-3 right-3 z-50 p-2 bg-white/95 hover:bg-white rounded-full shadow-lg transition-colors border border-gray-200"
+            >
+              <X className="w-5 h-5 text-gray-700" />
+            </button>
+
+            {/* Video Player - centered, 16:9 aspect ratio */}
+            <div className="relative bg-black w-full">
+              <div className="w-full aspect-video">
+                {isYT && youtubeEmbedUrl ? (
+                  <iframe
+                    src={youtubeEmbedUrl}
+                    title={video.title}
+                    className="w-full h-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                ) : socialPlatform ? (
+                  /* Social media videos can't be embedded — show thumbnail + open-externally CTA */
+                  <div className="relative w-full h-full flex items-center justify-center bg-gray-900">
+                    {video.thumbnail ? (
+                      <img
+                        src={video.thumbnail}
+                        alt={video.title}
+                        className="absolute inset-0 w-full h-full object-cover opacity-60 pointer-events-none"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 bg-gradient-to-b from-gray-800 to-gray-900 pointer-events-none" />
+                    )}
+                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 z-10 pointer-events-none">
+                      <a
+                        href={externalUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(event) => handleOpenExternal(event, externalUrl)}
+                        className={`pointer-events-auto flex items-center gap-2 px-6 py-3 ${socialPlatform.color} ${socialPlatform.hoverColor} text-white rounded-full font-bold text-base shadow-lg transition-colors`}
+                      >
+                        <Play className="w-5 h-5" />
+                        Watch on {socialPlatform.name}
+                      </a>
+                      <p className="text-white/60 text-sm pointer-events-none">Opens in a new tab</p>
+                    </div>
+                  </div>
+                ) : externalUrl ? (
+                  <video
+                    src={externalUrl}
+                    title={video.title}
+                    className="w-full h-full bg-black"
+                    controls
+                    autoPlay
+                    poster={video.thumbnail || undefined}
+                  />
                 ) : (
-                  <div className="absolute inset-0 bg-gradient-to-b from-gray-800 to-gray-900" />
+                  <div className="w-full h-full flex items-center justify-center bg-black text-white">
+                    No video available
+                  </div>
                 )}
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 z-10">
-                  <a
-                    href={video.videoUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`flex items-center gap-2 px-6 py-3 ${socialPlatform.color} ${socialPlatform.hoverColor} text-white rounded-full font-bold text-base shadow-lg transition-colors`}
-                  >
-                    <Play className="w-5 h-5" />
-                    Watch on {socialPlatform.name}
-                  </a>
-                  <p className="text-white/60 text-sm">Opens in a new tab</p>
-                </div>
               </div>
-            ) : video.videoUrl ? (
-              <video
-                src={video.videoUrl}
-                title={video.title}
-                className="w-full h-full bg-black"
-                controls
-                autoPlay
-                poster={video.thumbnail || undefined}
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-black text-white">
-                No video available
-              </div>
-            )}
-          </div>
-        </div>
+            </div>
 
         {/* Video Info */}
         <div className="p-5">
@@ -186,11 +249,12 @@ const VideoModal = ({ isOpen, onClose, video }: VideoModalProps) => {
               {shareMsg && <span className="text-green-200 text-xs ml-1">{shareMsg}</span>}
             </button>
 
-            {(isYT || socialPlatform) && video.videoUrl && (
+            {(isYT || socialPlatform) && externalUrl && (
               <a
-                href={video.videoUrl}
+                href={externalUrl}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={(event) => handleOpenExternal(event, externalUrl)}
                 className={`flex items-center gap-2 px-4 py-2 ${socialPlatform ? socialPlatform.color : 'bg-red-600'} ${socialPlatform ? socialPlatform.hoverColor : 'hover:bg-red-700'} text-white rounded-lg font-semibold text-sm transition-colors`}
               >
                 <ExternalLink className="w-4 h-4" />
@@ -199,8 +263,10 @@ const VideoModal = ({ isOpen, onClose, video }: VideoModalProps) => {
             )}
           </div>
         </div>
-      </motion.div>
-    </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   )
 }
 
