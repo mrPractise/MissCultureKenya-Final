@@ -657,18 +657,18 @@ const EventDetailPage = () => {
                   {ticketCategories.map((tc) => (
                     <div
                       key={tc.id}
-                      className="p-4 border-2 rounded-xl flex justify-between items-center transition-all border-gray-200 hover:border-green-300 hover:bg-green-50/50"
+                      className="p-4 border-2 rounded-xl flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 transition-all border-gray-200 hover:border-green-300 hover:bg-green-50/50"
                     >
-                      <div>
-                        <h4 className="font-semibold text-gray-900">{tc.name}</h4>
-                        {tc.description && <p className="text-xs text-gray-500">{tc.description}</p>}
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-semibold text-gray-900 text-sm sm:text-base">{tc.name}</h4>
+                        {tc.description && <p className="text-xs text-gray-500 line-clamp-2">{tc.description}</p>}
                         <p className="text-xs text-gray-400 mt-1">{tc.available} of {tc.total} available</p>
                       </div>
-                      <div className="flex items-center gap-4">
-                        <span className="text-lg font-bold text-green-700 whitespace-nowrap">
+                      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
+                        <span className="text-base sm:text-lg font-bold text-green-700 whitespace-nowrap text-center sm:text-left">
                           {Number(tc.price) === 0 ? 'Free' : `KES ${Number(tc.price).toLocaleString()}`}
                         </span>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 justify-center sm:justify-start">
                           <button
                             type="button"
                             onClick={() => updateTicketQuantity(tc.id, (ticketQuantities[tc.id] || 0) - 1)}
@@ -695,7 +695,7 @@ const EventDetailPage = () => {
                 </div>
                 {totalTickets > 0 && (
                   <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                    <div>
+                    <div className="text-center sm:text-left">
                       <p className="text-sm font-semibold text-gray-900">{totalTickets} ticket{totalTickets > 1 ? 's' : ''} selected</p>
                       <p className="text-xs text-gray-600">
                         Total: {totalAmount === 0 ? 'Free' : `KES ${totalAmount.toLocaleString()}`}
@@ -711,7 +711,7 @@ const EventDetailPage = () => {
                         }
                         setShowTicketForm(true)
                       }}
-                      className="bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-colors"
+                      className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-colors"
                     >
                       {totalAmount > 0 ? 'Checkout' : 'Continue'}
                     </button>
@@ -827,8 +827,8 @@ const EventDetailPage = () => {
 
             {/* Ticket Registration Form */}
             {showTicketForm && !regSuccess && (
-              <div className="bg-gray-50 rounded-xl p-6 border border-gray-200 space-y-4">
-                <h3 className="font-bold text-gray-900">Register for This Event</h3>
+              <div className="bg-gray-50 rounded-xl p-4 sm:p-6 border border-gray-200 space-y-4">
+                <h3 className="font-bold text-gray-900 text-lg sm:text-xl">Register for This Event</h3>
 
                 {!requiresPayment ? (
                   <p className="text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg p-3">
@@ -869,7 +869,7 @@ const EventDetailPage = () => {
                       value={regName}
                       onChange={(e) => { setRegName(e.target.value); setRegError('') }}
                       placeholder="Your full name"
-                      className="w-full pl-9 pr-3 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                      className="w-full pl-9 pr-3 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
                     />
                   </div>
                 </div>
@@ -883,7 +883,7 @@ const EventDetailPage = () => {
                       value={regEmail}
                       onChange={(e) => { setRegEmail(e.target.value); setRegError('') }}
                       placeholder="your@email.com"
-                      className="w-full pl-9 pr-3 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                      className="w-full pl-9 pr-3 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
                     />
                   </div>
                 </div>
@@ -898,7 +898,7 @@ const EventDetailPage = () => {
                       onChange={(e) => setRegPhone(e.target.value.replace(/\D/g, ''))}
                       placeholder="712345678"
                       maxLength={9}
-                      className="flex-1 px-3 py-2.5 border border-gray-300 rounded-r-xl focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                      className="flex-1 px-3 py-2.5 border border-gray-300 rounded-r-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
                     />
                   </div>
                 </div>
@@ -915,14 +915,14 @@ const EventDetailPage = () => {
                 <div className="flex gap-3">
                   <button
                     onClick={() => setShowTicketForm(false)}
-                    className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-2.5 rounded-xl font-semibold transition-colors"
+                    className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-2.5 rounded-xl font-semibold transition-colors text-sm"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleRegisterTicket}
                     disabled={regSubmitting}
-                    className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white py-2.5 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2"
+                    className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white py-2.5 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2 text-sm"
                   >
                     {regSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Ticket className="w-4 h-4" />}
                     {!requiresPayment ? 'Get Ticket' : 'Continue to PesaPal'}

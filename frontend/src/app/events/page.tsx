@@ -287,11 +287,11 @@ const EventsPage = () => {
                     key={event.id}
                     {...stagger}
                     transition={{ duration: 0.5, delay: index * 0.08 }}
-                    className="bg-white rounded-2xl transition-all duration-300 overflow-hidden group cursor-pointer border border-gray-100 flex flex-col sm:flex-row"
+                    className="bg-white rounded-2xl transition-all duration-300 overflow-hidden group cursor-pointer border border-gray-100 flex flex-col lg:flex-row"
                     onClick={() => handleEventClick(event)}
                   >
                     {/* Event Image with date overlay */}
-                    <div className="sm:w-48 flex-shrink-0 relative h-40 sm:h-auto overflow-hidden">
+                    <div className="lg:w-48 flex-shrink-0 relative h-48 lg:h-auto overflow-hidden">
                       {event.image ? (
                         <img
                           src={event.image}
@@ -303,7 +303,7 @@ const EventsPage = () => {
                           <Calendar className="w-10 h-10 text-green-400/40" />
                         </div>
                       )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent sm:bg-gradient-to-r sm:from-black/50 sm:via-transparent sm:to-transparent" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent lg:bg-gradient-to-r lg:from-black/50 lg:via-transparent lg:to-transparent" />
                       {/* Date badge overlay */}
                       <div className="absolute bottom-2 left-2 bg-white/95 backdrop-blur-sm rounded-lg px-2.5 py-1.5 shadow-sm">
                         <p className="text-lg font-bold text-gray-900 leading-none">{dateInfo.day}</p>
@@ -315,38 +315,37 @@ const EventsPage = () => {
                       </div>
                     </div>
 
-                    <div className="flex-1 p-5 sm:p-6 flex flex-col">
+                    <div className="flex-1 p-4 sm:p-5 lg:p-6 flex flex-col">
                       {/* Category + Audience tags */}
                       <div className="flex flex-wrap items-center gap-2 mb-2">
-                        <span className="bg-green-100 text-green-700 px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide">
+                        <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide">
                           {event.category}
                         </span>
                         {event.audience && (
-                          <span className="bg-gray-100 text-gray-600 px-2.5 py-0.5 rounded-full text-xs font-medium">
+                          <span className="bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full text-xs font-medium">
                             {event.audience}
                           </span>
                         )}
                       </div>
 
-                      <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-green-600 transition-colors line-clamp-2">
+                      <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-2 group-hover:text-green-600 transition-colors line-clamp-2">
                         {event.title}
                       </h3>
-                      <p className="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-2 flex-grow">
+                      <p className="text-gray-600 text-xs sm:text-sm leading-relaxed mb-3 line-clamp-2 flex-grow">
                         {event.description}
                       </p>
 
                       {/* Details row */}
-                      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-500 mb-4">
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500 mb-3">
                         <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{event.time}</span>
                         <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{event.venue}</span>
-                        <span className="flex items-center gap-1"><Ticket className="w-3 h-3" />{event.price}</span>
                       </div>
 
                       {/* Seats + CTA */}
-                      <div className="flex items-center justify-between">
+                      <div className="flex items-center justify-between pt-2 border-t border-gray-100">
                         {isLowSeats && (
                           <span className="text-xs font-bold text-red-600 flex items-center gap-1">
-                            <Sparkles className="w-3 h-3" /> Only {seatsLeft} seats left
+                            <Sparkles className="w-3 h-3" /> {seatsLeft} left
                           </span>
                         )}
                         {!isLowSeats && <span />}
