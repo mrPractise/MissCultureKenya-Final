@@ -441,21 +441,21 @@ const EventDetailPage = () => {
                     <p className="text-sm text-gray-600">
                       Browse all contestants and read their bio, even before voting starts.
                     </p>
-                    <div className="mt-3 flex flex-wrap gap-2">
+                    <div className="mt-3 flex flex-wrap gap-2 overflow-x-auto">
                       {contestantCategories.length > 0 ? (
                         contestantCategories.map((cat) => {
                           const count = contestants.filter((c) => (c.contestant_category || null) === cat.id).length
                           return (
                             <span
                               key={cat.id}
-                              className="text-xs font-semibold text-gray-700 bg-gray-100 px-3 py-1 rounded-full"
+                              className="text-xs font-semibold text-gray-700 bg-gray-100 px-2.5 py-1 rounded-full whitespace-nowrap"
                             >
                               {cat.name} · {count}
                             </span>
                           )
                         })
                       ) : (
-                        <span className="text-xs font-semibold text-gray-700 bg-gray-100 px-3 py-1 rounded-full">
+                        <span className="text-xs font-semibold text-gray-700 bg-gray-100 px-2.5 py-1 rounded-full">
                           {contestants.length} total
                         </span>
                       )}
