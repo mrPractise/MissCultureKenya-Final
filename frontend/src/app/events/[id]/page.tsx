@@ -723,10 +723,10 @@ const EventDetailPage = () => {
             {/* Voting Section */}
             {event.voting_enabled && (
               <div className="bg-gradient-to-r from-red-50 to-green-50 rounded-xl p-5 border border-red-100">
-                <div className="flex items-center justify-between">
-                  <div>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div className="flex-1 min-w-0">
                     <h3 className="font-bold text-gray-900 flex items-center gap-2">
-                      <Vote className="w-5 h-5 text-red-600" />
+                      <Vote className="w-5 h-5 text-red-600 flex-shrink-0" />
                       {isVotingOpen ? 'Voting is Open' : 'Voting is Closed'}
                     </h3>
                     <p className="text-sm text-gray-600 mt-1">
@@ -741,63 +741,61 @@ const EventDetailPage = () => {
                   {isVotingOpen ? (
                     <Link
                       href="/voting"
-                      className="bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-colors"
+                      className="bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-colors text-center whitespace-nowrap flex-shrink-0"
                     >
                       Vote Now
                     </Link>
                   ) : (
-                    <>
-                      <button
-                        type="button"
-                        disabled
-                        className="bg-gray-200 text-gray-500 px-5 py-2.5 rounded-xl font-semibold text-sm cursor-not-allowed"
-                      >
-                        Vote Closed
-                      </button>
+                    <button
+                      type="button"
+                      disabled
+                      className="bg-gray-200 text-gray-500 px-5 py-2.5 rounded-xl font-semibold text-sm cursor-not-allowed whitespace-nowrap flex-shrink-0 self-start sm:self-auto"
+                    >
+                      Vote Closed
+                    </button>
+                  )}
+                </div>
 
-                      {/* Per-event vote verification UI */}
-                      <div className="mt-4 border-t pt-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Check Your Votes for this Event</label>
-                        <div className="flex gap-2">
-                          <input
-                            type="tel"
-                            value={verifyPhone}
-                            onChange={(e) => { setVerifyPhone(e.target.value.replace(/\D/g, '')); setVerifyError('') }}
-                            placeholder="712345678"
-                            className="flex-1 px-3 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500"
-                          />
-                          <button
-                            onClick={handleVerifyForEvent}
-                            disabled={verifyLoading}
-                            className="px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold"
-                          >
-                            {verifyLoading ? 'Checking…' : 'Check My Votes'}
-                          </button>
-                        </div>
-                        {verifyError && <p className="text-sm text-red-700 mt-2">{verifyError}</p>}
-                        {verifyResults && (
-                          <div className="mt-3 bg-white border border-gray-100 rounded-xl p-3">
-                            <p className="text-xs text-gray-500">Results</p>
-                            <p className="text-sm font-semibold text-gray-900">Total Votes: {verifyTotalVotes ?? 0} · Transactions: {verifyTotalTransactions ?? 0}</p>
-                            <div className="mt-2 space-y-2">
-                              {verifyResults.length === 0 ? (
-                                <p className="text-sm text-gray-500">No matching vote transactions found.</p>
-                              ) : (
-                                verifyResults.map((v: any) => (
-                                  <div key={v.id} className="flex items-center justify-between text-sm bg-green-50/30 p-2 rounded-md">
-                                    <div>
-                                      <p className="font-semibold text-gray-900">{v.contestant_name || 'Contestant'}</p>
-                                      <p className="text-xs text-gray-600">Votes: {v.vote_count} · {new Date(v.created_at).toLocaleString()}</p>
-                                    </div>
-                                    <div className="text-xs text-gray-700">Ref: {v.mpesa_code || (v.payment ? v.payment.pesapal_tracking_id : '') || '—'}</div>
-                                  </div>
-                                ))
-                              )}
+                {/* Per-event vote verification UI */}
+                <div className="mt-4 border-t border-red-200/50 pt-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Check Your Votes for this Event</label>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <input
+                      type="tel"
+                      value={verifyPhone}
+                      onChange={(e) => { setVerifyPhone(e.target.value.replace(/\D/g, '')); setVerifyError('') }}
+                      placeholder="712345678"
+                      className="w-full sm:flex-1 px-3 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
+                    />
+                    <button
+                      onClick={handleVerifyForEvent}
+                      disabled={verifyLoading}
+                      className="w-full sm:w-auto px-4 py-2.5 bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white rounded-xl font-semibold text-sm transition-colors whitespace-nowrap"
+                    >
+                      {verifyLoading ? 'Checking…' : 'Check My Votes'}
+                    </button>
+                  </div>
+                  {verifyError && <p className="text-sm text-red-700 mt-2">{verifyError}</p>}
+                  {verifyResults && (
+                    <div className="mt-3 bg-white border border-gray-100 rounded-xl p-3 overflow-hidden">
+                      <p className="text-xs text-gray-500">Results for {verifyPhone}</p>
+                      <p className="text-sm font-semibold text-gray-900 mt-0.5">Total Votes: {verifyTotalVotes ?? 0} · Transactions: {verifyTotalTransactions ?? 0}</p>
+                      <div className="mt-2 space-y-2 max-h-64 overflow-y-auto">
+                        {verifyResults.length === 0 ? (
+                          <p className="text-sm text-gray-500">No matching vote transactions found.</p>
+                        ) : (
+                          verifyResults.map((v: any) => (
+                            <div key={v.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 text-sm bg-green-50/30 p-2 rounded-md">
+                              <div className="min-w-0">
+                                <p className="font-semibold text-gray-900 truncate">{v.contestant_name || 'Contestant'}</p>
+                                <p className="text-xs text-gray-600">Votes: {v.vote_count} · {new Date(v.created_at).toLocaleString()}</p>
+                              </div>
+                              <div className="text-xs text-gray-700 whitespace-nowrap">Ref: {v.mpesa_code || (v.payment ? v.payment.pesapal_tracking_id : '') || '—'}</div>
                             </div>
-                          </div>
+                          ))
                         )}
                       </div>
-                    </>
+                    </div>
                   )}
                 </div>
               </div>
