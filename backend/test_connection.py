@@ -1,6 +1,6 @@
 import requests
 
-url = "https://misscultureglobalkenya.up.railway.app/api/main/test-connection/"
+url = "https://api.misscultureglobalkenya.com/api/main/test-connection/"
 
 try:
     response = requests.get(url, timeout=20)

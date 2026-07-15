@@ -1,6 +1,6 @@
 import requests
 
-url = "https://misscultureglobalkenya.up.railway.app/api/main/contact/"
+url = "https://api.misscultureglobalkenya.com/api/main/contact/"
 payload = {
     "name": "Test",
     "email": "test@test.com",

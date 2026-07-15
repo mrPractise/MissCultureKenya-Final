@@ -100,7 +100,7 @@ fieldsets = (
 )
 ```
 
-**Access:** `https://misscultureglobalkenya.up.railway.app/admin/main/sitesettings/`
+**Access:** `https://api.misscultureglobalkenya.com/admin/main/sitesettings/`
 
 ---
 
@@ -319,7 +319,7 @@ EMAIL_HOST_USER=info@misscultureglobalkenya.com
 ### Frontend (.env.local)
 ```bash
 # API Base URL
-NEXT_PUBLIC_API_BASE_URL=https://misscultureglobalkenya.up.railway.app
+NEXT_PUBLIC_API_BASE_URL=https://api.misscultureglobalkenya.com
 
 # Fallback Logo (optional, primarily managed via backend)
 NEXT_PUBLIC_LOGO_URL=https://... (deprecated, use backend settings)
