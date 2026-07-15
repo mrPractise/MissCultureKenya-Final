@@ -2,7 +2,7 @@ import axios from 'axios'
 
 const rawBaseFromEnv = process.env.NEXT_PUBLIC_API_BASE_URL
 const rawBase =
-  rawBaseFromEnv ?? (process.env.NODE_ENV === 'production' ? '' : 'http://localhost:8000')
+  rawBaseFromEnv ?? (process.env.NODE_ENV === 'production' ? 'https://api.misscultureglobalkenya.com' : 'http://localhost:8000')
 let BASE = rawBase.replace(/\/+$/, "")
 if (BASE.endsWith("/admin")) {
   BASE = BASE.slice(0, -"/admin".length)
