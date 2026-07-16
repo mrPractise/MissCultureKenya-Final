@@ -162,10 +162,10 @@ class ContestantCategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Payment)
 class PaymentAdmin(admin.ModelAdmin):
-    list_display = ['mpesa_code', 'event', 'phone_number', 'amount', 'payment_type', 'status', 'pesapal_tracking_id', 'verified_by', 'created_at']
-    list_filter = ['status', 'payment_type', 'event', 'created_at']
-    search_fields = ['mpesa_code', 'phone_number', 'pesapal_tracking_id', 'pesapal_merchant_ref']
-    readonly_fields = ['pesapal_tracking_id', 'pesapal_merchant_ref', 'pesapal_response', 'created_at', 'updated_at', 'verified_at']
+    list_display = ['mpesa_code', 'event', 'phone_number', 'amount', 'payment_purpose', 'status', 'checkout_request_id', 'verified_by', 'created_at']
+    list_filter = ['status', 'payment_purpose', 'event', 'created_at']
+    search_fields = ['mpesa_code', 'phone_number', 'checkout_request_id', 'pesapal_tracking_id', 'pesapal_merchant_ref']
+    readonly_fields = ['checkout_request_id', 'merchant_request_id', 'stk_response', 'pesapal_tracking_id', 'pesapal_merchant_ref', 'pesapal_response', 'created_at', 'updated_at', 'verified_at']
     ordering = ['-created_at']
     date_hierarchy = 'created_at'
 
@@ -180,7 +180,7 @@ class PaymentAdmin(admin.ModelAdmin):
             payment.verified_at = timezone.now()
             payment.save()
             results = {}
-            if payment.payment_type == 'ticket':
+            if payment.payment_purpose == 'ticket':
                 if not payment.tickets.exists():
                     event = payment.event
                     event_year = event.start_date.year
@@ -241,7 +241,7 @@ class PaymentAdmin(admin.ModelAdmin):
                         details=f"Issued {len(created_codes)} ticket(s) for payment {payment.mpesa_code}: {', '.join(created_codes)}",
                         event=event,
                     )
-            elif payment.payment_type == 'vote':
+            elif payment.payment_purpose == 'vote':
                 if payment.contestant_id and not payment.vote_transactions.exists():
                     event = payment.event
                     vote_count = calculate_vote_count(payment.amount, event.vote_price)

@@ -227,11 +227,12 @@ class PaymentSerializer(serializers.ModelSerializer):
             'ticket_category', 'ticket_category_name', 'ticket_quantity',
             'ticket_breakdown',
             'full_name', 'email',
-            'phone_number', 'mpesa_code', 'amount', 'status', 'payment_type',
+            'phone_number', 'mpesa_code', 'amount', 'status', 'payment_purpose',
+            'checkout_request_id', 'merchant_request_id',
             'pesapal_tracking_id', 'pesapal_merchant_ref',
             'verified_by', 'verified_by_name', 'verified_at', 'created_at', 'updated_at',
         ]
-        read_only_fields = ['verified_by', 'verified_at', 'pesapal_tracking_id', 'pesapal_merchant_ref']
+        read_only_fields = ['verified_by', 'verified_at', 'checkout_request_id', 'merchant_request_id', 'pesapal_tracking_id', 'pesapal_merchant_ref']
 
 
 class PaymentCreateSerializer(serializers.ModelSerializer):
@@ -243,7 +244,7 @@ class PaymentCreateSerializer(serializers.ModelSerializer):
             'ticket_breakdown',
             'full_name', 'email',
             'phone_number', 'mpesa_code', 'amount',
-            'status', 'payment_type',
+            'status', 'payment_purpose',
         ]
 
     def validate_ticket_quantity(self, value):
@@ -263,8 +264,8 @@ class PaymentCreateSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         attrs = super().validate(attrs)
-        payment_type = attrs.get('payment_type')
-        if payment_type == 'ticket':
+        payment_purpose = attrs.get('payment_purpose')
+        if payment_purpose == 'ticket':
             ticket_category = attrs.get('ticket_category')
             ticket_breakdown = attrs.get('ticket_breakdown') or {}
             if not ticket_category and not ticket_breakdown:

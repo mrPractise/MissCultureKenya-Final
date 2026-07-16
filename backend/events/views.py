@@ -33,6 +33,7 @@ from .utils import (
 )
 from .ticket_pdf import generate_ticket_pdf
 from .pesapal import submit_order, get_transaction_status
+from .daraja import initiate_stk_push, process_callback
 
 
 def _absolute_backend_url(request, path):
@@ -214,9 +215,9 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
         results = {}
 
         if new_status == 'successful':
-            if payment.payment_type == 'ticket':
+            if payment.payment_purpose == 'ticket':
                 results = self._process_ticket_payment(payment, event)
-            elif payment.payment_type == 'vote':
+            elif payment.payment_purpose == 'vote':
                 results = self._process_vote_payment(payment, event, request)
 
         # Audit log
@@ -325,8 +326,8 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
     @action(detail=True, methods=['post'])
     def initiate_vote_payment(self, request, pk=None):
         """
-        Initiate a PesaPal order for voting.
-        Creates a pending Payment record and returns the PesaPal redirect URL.
+        Initiate M-Pesa Daraja STK Push for voting.
+        Creates a pending Payment record and triggers STK Push to user's phone.
         """
         event = self.get_object()
 
@@ -356,46 +357,40 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
         # Calculate vote count for informational purposes
         vote_count = calculate_vote_count(amount, event.vote_price)
 
-        # Create pending payment record
+        # Create pending payment record with payment_purpose
         payment = Payment.objects.create(
             event=event,
             contestant=contestant,
             phone_number=phone_number,
             amount=amount,
             status='pending',
-            payment_type='vote',
+            payment_purpose='vote',
         )
 
-        merchant_ref = f"MCK-VOTE-{payment.id}"
-        payment.pesapal_merchant_ref = merchant_ref
+        # Initiate STK Push
+        callback_url = _absolute_backend_url(request, '/api/events/mpesa-callback/')
+        account_reference = f"VOTE-{payment.id}"
+        transaction_desc = f'Vote for {contestant.name}'
 
-        ipn_id = getattr(settings, 'PESAPAL_IPN_ID', '')
-        callback_url = _absolute_backend_url(request, '/api/events/pesapal-redirect/')
-
-        result = submit_order(
-            order_id=merchant_ref,
-            amount=amount,
-            currency='KES',
-            description=f'Vote for {contestant.name}',
-            callback_url=callback_url,
-            notification_id=ipn_id,
-            first_name=contestant.name,
-            last_name='',
-            email=f'vote-{payment.id}@misscultureglobalkenya.com',
+        stk_result = initiate_stk_push(
             phone_number=phone_number,
+            amount=amount,
+            account_reference=account_reference,
+            transaction_desc=transaction_desc,
+            callback_url=callback_url,
         )
 
-        payment.pesapal_tracking_id = result.get('order_tracking_id', '')
-        payment.pesapal_response = result.get('raw', {})
+        payment.checkout_request_id = stk_result.get('checkout_request_id', '')
+        payment.merchant_request_id = stk_result.get('merchant_request_id', '')
+        payment.stk_response = stk_result.get('raw', {})
 
-        if result.get('success'):
+        if stk_result.get('success'):
             payment.save()
             return Response({
                 'success': True,
-                'redirect_url': result.get('redirect_url'),
-                'order_tracking_id': payment.pesapal_tracking_id,
-                'merchant_ref': merchant_ref,
-                'message': 'Continue to PesaPal checkout to complete payment.',
+                'message': 'STK Push sent to your phone. Enter your M-Pesa PIN to complete payment.',
+                'checkout_request_id': payment.checkout_request_id,
+                'merchant_request_id': payment.merchant_request_id,
                 'vote_count': vote_count,
                 'payment_id': payment.id,
             })
@@ -404,12 +399,16 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
             payment.save()
             return Response({
                 'success': False,
-                'error': result.get('error', 'Failed to create PesaPal order.'),
+                'error': stk_result.get('error', 'Failed to initiate STK Push.'),
                 'payment_id': payment.id,
             }, status=status.HTTP_502_BAD_GATEWAY)
 
     @action(detail=True, methods=['post'])
     def initiate_ticket_payment(self, request, pk=None):
+        """
+        Initiate M-Pesa Daraja STK Push for ticket purchase.
+        Creates a pending Payment record and triggers STK Push to user's phone.
+        """
         event = self.get_object()
 
         serializer = PesaPalTicketPaymentRequestSerializer(data=request.data)
@@ -441,53 +440,43 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
         if total_amount <= 0:
             return Response({'error': 'Selected ticket total is free. Use free registration instead.'}, status=status.HTTP_400_BAD_REQUEST)
 
+        # Create pending payment record with payment_purpose
         payment = Payment.objects.create(
             event=event,
             phone_number=phone_number,
             amount=total_amount,
             status='pending',
-            payment_type='ticket',
+            payment_purpose='ticket',
             full_name=full_name,
             email=email,
             ticket_breakdown=ticket_breakdown,
             ticket_quantity=total_qty,
         )
 
-        merchant_ref = f"MCK-TICKET-{payment.id}"
-        payment.pesapal_merchant_ref = merchant_ref
+        # Initiate STK Push
+        callback_url = _absolute_backend_url(request, '/api/events/mpesa-callback/')
+        account_reference = f"TICKET-{payment.id}"
+        transaction_desc = f'Tickets for {event.title}'
 
-        # Split full name into first/last for PesaPal billing
-        name_parts = full_name.strip().split(maxsplit=1)
-        first_name = name_parts[0]
-        last_name = name_parts[1] if len(name_parts) > 1 else ''
-
-        ipn_id = getattr(settings, 'PESAPAL_IPN_ID', '')
-        callback_url = _absolute_backend_url(request, '/api/events/pesapal-redirect/')
-
-        result = submit_order(
-            order_id=merchant_ref,
-            amount=total_amount,
-            currency='KES',
-            description=f'Tickets for {event.title}',
-            callback_url=callback_url,
-            notification_id=ipn_id,
-            first_name=first_name,
-            last_name=last_name,
-            email=email,
+        stk_result = initiate_stk_push(
             phone_number=phone_number,
+            amount=total_amount,
+            account_reference=account_reference,
+            transaction_desc=transaction_desc,
+            callback_url=callback_url,
         )
 
-        payment.pesapal_tracking_id = result.get('order_tracking_id', '')
-        payment.pesapal_response = result.get('raw', {})
+        payment.checkout_request_id = stk_result.get('checkout_request_id', '')
+        payment.merchant_request_id = stk_result.get('merchant_request_id', '')
+        payment.stk_response = stk_result.get('raw', {})
 
-        if result.get('success'):
+        if stk_result.get('success'):
             payment.save()
             return Response({
                 'success': True,
-                'redirect_url': result.get('redirect_url'),
-                'order_tracking_id': payment.pesapal_tracking_id,
-                'merchant_ref': merchant_ref,
-                'message': 'Continue to PesaPal checkout to complete payment.',
+                'message': 'STK Push sent to your phone. Enter your M-Pesa PIN to complete payment.',
+                'checkout_request_id': payment.checkout_request_id,
+                'merchant_request_id': payment.merchant_request_id,
                 'payment_id': payment.id,
                 'ticket_count': total_qty,
                 'amount': str(total_amount),
@@ -496,7 +485,7 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
         payment.save()
         return Response({
             'success': False,
-            'error': result.get('error', 'Failed to create PesaPal order.'),
+            'error': stk_result.get('error', 'Failed to initiate STK Push.'),
             'payment_id': payment.id,
         }, status=status.HTTP_502_BAD_GATEWAY)
 
@@ -721,7 +710,7 @@ class PaymentViewSet(viewsets.ModelViewSet):
                 payment.save(update_fields=['verified_by', 'verified_at', 'updated_at'])
 
             results = {}
-            if payment.payment_type == 'ticket':
+            if payment.payment_purpose == 'ticket':
                 if not payment.tickets.exists():
                     event = payment.event
                     event_year = event.start_date.year
@@ -776,7 +765,7 @@ class PaymentViewSet(viewsets.ModelViewSet):
                             ticket_category.save(update_fields=['available'])
 
                     results = {'tickets': created, 'ticket_count': len(created)}
-            elif payment.payment_type == 'vote':
+            elif payment.payment_purpose == 'vote':
                 if payment.contestant_id and not payment.vote_transactions.exists():
                     event = payment.event
                     vote_count = calculate_vote_count(payment.amount, event.vote_price)
@@ -873,7 +862,10 @@ class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def verify_votes_by_phone(request):
-    """Public endpoint: verify all votes for a phone number across all events."""
+    """
+    Public endpoint: verify all votes for a phone number across all events.
+    Filters by payment_purpose='vote' to exclude ticket purchases.
+    """
     phone = request.query_params.get('phone', '').strip()
     if not phone:
         return Response(
@@ -883,9 +875,18 @@ def verify_votes_by_phone(request):
 
     # Search by last 9 digits for flexibility
     search_digits = phone[-9:] if len(phone) >= 9 else phone
-    votes = VoteTransaction.objects.filter(
+    
+    # Find payments with payment_purpose='vote' for this phone
+    vote_payments = Payment.objects.filter(
         phone_number__contains=search_digits,
-        status='successful',
+        payment_purpose='vote',
+        status='successful'
+    ).select_related('event', 'contestant')
+    
+    # Get all vote transactions associated with these payments
+    votes = VoteTransaction.objects.filter(
+        payment__in=vote_payments,
+        status='successful'
     ).select_related('contestant', 'event').order_by('-created_at')
 
     from .utils import mask_phone_number
@@ -902,22 +903,53 @@ def verify_votes_by_phone(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def ticket_lookup(request):
-    """Public endpoint: look up a ticket by ticket_code."""
+    """
+    Public endpoint: look up tickets by phone number (payment_purpose='ticket' only).
+    Also supports looking up a single ticket by ticket_code.
+    """
     code = request.query_params.get('code', '').strip()
-    if not code:
-        return Response(
-            {'error': 'code query parameter is required.'},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    try:
-        ticket = Ticket.objects.select_related('event', 'ticket_category').get(ticket_code=code)
-        serializer = TicketDetailSerializer(ticket)
-        return Response(serializer.data)
-    except Ticket.DoesNotExist:
-        return Response(
-            {'error': f'Ticket with code "{code}" not found.'},
-            status=status.HTTP_404_NOT_FOUND
-        )
+    phone = request.query_params.get('phone', '').strip()
+    
+    # If code is provided, look up single ticket by code
+    if code:
+        try:
+            ticket = Ticket.objects.select_related('event', 'ticket_category').get(ticket_code=code)
+            serializer = TicketDetailSerializer(ticket)
+            return Response(serializer.data)
+        except Ticket.DoesNotExist:
+            return Response(
+                {'error': f'Ticket with code "{code}" not found.'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+    
+    # If phone is provided, look up all tickets for that phone (ticket payments only)
+    if phone:
+        # Search by last 9 digits for flexibility
+        search_digits = phone[-9:] if len(phone) >= 9 else phone
+        
+        # Find payments with payment_purpose='ticket' for this phone
+        ticket_payments = Payment.objects.filter(
+            phone_number__contains=search_digits,
+            payment_purpose='ticket',
+            status='successful'
+        ).select_related('event')
+        
+        # Get all tickets associated with these payments
+        tickets = Ticket.objects.filter(
+            payment__in=ticket_payments
+        ).select_related('event', 'ticket_category', 'payment').order_by('-issued_at')
+        
+        serializer = TicketDetailSerializer(tickets, many=True)
+        return Response({
+            'phone_masked': phone[:4] + '***' + phone[-4:] if len(phone) >= 8 else phone,
+            'total_tickets': tickets.count(),
+            'tickets': serializer.data,
+        })
+    
+    return Response(
+        {'error': 'Either code or phone query parameter is required.'},
+        status=status.HTTP_400_BAD_REQUEST
+    )
 
 
 @api_view(['POST'])
@@ -986,11 +1018,11 @@ def initiate_contribution_payment(request):
 def _process_successful_payment(payment):
     event = payment.event
     processor = EventViewSet()
-    if payment.payment_type == 'ticket':
+    if payment.payment_purpose == 'ticket':
         if payment.tickets.exists():
             return {'message': 'Tickets already issued.'}
         return processor._process_ticket_payment(payment, event)
-    if payment.payment_type == 'vote':
+    if payment.payment_purpose == 'vote':
         if payment.vote_transactions.exists():
             return {'message': 'Votes already counted.'}
         return processor._process_vote_payment(payment, event, None)
@@ -1005,10 +1037,90 @@ def _process_successful_payment(payment):
 @permission_classes([AllowAny])
 def mpesa_callback(request):
     """
-    Legacy M-Pesa Daraja STK Push callback endpoint.
-    Kept for backward compatibility — all new payments use PesaPal.
+    M-Pesa Daraja STK Push callback endpoint.
+    Processes payment callbacks and routes based on payment_purpose.
     """
-    return Response({'status': 'deprecated', 'message': 'All payments now use PesaPal. Use /pesapal-ipn/ instead.'}, status=status.HTTP_410_GONE)
+    try:
+        callback_data = request.data
+        processed = process_callback(callback_data)
+        
+        if not processed.get('success'):
+            return Response({'error': processed.get('error')}, status=status.HTTP_400_BAD_REQUEST)
+        
+        checkout_request_id = processed.get('checkout_request_id')
+        
+        if not checkout_request_id:
+            return Response({'error': 'Missing CheckoutRequestID'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Find payment by checkout_request_id
+        payment = Payment.objects.filter(checkout_request_id=checkout_request_id).first()
+        
+        if not payment:
+            return Response({'error': 'Payment not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        # Update payment with callback data
+        payment.stk_response = processed.get('raw', {})
+        
+        if processed.get('result_code') == 0:
+            # Payment successful
+            payment.status = 'successful'
+            payment.mpesa_code = processed.get('mpesa_receipt_number')
+            payment.save()
+            
+            # Route based on payment_purpose
+            if payment.payment_purpose == 'ticket':
+                results = EventViewSet()._process_ticket_payment(payment, payment.event)
+                AuditLog.objects.create(
+                    action='payment_verified',
+                    actor='system',
+                    details=json.dumps({
+                        'payment_id': payment.id,
+                        'mpesa_code': payment.mpesa_code,
+                        'amount': str(payment.amount),
+                        'payment_purpose': 'ticket',
+                        'source': 'mpesa_callback',
+                        'results': results,
+                    }),
+                    event=payment.event,
+                )
+            elif payment.payment_purpose == 'vote':
+                results = EventViewSet()._process_vote_payment(payment, payment.event, None)
+                AuditLog.objects.create(
+                    action='payment_verified',
+                    actor='system',
+                    details=json.dumps({
+                        'payment_id': payment.id,
+                        'mpesa_code': payment.mpesa_code,
+                        'amount': str(payment.amount),
+                        'payment_purpose': 'vote',
+                        'source': 'mpesa_callback',
+                        'results': results,
+                    }),
+                    event=payment.event,
+                )
+            elif payment.payment_purpose == 'donation':
+                # Donation - no ticket/vote logic
+                AuditLog.objects.create(
+                    action='payment_verified',
+                    actor='system',
+                    details=json.dumps({
+                        'payment_id': payment.id,
+                        'mpesa_code': payment.mpesa_code,
+                        'amount': str(payment.amount),
+                        'payment_purpose': 'donation',
+                        'source': 'mpesa_callback',
+                    }),
+                    event=payment.event,
+                )
+        else:
+            # Payment failed
+            payment.status = 'failed'
+            payment.save()
+        
+        return Response({'status': 'success'})
+    
+    except Exception as e:
+        return Response({'error': f'Callback processing failed: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 # ── Helper ───────────────────────────────────────────────────────────────────

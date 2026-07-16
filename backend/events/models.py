@@ -247,7 +247,7 @@ class GuestSpeaker(models.Model):
 
 
 class Payment(models.Model):
-    """Model for payment tracking (tickets and votes) via PesaPal."""
+    """Model for payment tracking (tickets and votes) via M-Pesa Daraja STK Push."""
     PAYMENT_STATUS_CHOICES = [
         ('pending', 'Pending'),
         ('successful', 'Successful'),
@@ -255,9 +255,10 @@ class Payment(models.Model):
         ('cancelled', 'Cancelled'),
         ('reversed', 'Reversed'),
     ]
-    PAYMENT_TYPE_CHOICES = [
+    PAYMENT_PURPOSE_CHOICES = [
         ('ticket', 'Ticket'),
         ('vote', 'Vote'),
+        ('donation', 'Donation'),
     ]
 
     event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='payments')
@@ -271,11 +272,16 @@ class Payment(models.Model):
     mpesa_code = models.CharField(max_length=20, unique=True, null=True, blank=True, help_text="M-Pesa transaction code (must be unique). Leave blank for pending payments.")
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='pending')
-    payment_type = models.CharField(max_length=10, choices=PAYMENT_TYPE_CHOICES)
+    payment_purpose = models.CharField(max_length=10, choices=PAYMENT_PURPOSE_CHOICES, help_text="Purpose of this payment: ticket, vote, or donation")
     verified_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, help_text="Admin who verified this payment")
     verified_at = models.DateTimeField(null=True, blank=True)
 
-    # PesaPal fields
+    # Daraja STK Push fields
+    checkout_request_id = models.CharField(max_length=50, blank=True, help_text="Daraja CheckoutRequestID from STK Push")
+    merchant_request_id = models.CharField(max_length=50, blank=True, help_text="Daraja MerchantRequestID from STK Push")
+    stk_response = models.JSONField(default=dict, blank=True, help_text="Raw STK Push response/callback data for debugging")
+
+    # PesaPal fields (kept for backward compatibility/legacy data)
     pesapal_tracking_id = models.CharField(max_length=100, blank=True, default='')
     pesapal_merchant_ref = models.CharField(max_length=100, blank=True, default='')
     pesapal_response = models.JSONField(default=dict, blank=True)

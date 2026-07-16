@@ -194,11 +194,32 @@ STATIC_URL = '/static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # CORS settings
-CORS_ALLOWED_ORIGINS_STR = config('CORS_ALLOWED_ORIGINS', default='http://localhost:3000,http://127.0.0.1:3000,https://misscultureglobalkenya.com')
+CORS_ALLOWED_ORIGINS_STR = config('CORS_ALLOWED_ORIGINS', default='http://localhost:3000,http://127.0.0.1:3000,https://misscultureglobalkenya.com,https://www.misscultureglobalkenya.com')
 CORS_ALLOWED_ORIGINS = [origin.strip() for origin in CORS_ALLOWED_ORIGINS_STR.split(',')]
 
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+
 # CSRF settings
-CSRF_TRUSTED_ORIGINS_STR = config('CSRF_TRUSTED_ORIGINS', default='http://localhost:3000,http://127.0.0.1:3000,https://misscultureglobalkenya.com')
+CSRF_TRUSTED_ORIGINS_STR = config('CSRF_TRUSTED_ORIGINS', default='http://localhost:3000,http://127.0.0.1:3000,https://misscultureglobalkenya.com,https://www.misscultureglobalkenya.com')
 CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in CSRF_TRUSTED_ORIGINS_STR.split(',')]
 
 # Also allow all origins in development (for testing)
@@ -206,6 +227,7 @@ if DEBUG:
     CORS_ALLOW_ALL_ORIGINS = True
 else:
     CORS_ALLOW_CREDENTIALS = True
+    CORS_ALLOW_ALL_ORIGINS = False
     # Production Security Settings
     SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default=True, cast=bool)
     SESSION_COOKIE_SECURE = True
