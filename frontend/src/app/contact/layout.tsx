@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Contact',
+  title: 'Contact Us',
   description: 'Get in touch for partnerships, media requests, event inquiries, and general questions. We respond to every message.',
   alternates: { canonical: '/contact' },
   openGraph: {

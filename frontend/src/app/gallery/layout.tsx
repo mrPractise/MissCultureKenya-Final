@@ -30,7 +30,7 @@ async function fetchGallerySettings() {
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await fetchGallerySettings()
 
-  const title: string = settings?.page_title || 'Gallery'
+  const title: string = settings?.page_title || 'Photo & Video Gallery'
   const description: string =
     settings?.page_subtitle ||
     'The mission in motion — explore photos and videos from pageant stages, cultural events, community work, and global diplomacy.'

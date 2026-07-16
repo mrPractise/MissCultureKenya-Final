@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Events',
+  title: 'Events Calendar',
   description: 'Explore upcoming and past events — pageants, cultural showcases, workshops, and diplomatic forums. See dates, venues, and ticket details.',
   alternates: { canonical: '/events' },
   openGraph: {

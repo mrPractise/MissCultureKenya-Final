@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Voting',
+  title: 'Vote for Contestants',
   description: 'Your voice shapes the stage. Vote for contestants and talent categories — transparent results and verified participation.',
   alternates: { canonical: '/voting' },
   openGraph: {

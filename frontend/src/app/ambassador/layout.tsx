@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Ambassador',
+  title: 'Brand Ambassador',
   description: 'Meet the ambassador and explore the journey — cultural diplomacy, community programs, and storytelling that represents Kenya on the global stage.',
   alternates: { canonical: '/ambassador' },
   openGraph: {

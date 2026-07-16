@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Kenya',
+  title: 'Discover Kenya',
   description: 'Discover Kenya’s regions, communities, and cultural heritage — stories, traditions, and achievements that shape our identity on the global stage.',
   alternates: { canonical: '/kenya' },
   openGraph: {

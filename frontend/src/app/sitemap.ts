@@ -5,7 +5,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const apiBase =
     process.env.API_BASE_URL ||
     process.env.NEXT_PUBLIC_API_BASE_URL ||
-    ''
+    'https://api.misscultureglobalkenya.com'
 
   const pages = [
     '',

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'FAQ',
+  title: 'Frequently Asked Questions',
   description: 'Frequently asked questions about Miss Culture Global Kenya — participation, events, voting, partnerships, and support.',
   alternates: { canonical: '/faq' },
   openGraph: {

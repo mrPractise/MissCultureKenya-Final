@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'About',
+  title: 'About Us',
   description: 'Learn the story of Miss Culture Global Kenya — our mission, vision, leadership, and impact across communities in Kenya and beyond.',
   alternates: { canonical: '/about' },
   openGraph: {

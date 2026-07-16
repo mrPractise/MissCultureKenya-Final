@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Contribute',
+  title: 'Support Our Mission',
   description: 'Give to culture and empower a generation. Support heritage preservation, youth programs, and community development in Kenya.',
   alternates: { canonical: '/contribute' },
   openGraph: {

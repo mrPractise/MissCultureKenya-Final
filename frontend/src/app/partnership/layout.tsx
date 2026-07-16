@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Partnership',
+  title: 'Partner With Us',
   description: 'Partner with Miss Culture Global Kenya to support cultural heritage, youth empowerment, and global cultural diplomacy — with clear sponsorship tiers and brand value.',
   alternates: { canonical: '/partnership' },
   openGraph: {
