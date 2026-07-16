@@ -91,19 +91,20 @@ export default function EventCheckoutPage() {
         ticket_breakdown,
       })
 
-      if (result?.success && result.redirect_url) {
+      if (result?.success) {
+        // M-Pesa STK Push sent — hand off to the success page which polls for confirmation.
         sessionStorage.setItem(storageKey(eventId), JSON.stringify({
           ...next,
           payment_id: result?.payment_id,
-          order_tracking_id: result?.order_tracking_id,
+          checkout_request_id: result?.checkout_request_id,
         }))
-        window.location.href = result.redirect_url
+        window.location.href = `/events/${eventId}/checkout/success`
       } else {
-        setError(result?.error || 'Failed to open PesaPal checkout.')
+        setError(result?.error || 'Failed to send the M-Pesa prompt.')
       }
     } catch (err) {
       const apiErr = err as ApiError
-      setError(apiErr.message || 'Failed to open PesaPal checkout.')
+      setError(apiErr.message || 'Failed to send the M-Pesa prompt.')
     } finally {
       setSubmitting(false)
     }
@@ -212,7 +213,7 @@ export default function EventCheckoutPage() {
               className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl font-semibold text-sm bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white transition-colors"
             >
               {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-              {submitting ? 'Opening PesaPal...' : 'Continue to PesaPal'}
+              {submitting ? 'Sending M-Pesa prompt...' : 'Pay with M-Pesa'}
             </button>
           </div>
         </div>

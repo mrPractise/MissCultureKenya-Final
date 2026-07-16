@@ -123,13 +123,15 @@ const VotePaymentModal = ({ isOpen, onClose, event, contestant }: VotePaymentMod
         contestant_id: contestant.id,
       })
 
-      if (result.success && result.redirect_url) {
-        setCheckoutId(result.order_tracking_id || '')
+      if (result.success) {
+        // M-Pesa STK Push sent to the phone; move to the waiting step and poll for confirmation.
+        setCheckoutId(result.checkout_request_id || '')
         setPaymentId(result.payment_id || null)
-        setSuccessMessage(result.message)
-        window.location.href = result.redirect_url
+        setSuccessMessage(result.message || '')
+        setPaymentStatus('pending')
+        setStep(2)
       } else {
-        setError(result.error || 'Failed to open checkout. Please try again.')
+        setError(result.error || 'Failed to send the M-Pesa prompt. Please try again.')
       }
     } catch (err) {
       const apiErr = err as ApiError
@@ -300,7 +302,7 @@ const VotePaymentModal = ({ isOpen, onClose, event, contestant }: VotePaymentMod
                   {submitting ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      Opening Checkout...
+                      Sending M-Pesa prompt...
                     </>
                   ) : (
                     <>
@@ -347,8 +349,8 @@ const VotePaymentModal = ({ isOpen, onClose, event, contestant }: VotePaymentMod
                   <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-left space-y-2">
                     <p className="text-sm text-blue-800 font-medium">What to do next:</p>
                     <ol className="text-sm text-blue-700 space-y-1.5 list-decimal list-inside">
-                      <li>Complete payment on the checkout page</li>
-                      <li>Use M-Pesa when prompted</li>
+                      <li>Check your phone for the M-Pesa pop-up</li>
+                      <li>Enter your M-Pesa PIN to confirm</li>
                       <li>Keep this window open to confirm your votes</li>
                     </ol>
                   </div>

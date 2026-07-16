@@ -396,8 +396,8 @@ const VotingPage = () => {
                   animate={{ opacity: 1, height: 'auto' }}
                   className="mt-4 space-y-4"
                 >
-                  <div className="flex gap-2">
-                    <div className="flex flex-1">
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <div className="flex flex-1 min-w-0">
                       <span className="inline-flex items-center px-3 bg-gray-100 border border-r-0 border-gray-300 rounded-l-xl text-sm text-gray-600 font-medium">
                         +254
                       </span>
@@ -407,13 +407,13 @@ const VotingPage = () => {
                         onChange={(e) => { setVerifyPhone(e.target.value.replace(/\D/g, '')); setVerifyError('') }}
                         placeholder="712345678"
                         maxLength={9}
-                        className="flex-1 px-3 py-3 border border-gray-300 rounded-r-xl focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                        className="flex-1 min-w-0 px-3 py-3 border border-gray-300 rounded-r-xl focus:ring-2 focus:ring-green-500 focus:border-green-500"
                       />
                     </div>
                     <button
                       onClick={handleVerifyVotes}
                       disabled={verifyLoading}
-                      className="bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white px-5 rounded-xl font-semibold text-sm transition-colors flex items-center gap-1.5"
+                      className="flex-shrink-0 justify-center bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white px-5 py-3 sm:py-0 rounded-xl font-semibold text-sm transition-colors flex items-center gap-1.5 whitespace-nowrap"
                     >
                       {verifyLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
                       Search
@@ -450,11 +450,11 @@ const VotingPage = () => {
                               {record.status}
                             </span>
                           </div>
-                          <div className="grid grid-cols-2 gap-2 text-xs text-gray-500">
-                            <span>Event: {record.event_title}</span>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-2 gap-y-1.5 text-xs text-gray-500">
+                            <span className="truncate">Event: {record.event_title}</span>
                             <span>Votes: {record.vote_count}</span>
                             <span>Amount: KES {parseFloat(record.amount).toLocaleString()}</span>
-                            <span>Code: {record.mpesa_code}</span>
+                            <span className="truncate">Code: {record.mpesa_code}</span>
                           </div>
                         </div>
                       ))}

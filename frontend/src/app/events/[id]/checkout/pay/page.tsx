@@ -110,13 +110,13 @@ export default function EventCheckoutPayPage() {
         email: draft.email,
         ticket_breakdown,
       })
-      if (result?.success && result.redirect_url) {
+      if (result?.success) {
         setCheckoutStarted(true)
-        setCheckoutId(result.order_tracking_id || '')
-        sessionStorage.setItem(storageKey(eventId), JSON.stringify({ ...draft, payment_id: result?.payment_id, order_tracking_id: result?.order_tracking_id }))
-        window.location.href = result.redirect_url
+        setCheckoutId(result.checkout_request_id || '')
+        sessionStorage.setItem(storageKey(eventId), JSON.stringify({ ...draft, payment_id: result?.payment_id, checkout_request_id: result?.checkout_request_id }))
+        window.location.href = `/events/${eventId}/checkout/success`
       } else {
-        setError(result?.error || 'Failed to open checkout.')
+        setError(result?.error || 'Failed to send the M-Pesa prompt.')
       }
     } catch (err: any) {
       const apiErr = err as ApiError
@@ -177,10 +177,10 @@ export default function EventCheckoutPayPage() {
             <div className="bg-green-50 border border-green-200 rounded-xl p-4">
               <h2 className="font-semibold text-green-900 flex items-center gap-2">
                 <CreditCard className="w-5 h-5" />
-                Secure PesaPal Checkout
+                Secure M-Pesa Checkout
               </h2>
               <p className="mt-2 text-sm text-green-800">
-                Tap the button below to continue to the PesaPal payment page.
+                Tap the button below to receive an M-Pesa prompt on your phone. Enter your PIN to pay.
               </p>
               {draft.phone && (
                 <p className="mt-2 text-xs text-green-700">
@@ -211,7 +211,7 @@ export default function EventCheckoutPayPage() {
               className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl font-semibold text-sm bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white transition-colors"
             >
               {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-              {checkoutStarted ? 'Opening Checkout...' : 'Continue to Pay'}
+              {checkoutStarted ? 'Sending M-Pesa prompt...' : 'Pay with M-Pesa'}
             </button>
           </div>
         </div>

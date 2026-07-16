@@ -601,10 +601,26 @@ Emails Sent: {len(emails_sent)}/{len(tickets)}"""
             ip_address=self._get_client_ip(request),
         )
 
+        # Notify admins about the new vote via Telegram
+        try:
+            send_telegram_message(
+                f"\U0001f5f3 <b>New Vote Confirmed!</b>\n\n"
+                f"Event: {event.title}\n"
+                f"Contestant: #{contestant.contestant_number} {contestant.name}\n"
+                f"Votes: {vote_count}\n"
+                f"Amount: KES {payment.amount}\n"
+                f"Phone: {payment.phone_number}\n"
+                f"M-Pesa Code: {payment.mpesa_code or '-'}"
+            )
+        except Exception:
+            pass
+
         return {'vote_id': vote.id, 'vote_count': vote_count, 'contestant': contestant.name}
 
     @staticmethod
     def _get_client_ip(request):
+        if request is None:
+            return None
         x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
         if x_forwarded_for:
             return x_forwarded_for.split(',')[0].strip()
@@ -658,7 +674,7 @@ class ContestantViewSet(viewsets.ReadOnlyModelViewSet):
 class PaymentViewSet(viewsets.ModelViewSet):
     queryset = Payment.objects.all().select_related('event', 'verified_by')
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['event', 'status', 'payment_type']
+    filterset_fields = ['event', 'status', 'payment_purpose']
     search_fields = ['mpesa_code', 'phone_number']
     ordering_fields = ['created_at', 'amount']
     ordering = ['-created_at']
@@ -788,7 +804,7 @@ class PaymentViewSet(viewsets.ModelViewSet):
                     'payment_id': payment.id,
                     'mpesa_code': payment.mpesa_code,
                     'amount': str(payment.amount),
-                    'payment_type': payment.payment_type,
+                    'payment_purpose': payment.payment_purpose,
                     'event_id': payment.event_id,
                     'results': results,
                 }),
@@ -1222,7 +1238,7 @@ def pesapal_ipn_callback(request):
 
                 # Ticket processing already sends its own detailed Telegram message.
                 event = payment.event
-                if payment.payment_type == 'vote':
+                if payment.payment_purpose == 'vote':
                     contestant = payment.contestant
                     vote_count = calculate_vote_count(payment.amount, event.vote_price)
                     send_telegram_message(
@@ -1240,7 +1256,7 @@ def pesapal_ipn_callback(request):
                     details=json.dumps({
                         'payment_id': payment.id,
                         'amount': str(payment.amount),
-                        'payment_type': payment.payment_type,
+                        'payment_purpose': payment.payment_purpose,
                         'source': 'pesapal_ipn',
                         'tracking_id': tracking_id,
                         'merchant_ref': merchant_ref,
@@ -1334,9 +1350,9 @@ def pesapal_payment_redirect(request):
         if payment_status == 'COMPLETED':
             from django.shortcuts import redirect
             if payment:
-                if payment.payment_type == 'vote':
+                if payment.payment_purpose == 'vote':
                     return redirect(f'{frontend_url}/voting?payment=success')
-                elif payment.payment_type == 'ticket':
+                elif payment.payment_purpose == 'ticket':
                     return redirect(f'{frontend_url}/events/{payment.event_id}/checkout/success?payment=success')
             # Default: contribution
             return redirect(f'{frontend_url}/contribute?payment=success')
@@ -1349,8 +1365,8 @@ def pesapal_payment_redirect(request):
     if not payment and tracking_id:
         payment = Payment.objects.filter(pesapal_tracking_id=tracking_id).first()
     if payment:
-        if payment.payment_type == 'vote':
+        if payment.payment_purpose == 'vote':
             return dj_redirect(f'{frontend_url}/voting?payment=failed')
-        elif payment.payment_type == 'ticket':
+        elif payment.payment_purpose == 'ticket':
             return dj_redirect(f'{frontend_url}/events/{payment.event_id}/checkout/success?payment=failed')
     return dj_redirect(f'{frontend_url}/contribute?payment=failed')

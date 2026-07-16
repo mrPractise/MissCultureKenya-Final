@@ -333,6 +333,10 @@ MPESA_PASSKEY = config('MPESA_PASSKEY', default='')
 MPESA_SHORTCODE = config('MPESA_SHORTCODE', default='')
 MPESA_ENVIRONMENT = config('MPESA_ENVIRONMENT', default='')
 
+# Telegram Notifications (optional payment/vote alerts)
+TELEGRAM_BOT_TOKEN = config('TELEGRAM_BOT_TOKEN', default='')
+TELEGRAM_CHAT_ID = config('TELEGRAM_CHAT_ID', default='')
+
 FRONTEND_URL = config('FRONTEND_URL', default='https://misscultureglobalkenya.com')
 
 # Tag-based folder prefixes for organized uploads
