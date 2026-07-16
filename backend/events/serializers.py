@@ -374,14 +374,18 @@ class LiveResultSerializer(serializers.Serializer):
 
 
 class VoteVerifySerializer(serializers.Serializer):
-    """Serializer for vote verification by phone number"""
-    event_title = serializers.CharField()
-    contestant_name = serializers.CharField()
-    vote_count = serializers.IntegerField()
-    amount = serializers.DecimalField(max_digits=10, decimal_places=2)
-    mpesa_code = serializers.CharField()
-    status = serializers.CharField()
-    created_at = serializers.DateTimeField()
+    """Serializer for vote verification by phone number.
+
+    Serializes VoteTransaction instances; the display fields are pulled from the
+    related event/contestant/payment via `source`.
+    """
+    event_title = serializers.CharField(source='event.title', read_only=True)
+    contestant_name = serializers.CharField(source='contestant.name', read_only=True)
+    vote_count = serializers.IntegerField(read_only=True)
+    amount = serializers.DecimalField(source='payment.amount', max_digits=10, decimal_places=2, read_only=True)
+    mpesa_code = serializers.CharField(read_only=True, allow_blank=True)
+    status = serializers.CharField(read_only=True)
+    created_at = serializers.DateTimeField(read_only=True)
 
 
 # ── PesaPal checkout requests ────────────────────────────────────────────────
