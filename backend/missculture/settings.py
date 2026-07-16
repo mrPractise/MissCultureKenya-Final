@@ -326,6 +326,13 @@ PESAPAL_IPN_ID = config('PESAPAL_IPN_ID', default='')
 PESAPAL_CALLBACK_URL = config('PESAPAL_CALLBACK_URL', default='')
 PESAPAL_IPN_URL = config('PESAPAL_IPN_URL', default='')
 
+# M-Pesa Daraja Configuration (STK Push for voting/ticketing)
+MPESA_CONSUMER_KEY = config('MPESA_CONSUMER_KEY', default='')
+MPESA_CONSUMER_SECRET = config('MPESA_CONSUMER_SECRET', default='')
+MPESA_PASSKEY = config('MPESA_PASSKEY', default='')
+MPESA_SHORTCODE = config('MPESA_SHORTCODE', default='')
+MPESA_ENVIRONMENT = config('MPESA_ENVIRONMENT', default='')
+
 FRONTEND_URL = config('FRONTEND_URL', default='https://misscultureglobalkenya.com')
 
 # Tag-based folder prefixes for organized uploads
