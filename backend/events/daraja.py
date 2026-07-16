@@ -195,7 +195,16 @@ def process_callback(callback_data):
         checkout_request_id = stk_callback.get('CheckoutRequestID')
         merchant_request_id = stk_callback.get('MerchantRequestID')
         
-        metadata = stk_callback.get('Metadata', {})
+        # Safaricom sends the details under CallbackMetadata -> Item (a list).
+        # Older/sandbox payloads occasionally use "Metadata"; support both, and
+        # tolerate the value being either the wrapper dict or the raw item list.
+        metadata = stk_callback.get('CallbackMetadata') or stk_callback.get('Metadata') or {}
+        if isinstance(metadata, dict):
+            items = metadata.get('Item', []) or []
+        elif isinstance(metadata, list):
+            items = metadata
+        else:
+            items = []
         
         # Extract payment details from metadata
         amount = None
@@ -203,7 +212,9 @@ def process_callback(callback_data):
         phone_number = None
         transaction_date = None
         
-        for item in metadata:
+        for item in items:
+            if not isinstance(item, dict):
+                continue
             name = item.get('Name')
             value = item.get('Value')
             

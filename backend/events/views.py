@@ -1,4 +1,5 @@
 import json
+import logging
 import uuid
 from decimal import Decimal
 
@@ -34,6 +35,8 @@ from .utils import (
 from .ticket_pdf import generate_ticket_pdf
 from .pesapal import submit_order, get_transaction_status
 from .daraja import initiate_stk_push, process_callback
+
+logger = logging.getLogger(__name__)
 
 
 def _absolute_backend_url(request, path):
@@ -1055,88 +1058,97 @@ def mpesa_callback(request):
     """
     M-Pesa Daraja STK Push callback endpoint.
     Processes payment callbacks and routes based on payment_purpose.
+
+    IMPORTANT: This endpoint always responds with HTTP 200 and the
+    Safaricom-expected acknowledgement body. Returning any non-200 status makes
+    Safaricom retry the same callback repeatedly, which would double-count votes
+    or resend tickets. All errors are logged instead of surfaced as 500s.
     """
+    ack = Response({'ResultCode': 0, 'ResultDesc': 'Accepted'})
+
     try:
         callback_data = request.data
+    except Exception:
+        callback_data = {}
+
+    try:
         processed = process_callback(callback_data)
-        
-        if not processed.get('success'):
-            return Response({'error': processed.get('error')}, status=status.HTTP_400_BAD_REQUEST)
-        
         checkout_request_id = processed.get('checkout_request_id')
-        
+
         if not checkout_request_id:
-            return Response({'error': 'Missing CheckoutRequestID'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        # Find payment by checkout_request_id
+            logger.warning('mpesa_callback: missing CheckoutRequestID. Raw=%s', callback_data)
+            return ack
+
         payment = Payment.objects.filter(checkout_request_id=checkout_request_id).first()
-        
         if not payment:
-            return Response({'error': 'Payment not found'}, status=status.HTTP_404_NOT_FOUND)
-        
-        # Update payment with callback data
+            logger.warning('mpesa_callback: no payment for CheckoutRequestID=%s', checkout_request_id)
+            return ack
+
         payment.stk_response = processed.get('raw', {})
-        
-        if processed.get('result_code') == 0:
-            # Payment successful
-            payment.status = 'successful'
-            payment.mpesa_code = processed.get('mpesa_receipt_number')
+
+        result_code = processed.get('result_code')
+
+        # Non-zero result code => customer cancelled / failed / timed out.
+        if result_code != 0:
+            if payment.status != 'successful':
+                payment.status = 'failed'
             payment.save()
-            
-            # Route based on payment_purpose
-            if payment.payment_purpose == 'ticket':
-                results = EventViewSet()._process_ticket_payment(payment, payment.event)
-                AuditLog.objects.create(
-                    action='payment_verified',
-                    actor='system',
-                    details=json.dumps({
-                        'payment_id': payment.id,
-                        'mpesa_code': payment.mpesa_code,
-                        'amount': str(payment.amount),
-                        'payment_purpose': 'ticket',
-                        'source': 'mpesa_callback',
-                        'results': results,
-                    }),
-                    event=payment.event,
-                )
-            elif payment.payment_purpose == 'vote':
-                results = EventViewSet()._process_vote_payment(payment, payment.event, None)
-                AuditLog.objects.create(
-                    action='payment_verified',
-                    actor='system',
-                    details=json.dumps({
-                        'payment_id': payment.id,
-                        'mpesa_code': payment.mpesa_code,
-                        'amount': str(payment.amount),
-                        'payment_purpose': 'vote',
-                        'source': 'mpesa_callback',
-                        'results': results,
-                    }),
-                    event=payment.event,
-                )
-            elif payment.payment_purpose == 'donation':
-                # Donation - no ticket/vote logic
-                AuditLog.objects.create(
-                    action='payment_verified',
-                    actor='system',
-                    details=json.dumps({
-                        'payment_id': payment.id,
-                        'mpesa_code': payment.mpesa_code,
-                        'amount': str(payment.amount),
-                        'payment_purpose': 'donation',
-                        'source': 'mpesa_callback',
-                    }),
-                    event=payment.event,
-                )
+            logger.info(
+                'mpesa_callback: payment %s failed (ResultCode=%s, %s)',
+                payment.id, result_code, processed.get('result_desc')
+            )
+            return ack
+
+        # Idempotency guard: if we already processed this payment, do nothing.
+        already_processed = (
+            payment.status == 'successful'
+            and (payment.tickets.exists() or payment.vote_transactions.exists()
+                 or payment.payment_purpose == 'donation')
+        )
+
+        payment.status = 'successful'
+        receipt = processed.get('mpesa_receipt_number')
+        if receipt:
+            payment.mpesa_code = receipt
+        payment.save()
+
+        if already_processed:
+            logger.info('mpesa_callback: payment %s already processed, acknowledging retry', payment.id)
+            return ack
+
+        # Route based on payment_purpose
+        if payment.payment_purpose == 'ticket':
+            results = EventViewSet()._process_ticket_payment(payment, payment.event)
+            purpose = 'ticket'
+        elif payment.payment_purpose == 'vote':
+            results = EventViewSet()._process_vote_payment(payment, payment.event, None)
+            purpose = 'vote'
         else:
-            # Payment failed
-            payment.status = 'failed'
-            payment.save()
-        
-        return Response({'status': 'success'})
-    
-    except Exception as e:
-        return Response({'error': f'Callback processing failed: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            results = None
+            purpose = payment.payment_purpose or 'donation'
+
+        try:
+            AuditLog.objects.create(
+                action='payment_verified',
+                actor='system',
+                details=json.dumps({
+                    'payment_id': payment.id,
+                    'mpesa_code': payment.mpesa_code,
+                    'amount': str(payment.amount),
+                    'payment_purpose': purpose,
+                    'source': 'mpesa_callback',
+                    'results': results,
+                }),
+                event=payment.event,
+            )
+        except Exception:
+            logger.exception('mpesa_callback: failed to write AuditLog for payment %s', payment.id)
+
+        return ack
+
+    except Exception:
+        logger.exception('mpesa_callback: unexpected error. Raw=%s', callback_data)
+        return ack
 
 
 # ── Helper ───────────────────────────────────────────────────────────────────
