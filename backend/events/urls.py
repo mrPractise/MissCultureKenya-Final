@@ -5,7 +5,7 @@ from .views import (
     TicketCategoryViewSet, ContestantViewSet, PaymentViewSet,
     TicketViewSet, VoteTransactionViewSet, AuditLogViewSet,
     verify_votes_by_phone, ticket_lookup, mpesa_callback,
-    initiate_contribution_payment,
+    initiate_contribution_payment, contribution_status,
     pesapal_ipn_callback, pesapal_payment_redirect,
 )
 
@@ -24,6 +24,7 @@ urlpatterns = [
     path('verify-votes/', verify_votes_by_phone, name='verify-votes'),
     path('ticket-lookup/', ticket_lookup, name='ticket-lookup'),
     path('contributions/initiate/', initiate_contribution_payment, name='initiate-contribution-payment'),
+    path('contributions/<int:pk>/', contribution_status, name='contribution-status'),
     path('pesapal-ipn/', pesapal_ipn_callback, name='pesapal-ipn'),
     path('pesapal-redirect/', pesapal_payment_redirect, name='pesapal-redirect'),
     path('mpesa-callback/', mpesa_callback, name='mpesa-callback'),

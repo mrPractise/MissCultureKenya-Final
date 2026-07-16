@@ -26,7 +26,7 @@ from .serializers import (
     VoteTransactionSerializer, AuditLogSerializer,
     LiveResultSerializer, VoteVerifySerializer,
     PesaPalVotePaymentRequestSerializer, PesaPalTicketPaymentRequestSerializer,
-    ContributionCheckoutSerializer,
+    ContributionCheckoutSerializer, ContributionSerializer,
 )
 from .utils import (
     generate_ticket_code, calculate_vote_count, 
@@ -370,9 +370,10 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
             payment_purpose='vote',
         )
 
-        # Initiate STK Push
+        # Initiate STK Push. Safaricom caps AccountReference at ~12 chars, so we
+        # trim the contestant name to fit (falling back to a stable reference).
         callback_url = _absolute_backend_url(request, '/api/events/mpesa-callback/')
-        account_reference = f"VOTE-{payment.id}"
+        account_reference = (contestant.name or '').strip()[:12] or f"VOTE-{payment.id}"
         transaction_desc = f'Vote for {contestant.name}'
 
         stk_result = initiate_stk_push(
@@ -974,63 +975,63 @@ def ticket_lookup(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def initiate_contribution_payment(request):
+    """Initiate an M-Pesa STK Push for a public contribution/donation.
+
+    Contributions are tracked in the separate Contribution model (kept apart
+    from tickets/votes so vote counts are never affected). Confirmation happens
+    asynchronously via the shared mpesa-callback endpoint.
+    """
     serializer = ContributionCheckoutSerializer(data=request.data)
     if not serializer.is_valid():
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     data = serializer.validated_data
-    merchant_ref = f"MCK-CONTRIB-{uuid.uuid4().hex[:12].upper()}"
-
-    # Split full name into first/last for PesaPal billing
-    name_parts = data['full_name'].strip().split(maxsplit=1)
-    first_name = name_parts[0]
-    last_name = name_parts[1] if len(name_parts) > 1 else ''
+    phone_number = (data.get('phone_number') or '').strip()
+    if not phone_number:
+        return Response(
+            {'success': False, 'error': 'An M-Pesa phone number is required.'},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
     contribution = Contribution.objects.create(
         full_name=data['full_name'],
         email=data['email'],
-        phone_number=data.get('phone_number', ''),
+        phone_number=phone_number,
         amount=data['amount'],
-        pesapal_merchant_ref=merchant_ref,
     )
 
-    ipn_id = getattr(settings, 'PESAPAL_IPN_ID', '')
-    callback_url = _absolute_backend_url(request, '/api/events/pesapal-redirect/')
-    frontend_success = _frontend_url('/contribute?payment=success')
-
-    result = submit_order(
-        order_id=merchant_ref,
+    # Initiate STK Push. Safaricom caps AccountReference at ~12 chars.
+    callback_url = _absolute_backend_url(request, '/api/events/mpesa-callback/')
+    account_reference = (data['full_name'] or '').strip()[:12] or 'CONTRIBUTE'
+    stk_result = initiate_stk_push(
+        phone_number=phone_number,
         amount=contribution.amount,
-        currency='KES',
-        description='Contribution to Miss Culture Global Kenya',
+        account_reference=account_reference,
+        transaction_desc='Contribution',
         callback_url=callback_url,
-        notification_id=ipn_id,
-        first_name=first_name,
-        last_name=last_name,
-        email=contribution.email,
-        phone_number=contribution.phone_number,
     )
 
-    contribution.pesapal_response = result.get('raw', {})
-    contribution.pesapal_tracking_id = result.get('order_tracking_id', '')
+    contribution.stk_response = stk_result.get('raw', {})
 
-    if not result.get('success'):
+    if not stk_result.get('success'):
         contribution.status = 'failed'
         contribution.save()
         return Response({
             'success': False,
-            'error': result.get('error', 'Failed to create PesaPal order.'),
+            'error': stk_result.get('error', 'Failed to send the M-Pesa prompt.'),
             'contribution_id': contribution.id,
         }, status=status.HTTP_502_BAD_GATEWAY)
 
+    contribution.checkout_request_id = stk_result.get('checkout_request_id', '')
+    contribution.merchant_request_id = stk_result.get('merchant_request_id', '')
     contribution.save()
+
     return Response({
         'success': True,
-        'redirect_url': result.get('redirect_url'),
-        'order_tracking_id': contribution.pesapal_tracking_id,
-        'merchant_ref': contribution.pesapal_merchant_ref,
+        'checkout_request_id': contribution.checkout_request_id,
+        'merchant_request_id': contribution.merchant_request_id,
         'contribution_id': contribution.id,
-        'message': 'Continue to PesaPal checkout to complete your contribution.',
+        'message': stk_result.get('customer_message') or 'Check your phone for the M-Pesa prompt to complete your contribution.',
     })
 
 
@@ -1048,7 +1049,70 @@ def _process_successful_payment(payment):
     return {}
 
 
+def _handle_contribution_callback(contribution, processed, ack):
+    """Confirm or fail a Contribution from an M-Pesa STK callback.
 
+    Idempotent: repeated callbacks for an already-successful contribution are
+    acknowledged without re-notifying.
+    """
+    contribution.stk_response = processed.get('raw', {})
+    result_code = processed.get('result_code')
+
+    if result_code != 0:
+        if contribution.status != 'successful':
+            contribution.status = 'failed'
+        contribution.save()
+        logger.info(
+            'mpesa_callback: contribution %s failed (ResultCode=%s, %s)',
+            contribution.id, result_code, processed.get('result_desc')
+        )
+        return ack
+
+    already_successful = contribution.status == 'successful'
+    contribution.status = 'successful'
+    receipt = processed.get('mpesa_receipt_number')
+    if receipt:
+        contribution.mpesa_code = receipt
+    contribution.save()
+
+    if not already_successful:
+        try:
+            send_telegram_message(
+                f"\U0001f4b0 <b>New Contribution!</b>\n\n"
+                f"Name: {contribution.full_name}\n"
+                f"Amount: KES {contribution.amount}\n"
+                f"Phone: {contribution.phone_number}\n"
+                f"M-Pesa Code: {contribution.mpesa_code or '-'}"
+            )
+        except Exception:
+            pass
+        try:
+            AuditLog.objects.create(
+                action='payment_verified',
+                actor='system',
+                details=json.dumps({
+                    'contribution_id': contribution.id,
+                    'mpesa_code': contribution.mpesa_code,
+                    'amount': str(contribution.amount),
+                    'payment_purpose': 'donation',
+                    'source': 'mpesa_callback',
+                }),
+                event=None,
+            )
+        except Exception:
+            logger.exception('mpesa_callback: failed to write AuditLog for contribution %s', contribution.id)
+
+    return ack
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def contribution_status(request, pk):
+    """Public: poll the status of a contribution by id (for the STK flow)."""
+    contribution = Contribution.objects.filter(pk=pk).first()
+    if not contribution:
+        return Response({'error': 'Contribution not found.'}, status=status.HTTP_404_NOT_FOUND)
+    return Response(ContributionSerializer(contribution).data)
 
 
 @api_view(['POST'])
@@ -1081,7 +1145,11 @@ def mpesa_callback(request):
 
         payment = Payment.objects.filter(checkout_request_id=checkout_request_id).first()
         if not payment:
-            logger.warning('mpesa_callback: no payment for CheckoutRequestID=%s', checkout_request_id)
+            # Not a ticket/vote payment — it may be a contribution/donation.
+            contribution = Contribution.objects.filter(checkout_request_id=checkout_request_id).first()
+            if contribution:
+                return _handle_contribution_callback(contribution, processed, ack)
+            logger.warning('mpesa_callback: no payment/contribution for CheckoutRequestID=%s', checkout_request_id)
             return ack
 
         payment.stk_response = processed.get('raw', {})

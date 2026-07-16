@@ -442,8 +442,8 @@ class PesaPalTicketPaymentRequestSerializer(serializers.Serializer):
 
 class ContributionCheckoutSerializer(serializers.Serializer):
     full_name = serializers.CharField(max_length=200, required=True)
-    email = serializers.EmailField(required=True)
-    phone_number = serializers.CharField(max_length=20, required=False, allow_blank=True)
+    email = serializers.EmailField(required=False, allow_blank=True, default='')
+    phone_number = serializers.CharField(max_length=20, required=True)
     amount = serializers.DecimalField(max_digits=10, decimal_places=2, required=True, min_value=1)
 
 
@@ -452,7 +452,7 @@ class ContributionSerializer(serializers.ModelSerializer):
         model = Contribution
         fields = [
             'id', 'full_name', 'email', 'phone_number', 'amount', 'status',
-            'pesapal_tracking_id', 'pesapal_merchant_ref',
+            'mpesa_code', 'checkout_request_id',
             'created_at', 'updated_at',
         ]
         read_only_fields = fields

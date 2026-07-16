@@ -253,10 +253,15 @@ const apiClient = {
     return handle(client.post(`/api/events/events/${eventId}/initiate_ticket_payment/`, data))
   },
 
-  // Initiate PesaPal checkout for public contributions
-  // Returns { success, redirect_url, order_tracking_id, merchant_ref, contribution_id, message }
+  // Initiate M-Pesa STK Push for public contributions
+  // Returns { success, checkout_request_id, merchant_request_id, contribution_id, message }
   initiateContributionPayment(data: { full_name: string; email: string; phone_number?: string; amount: number }) {
     return handle(client.post('/api/events/contributions/initiate/', data))
+  },
+
+  // Contribution status check (for polling the STK flow)
+  getContributionStatus(contributionId: number | string) {
+    return handle(client.get(`/api/events/contributions/${contributionId}/`))
   },
 
   // Ticket categories for an event

@@ -299,7 +299,7 @@ class Payment(models.Model):
 
 
 class Contribution(models.Model):
-    """Model for public contribution payments via PesaPal."""
+    """Model for public contribution payments via M-Pesa Daraja STK Push."""
     STATUS_CHOICES = [
         ('pending', 'Pending'),
         ('successful', 'Successful'),
@@ -309,11 +309,18 @@ class Contribution(models.Model):
     ]
 
     full_name = models.CharField(max_length=200)
-    email = models.EmailField()
+    email = models.EmailField(blank=True, default='')
     phone_number = models.CharField(max_length=20, blank=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
-    # PesaPal fields
+    mpesa_code = models.CharField(max_length=20, blank=True, default='', help_text="M-Pesa transaction code")
+
+    # Daraja STK Push fields
+    checkout_request_id = models.CharField(max_length=50, blank=True, default='', help_text="Daraja CheckoutRequestID from STK Push")
+    merchant_request_id = models.CharField(max_length=50, blank=True, default='', help_text="Daraja MerchantRequestID from STK Push")
+    stk_response = models.JSONField(default=dict, blank=True, help_text="Raw STK Push response/callback data for debugging")
+
+    # PesaPal fields (kept for backward compatibility/legacy data)
     pesapal_tracking_id = models.CharField(max_length=100, blank=True, default='')
     pesapal_merchant_ref = models.CharField(max_length=100, blank=True, default='')
     pesapal_response = models.JSONField(default=dict, blank=True)

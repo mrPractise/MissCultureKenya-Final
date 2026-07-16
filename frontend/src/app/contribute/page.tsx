@@ -44,6 +44,45 @@ const ContributePage = () => {
   const [error, setError] = useState('')
 
   const [successMsg, setSuccessMsg] = useState('')
+  const [pending, setPending] = useState(false)
+  const [pendingMsg, setPendingMsg] = useState('')
+  const [contributionId, setContributionId] = useState<number | null>(null)
+
+  // Poll the contribution status while the M-Pesa prompt is pending.
+  useEffect(() => {
+    if (!pending || !contributionId) return
+    let attempts = 0
+    const maxAttempts = 40 // ~2 minutes at 3s intervals
+    const interval = setInterval(async () => {
+      attempts += 1
+      try {
+        const res = await apiClient.getContributionStatus(contributionId)
+        if (res?.status === 'successful') {
+          clearInterval(interval)
+          setPending(false)
+          setPendingMsg('')
+          setSuccessMsg('Thank you! Your contribution was received successfully.')
+          return
+        }
+        if (res?.status === 'failed' || res?.status === 'cancelled') {
+          clearInterval(interval)
+          setPending(false)
+          setPendingMsg('')
+          setError('Payment was not completed or was cancelled. Please try again.')
+          return
+        }
+      } catch {
+        // Ignore transient errors and keep polling.
+      }
+      if (attempts >= maxAttempts) {
+        clearInterval(interval)
+        setPending(false)
+        setPendingMsg('')
+        setError("We didn't get a confirmation in time. If you completed the payment on your phone, it will reflect shortly.")
+      }
+    }, 3000)
+    return () => clearInterval(interval)
+  }, [pending, contributionId])
 
   // Handle payment return URL params
   useEffect(() => {
@@ -64,8 +103,8 @@ const ContributePage = () => {
       setError('Please enter your name.')
       return
     }
-    if (!email.trim()) {
-      setError('Please enter your email.')
+    if (!phone.trim()) {
+      setError('Please enter your M-Pesa phone number.')
       return
     }
     if (!numericAmount || numericAmount < 1) {
@@ -75,6 +114,7 @@ const ContributePage = () => {
 
     setSubmitting(true)
     setError('')
+    setSuccessMsg('')
     try {
       const result = await apiClient.initiateContributionPayment({
         full_name: fullName.trim(),
@@ -83,10 +123,13 @@ const ContributePage = () => {
         amount: numericAmount,
       })
 
-      if (result?.success && result.redirect_url) {
-        window.location.href = result.redirect_url
+      if (result?.success) {
+        // STK Push sent — wait on the phone and poll for confirmation.
+        setContributionId(result.contribution_id || null)
+        setPendingMsg(result.message || 'Check your phone for the M-Pesa prompt and enter your PIN to complete your contribution.')
+        setPending(true)
       } else {
-        setError(result?.error || 'Failed to start payment.')
+        setError(result?.error || 'Failed to send the M-Pesa prompt.')
       }
     } catch (err) {
       const apiErr = err as ApiError
@@ -218,7 +261,7 @@ const ContributePage = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">Email</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">Email <span className="font-normal text-gray-400">(optional)</span></label>
                   <input
                     type="email"
                     value={email}
@@ -254,6 +297,13 @@ const ContributePage = () => {
                   </div>
                 )}
 
+                {pending && (
+                  <div className="flex items-start gap-2 p-3 bg-blue-50 border border-blue-200 rounded-xl">
+                    <Loader2 className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0 animate-spin" />
+                    <p className="text-sm text-blue-700">{pendingMsg || 'Waiting for M-Pesa confirmation...'}</p>
+                  </div>
+                )}
+
                 {error && (
                   <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-xl">
                     <AlertCircle className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />
@@ -264,11 +314,11 @@ const ContributePage = () => {
                 <button
                   type="button"
                   onClick={handleSubmit}
-                  disabled={submitting}
+                  disabled={submitting || pending}
                   className="w-full bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white py-3.5 rounded-xl font-bold transition-colors flex items-center justify-center gap-2"
                 >
-                  {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
-                  Continue to Secure Checkout
+                  {(submitting || pending) ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                  {submitting ? 'Sending M-Pesa prompt...' : pending ? 'Waiting for confirmation...' : 'Pay with M-Pesa'}
                 </button>
               </div>
             </motion.div>

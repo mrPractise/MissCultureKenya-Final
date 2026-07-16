@@ -662,7 +662,7 @@ const EventDetailPage = () => {
                       <div className="flex-1 min-w-0">
                         <h4 className="font-semibold text-gray-900 text-sm sm:text-base">{tc.name}</h4>
                         {tc.description && <p className="text-xs text-gray-500 line-clamp-2">{tc.description}</p>}
-                        <p className="text-xs text-gray-400 mt-1">{tc.available} of {tc.total} available</p>
+                        <p className="text-xs text-gray-400 mt-1">{Number(tc.available) || 0} of {Math.max(Number(tc.total) || 0, Number(tc.available) || 0)} available</p>
                       </div>
                       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
                         <span className="text-base sm:text-lg font-bold text-green-700 whitespace-nowrap text-center sm:text-left">

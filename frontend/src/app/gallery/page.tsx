@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Camera, Video, Download, Share2, MapPin, Calendar, Play, ChevronRight } from 'lucide-react'
+import { Camera, Video, Download, Share2, MapPin, Calendar, ChevronRight } from 'lucide-react'
 import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import PhotoLightboxModal from '@/components/PhotoLightboxModal'
@@ -526,10 +526,6 @@ const GalleryPage = () => {
                       {video.category && (
                         <span className="bg-gray-100 px-3 py-1 rounded-full text-xs font-medium uppercase tracking-wide">{video.category}</span>
                       )}
-                      <div className="flex items-center space-x-2">
-                        <Play className="w-3.5 h-3.5" />
-                        <span>{video.views} views</span>
-                      </div>
                     </div>
                   </div>
                 </motion.div>
