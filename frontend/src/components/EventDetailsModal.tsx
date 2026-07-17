@@ -314,7 +314,7 @@ const EventDetailsModal = ({ isOpen, onClose, event }: EventDetailsModalProps) =
                         <div className="flex justify-between items-center mb-2">
                           <div className="flex-1 min-w-0">
                             <h5 className="font-semibold text-gray-900 text-sm">{ticket.name}</h5>
-                            <p className="text-xs text-gray-500">{ticket.description} · {ticket.available}/{ticket.total} left</p>
+                            <p className="text-xs text-gray-500">{ticket.description} · {Number(ticket.available) || 0} of {Math.max(Number(ticket.total) || 0, Number(ticket.available) || 0)} available</p>
                           </div>
                           <p className="text-sm font-bold text-red-600 ml-3">{ticket.price}</p>
                         </div>

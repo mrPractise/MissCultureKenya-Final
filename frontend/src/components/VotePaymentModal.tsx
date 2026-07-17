@@ -248,9 +248,14 @@ const VotePaymentModal = ({ isOpen, onClose, event, contestant }: VotePaymentMod
                     <input
                       type="tel"
                       value={phone}
-                      onChange={(e) => { setPhone(e.target.value.replace(/\D/g, '')); setError('') }}
+                      onChange={(e) => {
+                        let v = e.target.value.replace(/\D/g, '')
+                        if (v.startsWith('254')) v = v.slice(3)
+                        else if (v.startsWith('0')) v = v.slice(1)
+                        setPhone(v.slice(0, 9)); setError('')
+                      }}
                       placeholder="712345678"
-                      maxLength={9}
+                      maxLength={12}
                       className="flex-1 px-3 py-3 border border-gray-300 rounded-r-xl focus:ring-2 focus:ring-green-500 focus:border-green-500"
                     />
                   </div>

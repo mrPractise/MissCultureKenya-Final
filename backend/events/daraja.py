@@ -104,11 +104,16 @@ def initiate_stk_push(phone_number, amount, account_reference, transaction_desc,
     
     access_token = auth_result['access_token']
     
-    # Format phone number (ensure it starts with 254)
-    if phone_number.startswith('0'):
+    # Normalize the phone number to the 2547XXXXXXXX / 2541XXXXXXXX format that
+    # Safaricom expects, no matter how the user typed it (0712..., +254712...,
+    # 254712..., or just 712...). Strip spaces and any other formatting first.
+    phone_number = ''.join(ch for ch in str(phone_number) if ch.isdigit())
+    if phone_number.startswith('254'):
+        pass
+    elif phone_number.startswith('0'):
         phone_number = '254' + phone_number[1:]
-    elif phone_number.startswith('+'):
-        phone_number = phone_number[1:]
+    elif phone_number.startswith('7') or phone_number.startswith('1'):
+        phone_number = '254' + phone_number
     
     # Generate timestamp and password
     timestamp = datetime.datetime.now().strftime('%Y%m%d%H%M%S')

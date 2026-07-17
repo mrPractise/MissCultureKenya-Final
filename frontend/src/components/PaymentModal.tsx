@@ -180,12 +180,14 @@ const PaymentModal = ({ isOpen, onClose, event, ticketQuantities, totalPrice, to
         ticket_breakdown: breakdown,
       })
 
-      if (result.success && result.redirect_url) {
-        setCheckoutId(result.order_tracking_id || '')
+      if (result.success) {
+        // M-Pesa STK Push sent to the phone; move to the waiting step and poll for confirmation.
+        setCheckoutId(result.checkout_request_id || '')
         setPaymentId(result.payment_id || null)
-        window.location.href = result.redirect_url
+        setPaymentStatus('pending')
+        setCurrentStep('processing')
       } else {
-        setError(result.error || 'Failed to open checkout. Please try again.')
+        setError(result.error || 'Failed to send the M-Pesa prompt. Please try again.')
       }
     } catch (err) {
       const apiErr = err as ApiError
@@ -363,9 +365,14 @@ const PaymentModal = ({ isOpen, onClose, event, ticketQuantities, totalPrice, to
                   <input
                     type="tel"
                     value={phone}
-                    onChange={(e) => { setPhone(e.target.value.replace(/\D/g, '')); setError('') }}
+                    onChange={(e) => {
+                      let v = e.target.value.replace(/\D/g, '')
+                      if (v.startsWith('254')) v = v.slice(3)
+                      else if (v.startsWith('0')) v = v.slice(1)
+                      setPhone(v.slice(0, 9)); setError('')
+                    }}
                     placeholder="712345678"
-                    maxLength={9}
+                    maxLength={12}
                     className="flex-1 px-3 py-3 border border-gray-300 rounded-r-xl focus:ring-2 focus:ring-green-500 focus:border-green-500"
                   />
                 </div>
@@ -418,7 +425,7 @@ const PaymentModal = ({ isOpen, onClose, event, ticketQuantities, totalPrice, to
                 {submitting ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    Opening Checkout...
+                    Sending M-Pesa prompt...
                   </>
                 ) : (
                   <>
@@ -467,8 +474,8 @@ const PaymentModal = ({ isOpen, onClose, event, ticketQuantities, totalPrice, to
                 <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-left space-y-2">
                   <p className="text-sm text-blue-800 font-medium">What to do next:</p>
                   <ol className="text-sm text-blue-700 space-y-1.5 list-decimal list-inside">
-                    <li>Complete payment on the checkout page</li>
-                    <li>Use M-Pesa when prompted</li>
+                    <li>Check your phone for the M-Pesa pop-up</li>
+                    <li>Enter your M-Pesa PIN to confirm</li>
                     <li>Keep this window open to receive your tickets</li>
                   </ol>
                 </div>

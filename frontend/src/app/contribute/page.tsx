@@ -271,13 +271,24 @@ const ContributePage = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1.5">M-Pesa Phone Number</label>
-                  <input
-                    type="tel"
-                    value={phone}
-                    onChange={(e) => { setPhone(e.target.value.replace(/[^\d+]/g, '')); setError('') }}
-                    placeholder="0712345678"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                  />
+                  <div className="flex">
+                    <span className="inline-flex items-center px-3 bg-gray-100 border border-r-0 border-gray-300 rounded-l-xl text-sm text-gray-600 font-medium">
+                      +254
+                    </span>
+                    <input
+                      type="tel"
+                      value={phone}
+                      onChange={(e) => {
+                        let v = e.target.value.replace(/\D/g, '')
+                        if (v.startsWith('254')) v = v.slice(3)
+                        else if (v.startsWith('0')) v = v.slice(1)
+                        setPhone(v.slice(0, 9)); setError('')
+                      }}
+                      placeholder="712345678"
+                      maxLength={12}
+                      className="flex-1 px-4 py-3 border border-gray-300 rounded-r-xl focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                    />
+                  </div>
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1.5">Amount (KES)</label>
