@@ -302,24 +302,46 @@ const EventDetailsModal = ({ isOpen, onClose, event }: EventDetailsModalProps) =
                 <div>
                   <h4 className="font-semibold text-gray-900 mb-2.5 text-sm">Tickets</h4>
                   <div className="space-y-2">
-                    {event.ticketCategories.map((ticket, index) => (
+                    {event.ticketCategories.map((ticket, index) => {
+                      const availableNum = Number(ticket.available) || 0
+                      const totalNum = Number(ticket.total) || 0
+                      // Sold out only when the category has a set capacity that's fully depleted.
+                      const isSoldOut = totalNum > 0 && availableNum <= 0
+                      return (
                       <div
                         key={index}
                         className={`p-3 border-2 rounded-xl transition-all duration-200 ${
-                          selectedTicketCategory === ticket.name
+                          isSoldOut
+                            ? 'border-gray-200 bg-gray-50 opacity-75'
+                            : selectedTicketCategory === ticket.name
                             ? 'border-red-500 bg-red-50'
                             : 'border-gray-200 hover:border-gray-300'
                         }`}
                       >
                         <div className="flex justify-between items-center mb-2">
                           <div className="flex-1 min-w-0">
-                            <h5 className="font-semibold text-gray-900 text-sm">{ticket.name}</h5>
-                            <p className="text-xs text-gray-500">{ticket.description} · {Number(ticket.available) || 0} of {Math.max(Number(ticket.total) || 0, Number(ticket.available) || 0)} available</p>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <h5 className="font-semibold text-gray-900 text-sm">{ticket.name}</h5>
+                              {isSoldOut && (
+                                <span className="text-[10px] font-bold uppercase tracking-wide text-red-600 bg-red-50 border border-red-200 px-2 py-0.5 rounded-full">Sold Out</span>
+                              )}
+                            </div>
+                            <p className="text-xs text-gray-500">
+                              {ticket.description}{ticket.description ? ' · ' : ''}
+                              {isSoldOut ? 'Sold out' : `${availableNum} of ${Math.max(totalNum, availableNum)} available`}
+                            </p>
                           </div>
                           <p className="text-sm font-bold text-red-600 ml-3">{ticket.price}</p>
                         </div>
-                        
+
                         {/* Quantity Selector */}
+                        {isSoldOut ? (
+                          <div className="flex justify-end">
+                            <span className="px-3 py-1 rounded-lg bg-gray-100 text-gray-500 text-xs font-semibold border border-gray-200">
+                              Sold Out
+                            </span>
+                          </div>
+                        ) : (
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-2">
                             <button
@@ -351,8 +373,10 @@ const EventDetailsModal = ({ isOpen, onClose, event }: EventDetailsModalProps) =
                             {selectedTicketCategory === ticket.name ? 'Selected' : 'Select'}
                           </button>
                         </div>
+                        )}
                       </div>
-                    ))}
+                      )
+                    })}
                   </div>
                   
                   {/* Total Summary */}

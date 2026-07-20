@@ -662,20 +662,44 @@ const EventDetailPage = () => {
               <div>
                 <h2 className="text-xl font-bold text-gray-900 mb-3">Tickets</h2>
                 <div className="space-y-3">
-                  {ticketCategories.map((tc) => (
+                  {ticketCategories.map((tc) => {
+                    const availableNum = Number(tc.available) || 0
+                    const totalNum = Number(tc.total) || 0
+                    // A category is capacity-limited only when a total is set.
+                    // It's sold out when that capacity has been fully depleted.
+                    const isSoldOut = totalNum > 0 && availableNum <= 0
+                    return (
                     <div
                       key={tc.id}
-                      className="p-4 border-2 rounded-xl flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 transition-all border-gray-200 hover:border-green-300 hover:bg-green-50/50"
+                      className={`p-4 border-2 rounded-xl flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 transition-all ${
+                        isSoldOut
+                          ? 'border-gray-200 bg-gray-50 opacity-75'
+                          : 'border-gray-200 hover:border-green-300 hover:bg-green-50/50'
+                      }`}
                     >
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-semibold text-gray-900 text-sm sm:text-base">{tc.name}</h4>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h4 className="font-semibold text-gray-900 text-sm sm:text-base">{tc.name}</h4>
+                          {isSoldOut && (
+                            <span className="text-[10px] font-bold uppercase tracking-wide text-red-600 bg-red-50 border border-red-200 px-2 py-0.5 rounded-full">Sold Out</span>
+                          )}
+                        </div>
                         {tc.description && <p className="text-xs text-gray-500 line-clamp-2">{tc.description}</p>}
-                        <p className="text-xs text-gray-400 mt-1">{Number(tc.available) || 0} of {Math.max(Number(tc.total) || 0, Number(tc.available) || 0)} available</p>
+                        {isSoldOut ? (
+                          <p className="text-xs font-semibold text-red-600 mt-1">Sold out</p>
+                        ) : (
+                          <p className="text-xs text-gray-400 mt-1">{availableNum} of {Math.max(totalNum, availableNum)} available</p>
+                        )}
                       </div>
                       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
                         <span className="text-base sm:text-lg font-bold text-green-700 whitespace-nowrap text-center sm:text-left">
                           {Number(tc.price) === 0 ? 'Free' : `KES ${Number(tc.price).toLocaleString()}`}
                         </span>
+                        {isSoldOut ? (
+                          <span className="px-4 py-2 rounded-xl bg-gray-100 text-gray-500 text-sm font-semibold text-center border border-gray-200 whitespace-nowrap">
+                            Sold Out
+                          </span>
+                        ) : (
                         <div className="flex items-center gap-2 justify-center sm:justify-start">
                           <button
                             type="button"
@@ -697,9 +721,11 @@ const EventDetailPage = () => {
                             +
                           </button>
                         </div>
+                        )}
                       </div>
                     </div>
-                  ))}
+                    )
+                  })}
                 </div>
                 {totalTickets > 0 && (
                   <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
