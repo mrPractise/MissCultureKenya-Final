@@ -55,7 +55,7 @@ const faqCategories = [
       },
       {
         question: 'How is voting done?',
-        answer: 'Voting is done through our website using M-Pesa via PesaPal. Each vote has a set price (varies by event). You can vote as many times as you like — your votes are counted immediately after payment confirmation. Live vote counts may be displayed depending on the event\'s visibility settings.'
+        answer: 'Voting is done through our website using M-Pesa. Each vote has a set price (varies by event). You can vote as many times as you like — your votes are counted immediately after payment confirmation. Live vote counts may be displayed depending on the event\'s visibility settings.'
       }
     ]
   },
@@ -99,7 +99,7 @@ const faqCategories = [
       },
       {
         question: 'Can individuals donate?',
-        answer: 'Absolutely. Individual donations of any amount are welcome. You can contribute via M-Pesa or card through our secure PesaPal checkout. Suggested amounts start at KES 500.'
+        answer: 'Absolutely. Individual donations of any amount are welcome. You can contribute securely via M-Pesa. Suggested amounts start at KES 500.'
       },
       {
         question: 'What are the partnership requirements?',

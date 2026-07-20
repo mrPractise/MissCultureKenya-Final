@@ -1,11 +1,11 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Calendar, Clock, MapPin, Users, ExternalLink, Share2, ArrowLeft, Vote, Check, Ticket, AlertCircle, Loader2, Mail, Phone, User, CreditCard } from 'lucide-react'
+import { Calendar, Clock, MapPin, Users, ExternalLink, Share2, ArrowLeft, Vote, Check, Ticket, AlertCircle, Loader2, Mail, Phone, User, CreditCard, Download } from 'lucide-react'
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
-import apiClient from '@/lib/api'
+import apiClient, { downloadTickets } from '@/lib/api'
 import type { ApiError } from '@/lib/api'
 
 interface TicketCategoryData {
@@ -277,8 +277,12 @@ const EventDetailPage = () => {
   }
 
   const handleRegisterTicket = async () => {
-    if (!regName || !regEmail) {
-      setRegError('Name and email are required')
+    if (!regName) {
+      setRegError('Name is required')
+      return
+    }
+    if (regEmail.trim() && !regEmail.includes('@')) {
+      setRegError('Please enter a valid email address, or leave it blank')
       return
     }
     if (selectedItems.length === 0) {
@@ -315,6 +319,10 @@ const EventDetailPage = () => {
         }
       }
       setRegSuccess({ ticket_codes: ticketCodes })
+      // Auto-download the issued ticket(s) so the attendee keeps a copy.
+      if (ticketCodes.length > 0) {
+        downloadTickets(ticketCodes)
+      }
     } catch (err) {
       const apiErr = err as ApiError
       setRegError(apiErr.message || 'Failed to register ticket')
@@ -834,7 +842,7 @@ const EventDetailPage = () => {
                   </p>
                 ) : (
                   <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-3">
-                    This is a paid ticket. You'll be redirected to PesaPal for secure payment when you continue.
+                    This is a paid ticket. You&apos;ll pay securely with M-Pesa on the next step.
                   </p>
                 )}
 
@@ -873,7 +881,7 @@ const EventDetailPage = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Email <span className="text-gray-400 font-normal">(optional)</span></label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <input
@@ -901,7 +909,7 @@ const EventDetailPage = () => {
                   </div>
                 </div>
 
-                {/* Paid tickets redirect to PesaPal; manual M-Pesa codes are no longer required */}
+                {/* Paid tickets are completed via M-Pesa STK Push on the checkout page */}
 
                 {regError && (
                   <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-xl">
@@ -923,7 +931,7 @@ const EventDetailPage = () => {
                     className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white py-2.5 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2 text-sm"
                   >
                     {regSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Ticket className="w-4 h-4" />}
-                    {!requiresPayment ? 'Get Ticket' : 'Continue to PesaPal'}
+                    {!requiresPayment ? 'Get Ticket' : 'Pay with M-Pesa'}
                   </button>
                 </div>
               </div>
@@ -938,6 +946,14 @@ const EventDetailPage = () => {
                 <h3 className="font-bold text-green-900 text-lg">
                   {regSuccess?.ticket_code || regSuccess?.ticket_codes?.length ? 'Ticket Registered!' : 'Payment Submitted!'}
                 </h3>
+                {(regSuccess.ticket_code || regSuccess?.ticket_codes?.length) && (
+                  <div className="flex items-start gap-2 bg-blue-50 border border-blue-200 rounded-lg p-3 text-left">
+                    <Download className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                    <p className="text-sm text-blue-800">
+                      Your ticket has been downloaded to your device. Check your downloads, or use the button below.
+                    </p>
+                  </div>
+                )}
                 {(regSuccess.ticket_code || regSuccess?.ticket_codes?.length) && (
                   <div className="bg-white rounded-lg p-3 inline-block text-left">
                     <p className="text-xs text-gray-500 mb-2">Ticket Code{regSuccess?.ticket_codes?.length > 1 ? 's' : ''}</p>
@@ -959,23 +975,39 @@ const EventDetailPage = () => {
                     : 'Your payment has been submitted for verification. Your ticket will be issued after confirmation.'}
                 </p>
                 {regSuccess.ticket_code && (
-                  <Link
-                    href={`/events/${eventId}/ticket/${encodeURIComponent(regSuccess.ticket_code)}`}
-                    className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-colors"
-                  >
-                    <Ticket className="w-4 h-4" /> View Ticket
-                  </Link>
+                  <div className="flex flex-wrap justify-center gap-2">
+                    <Link
+                      href={`/events/${eventId}/ticket/${encodeURIComponent(regSuccess.ticket_code)}`}
+                      className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-colors"
+                    >
+                      <Ticket className="w-4 h-4" /> View Ticket
+                    </Link>
+                    <a
+                      href={apiClient.ticketPdfUrl(regSuccess.ticket_code)}
+                      className="inline-flex items-center gap-2 bg-white border border-green-600 text-green-700 hover:bg-green-50 px-5 py-2.5 rounded-xl font-semibold text-sm transition-colors"
+                    >
+                      <Download className="w-4 h-4" /> Download
+                    </a>
+                  </div>
                 )}
                 {Array.isArray(regSuccess.ticket_codes) && regSuccess.ticket_codes.length > 0 && (
                   <div className="flex flex-wrap justify-center gap-2">
                     {regSuccess.ticket_codes.map((code: string) => (
-                      <Link
-                        key={code}
-                        href={`/events/${eventId}/ticket/${encodeURIComponent(code)}`}
-                        className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-xl font-semibold text-sm transition-colors"
-                      >
-                        <Ticket className="w-4 h-4" /> View {code}
-                      </Link>
+                      <div key={code} className="inline-flex items-center gap-1">
+                        <Link
+                          href={`/events/${eventId}/ticket/${encodeURIComponent(code)}`}
+                          className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-l-xl font-semibold text-sm transition-colors"
+                        >
+                          <Ticket className="w-4 h-4" /> View {code}
+                        </Link>
+                        <a
+                          href={apiClient.ticketPdfUrl(code)}
+                          className="inline-flex items-center bg-white border border-green-600 text-green-700 hover:bg-green-50 px-3 py-2 rounded-r-xl font-semibold text-sm transition-colors"
+                          title={`Download ${code}`}
+                        >
+                          <Download className="w-4 h-4" />
+                        </a>
+                      </div>
                     ))}
                   </div>
                 )}
@@ -1004,7 +1036,7 @@ const EventDetailPage = () => {
                 Payment Info
               </h3>
               <p className="text-sm text-green-800">
-                Paid tickets and votes are completed through secure PesaPal checkout.
+                Paid tickets and votes are completed securely with M-Pesa.
               </p>
             </div>
 

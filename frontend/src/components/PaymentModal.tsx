@@ -1,10 +1,10 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Smartphone, X, CheckCircle, ArrowLeft, AlertCircle, Loader2, User, Mail, Ticket as TicketIcon, Wallet } from 'lucide-react'
+import { Smartphone, X, CheckCircle, ArrowLeft, AlertCircle, Loader2, User, Mail, Ticket as TicketIcon, Wallet, Download } from 'lucide-react'
 import MpesaLogo from '@/components/MpesaLogo'
 import { useState, useEffect, useRef } from 'react'
-import apiClient from '@/lib/api'
+import apiClient, { downloadTickets } from '@/lib/api'
 import type { ApiError } from '@/lib/api'
 
 interface TicketCategory {
@@ -81,6 +81,8 @@ const PaymentModal = ({ isOpen, onClose, event, ticketQuantities, totalPrice, to
   const [paymentId, setPaymentId] = useState<number | null>(null)
   const [paymentStatus, setPaymentStatus] = useState<'pending' | 'successful' | 'failed'>('pending')
   const [issuedTickets, setIssuedTickets] = useState<any[]>([])
+  const [autoDownloaded, setAutoDownloaded] = useState(false)
+  const downloadedRef = useRef(false)
   const pollingInterval = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
@@ -115,6 +117,13 @@ const PaymentModal = ({ isOpen, onClose, event, ticketQuantities, totalPrice, to
           const ticketData = await apiClient.get('/api/events/tickets/', { payment: paymentId })
           const tickets = Array.isArray(ticketData) ? ticketData : (ticketData?.results || [])
           setIssuedTickets(tickets)
+          // Auto-download every issued ticket once, so the attendee keeps a copy
+          // even if they close this modal before noting the code.
+          if (!downloadedRef.current && tickets.length > 0) {
+            downloadedRef.current = true
+            downloadTickets(tickets.map((t: any) => t.ticket_code))
+            setAutoDownloaded(true)
+          }
         } catch (e) {
           console.error('Failed to fetch issued tickets', e)
         }
@@ -159,8 +168,10 @@ const PaymentModal = ({ isOpen, onClose, event, ticketQuantities, totalPrice, to
       setError('Please enter your full name')
       return
     }
-    if (!email.trim() || !email.includes('@')) {
-      setError('Please enter a valid email address')
+    // Email is optional (the ticket downloads automatically), but if one is
+    // typed it must be valid so the emailed copy actually reaches them.
+    if (email.trim() && !email.includes('@')) {
+      setError('Please enter a valid email address, or leave it blank')
       return
     }
     if (!phone || phone.length < 9) {
@@ -207,6 +218,8 @@ const PaymentModal = ({ isOpen, onClose, event, ticketQuantities, totalPrice, to
     setPaymentId(null)
     setPaymentStatus('pending')
     setIssuedTickets([])
+    setAutoDownloaded(false)
+    downloadedRef.current = false
     setAgreedToTerms(false)
     setSubmitting(false)
     onClose()
@@ -338,7 +351,7 @@ const PaymentModal = ({ isOpen, onClose, event, ticketQuantities, totalPrice, to
               {/* Email */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Email Address
+                  Email Address <span className="text-gray-400 font-normal">(optional)</span>
                 </label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -350,7 +363,7 @@ const PaymentModal = ({ isOpen, onClose, event, ticketQuantities, totalPrice, to
                     className="w-full pl-9 pr-3 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500"
                   />
                 </div>
-                <p className="text-xs text-gray-500 mt-1">Your ticket confirmation will be sent here</p>
+                <p className="text-xs text-gray-500 mt-1">Your ticket downloads automatically. Add an email to also receive a copy.</p>
               </div>
 
               {/* Phone Number */}
@@ -419,7 +432,7 @@ const PaymentModal = ({ isOpen, onClose, event, ticketQuantities, totalPrice, to
 
               <button
                 onClick={handleSubmit}
-                disabled={submitting || !phone || phone.length < 9 || !fullName || !email || !agreedToTerms}
+                disabled={submitting || !phone || phone.length < 9 || !fullName || !agreedToTerms}
                 className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white py-4 rounded-xl font-bold text-lg transition-all transform hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 shadow-lg shadow-green-600/20"
               >
                 {submitting ? (
@@ -483,20 +496,39 @@ const PaymentModal = ({ isOpen, onClose, event, ticketQuantities, totalPrice, to
 
               {paymentStatus === 'successful' && issuedTickets.length > 0 && (
                 <div className="space-y-3">
+                  {autoDownloaded && (
+                    <div className="flex items-start gap-2 bg-blue-50 border border-blue-200 rounded-xl p-3 text-left">
+                      <Download className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                      <p className="text-sm text-blue-800">
+                        Your ticket{issuedTickets.length > 1 ? 's have' : ' has'} been downloaded to your device. Check your downloads if you don&apos;t see {issuedTickets.length > 1 ? 'them' : 'it'}.
+                      </p>
+                    </div>
+                  )}
                   <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-left">
                     <p className="text-xs text-green-600 font-bold uppercase mb-2">Your Ticket Codes</p>
                     <div className="grid grid-cols-1 gap-2">
                       {issuedTickets.map((t, i) => (
                         <div key={i} className="flex items-center justify-between bg-white p-2 rounded-lg border border-green-100">
-                          <span className="font-mono font-bold text-green-700">{t.ticket_code}</span>
-                          <span className="text-[10px] text-gray-400">{t.ticket_category_name}</span>
+                          <div className="flex flex-col">
+                            <span className="font-mono font-bold text-green-700">{t.ticket_code}</span>
+                            <span className="text-[10px] text-gray-400">{t.ticket_category_name}</span>
+                          </div>
+                          <a
+                            href={apiClient.ticketPdfUrl(t.ticket_code)}
+                            className="flex items-center gap-1 text-xs font-semibold text-green-700 bg-green-100 hover:bg-green-200 px-2.5 py-1.5 rounded-lg transition-colors"
+                            title="Download ticket PDF"
+                          >
+                            <Download className="w-3.5 h-3.5" /> Download
+                          </a>
                         </div>
                       ))}
                     </div>
                   </div>
-                  <p className="text-xs text-gray-500">
-                    A confirmation email has also been sent to <span className="font-medium">{email}</span>.
-                  </p>
+                  {email.trim() && (
+                    <p className="text-xs text-gray-500">
+                      A copy has also been sent to <span className="font-medium">{email}</span>.
+                    </p>
+                  )}
                 </div>
               )}
 

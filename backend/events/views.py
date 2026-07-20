@@ -127,12 +127,12 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
         # Validate event is free (has a ticket category with price 0)
         ticket_category_id = request.data.get('ticket_category')
         full_name = request.data.get('full_name')
-        email = request.data.get('email')
+        email = request.data.get('email', '') or ''
         phone = request.data.get('phone', '')
 
-        if not all([full_name, email]):
+        if not full_name:
             return Response(
-                {'error': 'full_name and email are required.'},
+                {'error': 'full_name is required.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
@@ -544,7 +544,7 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
                 qty = max(1, int(qty))
                 for _ in range(qty):
                     ticket = create_and_email_ticket(ticket_category)
-                    tickets.append({'ticket_id': ticket.id, 'ticket_code': ticket.ticket_code, 'ticket_category': ticket_category.id, 'email_sent': ticket.ticket_code in emails_sent})
+                    tickets.append({'ticket_id': ticket.id, 'ticket_code': ticket.ticket_code, 'ticket_category': ticket_category.id, 'ticket_category_name': ticket_category.name, 'email_sent': ticket.ticket_code in emails_sent})
 
                 ticket_category.available = max(0, int(ticket_category.available or 0) - qty)
                 ticket_category.save(update_fields=['available'])
@@ -558,7 +558,7 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
 
             for _ in range(quantity):
                 ticket = create_and_email_ticket(ticket_category)
-                tickets.append({'ticket_id': ticket.id, 'ticket_code': ticket.ticket_code, 'ticket_category': ticket_category.id if ticket_category else None, 'email_sent': ticket.ticket_code in emails_sent})
+                tickets.append({'ticket_id': ticket.id, 'ticket_code': ticket.ticket_code, 'ticket_category': ticket_category.id if ticket_category else None, 'ticket_category_name': ticket_category.name if ticket_category else 'General', 'email_sent': ticket.ticket_code in emails_sent})
 
             if ticket_category:
                 ticket_category.available = max(0, int(ticket_category.available or 0) - quantity)
@@ -567,6 +567,10 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
         # Send Telegram notification about ticket sales
         if tickets:
             try:
+                ticket_lines = '\n'.join([
+                    f"• {t['ticket_code']} — {t.get('ticket_category_name') or 'General'}"
+                    for t in tickets
+                ])
                 message = f"""🎫 <b>New Ticket Purchase</b>
 
 Event: {event.title}
@@ -575,7 +579,8 @@ Phone: {payment.phone_number}
 Tickets: {len(tickets)}
 Amount: KES {payment.amount}
 
-Ticket Codes: {', '.join([t['ticket_code'] for t in tickets])}
+Tickets (Code — Category):
+{ticket_lines}
 Emails Sent: {len(emails_sent)}/{len(tickets)}"""
                 send_telegram_message(message)
             except:

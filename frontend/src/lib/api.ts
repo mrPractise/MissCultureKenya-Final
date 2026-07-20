@@ -243,12 +243,12 @@ const apiClient = {
     return handle(client.post('/api/events/payments/', data))
   },
 
-  // Initiate PesaPal checkout for voting
+  // Initiate M-Pesa STK Push for voting
   initiateVotePayment(eventId: number | string, data: { phone_number: string; amount: number; contestant_id: number }) {
     return handle(client.post(`/api/events/events/${eventId}/initiate_vote_payment/`, data))
   },
 
-  // Initiate PesaPal checkout for ticket purchase
+  // Initiate M-Pesa STK Push for ticket purchase
   initiateTicketPayment(eventId: number | string, data: { phone_number: string; full_name: string; email: string; ticket_breakdown: Record<string, number> }) {
     return handle(client.post(`/api/events/events/${eventId}/initiate_ticket_payment/`, data))
   },
@@ -292,3 +292,24 @@ const apiClient = {
 
 export default apiClient
 export type { ApiError }
+
+// Trigger a browser download of a ticket PDF by code. The backend responds with
+// Content-Disposition: attachment, so the browser downloads the file (and shows
+// its own download notification) instead of navigating away.
+export function downloadTicketPdf(code: string) {
+  if (typeof document === 'undefined' || !code) return
+  const a = document.createElement('a')
+  a.href = apiClient.ticketPdfUrl(code)
+  a.rel = 'noopener'
+  a.style.display = 'none'
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+}
+
+// Download a list of ticket codes, staggered so browsers don't block the batch.
+export function downloadTickets(codes: string[]) {
+  codes.filter(Boolean).forEach((code, i) => {
+    setTimeout(() => downloadTicketPdf(code), i * 700)
+  })
+}

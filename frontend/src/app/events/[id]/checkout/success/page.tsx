@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { CheckCircle, Ticket, Loader2, AlertCircle, Check, Download } from 'lucide-react'
-import apiClient from '@/lib/api'
+import apiClient, { downloadTickets } from '@/lib/api'
 
 type CheckoutDraft = {
   eventId: number
@@ -24,6 +24,8 @@ export default function EventCheckoutSuccessPage() {
   const [draft, setDraft] = useState<CheckoutDraft | null>(null)
   const [paymentStatus, setPaymentStatus] = useState<'pending' | 'successful' | 'failed'>('pending')
   const [issuedTickets, setIssuedTickets] = useState<any[]>([])
+  const [autoDownloaded, setAutoDownloaded] = useState(false)
+  const downloadedRef = useRef(false)
   const [error, setError] = useState('')
   const pollingInterval = useRef<NodeJS.Timeout | null>(null)
 
@@ -66,6 +68,13 @@ export default function EventCheckoutSuccessPage() {
           const ticketData = await apiClient.get('/api/events/tickets/', { payment: paymentId })
           const tickets = Array.isArray(ticketData) ? ticketData : (ticketData?.results || [])
           setIssuedTickets(tickets)
+          // Auto-download issued tickets once so the buyer keeps a copy even if
+          // they leave this page before noting the code.
+          if (!downloadedRef.current && tickets.length > 0) {
+            downloadedRef.current = true
+            downloadTickets(tickets.map((t: any) => t.ticket_code))
+            setAutoDownloaded(true)
+          }
         } catch (e) {
           console.error('Failed to fetch tickets', e)
         }
@@ -119,6 +128,14 @@ export default function EventCheckoutSuccessPage() {
 
           {paymentStatus === 'successful' && issuedTickets.length > 0 && (
             <div className="mt-6 space-y-3">
+              {autoDownloaded && (
+                <div className="flex items-start gap-2 bg-blue-50 border border-blue-200 rounded-xl p-3 text-left">
+                  <Download className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                  <p className="text-sm text-blue-800">
+                    Your ticket{issuedTickets.length > 1 ? 's have' : ' has'} been downloaded to your device. Check your downloads if you don&apos;t see {issuedTickets.length > 1 ? 'them' : 'it'}.
+                  </p>
+                </div>
+              )}
               <div className="bg-white border border-green-200 rounded-xl p-4 text-left">
                 <p className="text-xs text-green-600 font-bold uppercase mb-2">Your Ticket Codes</p>
                 <div className="grid grid-cols-1 gap-2">

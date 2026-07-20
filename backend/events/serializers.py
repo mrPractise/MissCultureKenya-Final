@@ -418,7 +418,9 @@ class PesaPalTicketPaymentRequestSerializer(serializers.Serializer):
     """Serializer for initiating a PesaPal payment for tickets."""
     phone_number = serializers.CharField(max_length=20, required=True)
     full_name = serializers.CharField(max_length=200, required=True)
-    email = serializers.EmailField(required=True)
+    # Email is optional — attendees always get the ticket via download/on-screen.
+    # When provided, we also email the PDF as a convenience.
+    email = serializers.EmailField(required=False, allow_blank=True, default='')
     ticket_breakdown = serializers.JSONField(required=True)
 
     def validate_ticket_breakdown(self, value):
