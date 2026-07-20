@@ -65,7 +65,7 @@ class EventAdmin(admin.ModelAdmin):
             'fields': ('featured_image', 'gallery')
         }),
         ('Ticketing', {
-            'fields': ('capacity', 'registration_required', 'ticket_prefix', 'ticket_url', 'registration_url')
+            'fields': ('capacity', 'registration_required', 'ticket_prefix', 'ticket_url', 'registration_url', 'checkin_pin')
         }),
         ('Voting Configuration', {
             'fields': ('voting_enabled', 'vote_price', 'voting_start', 'voting_end', 'result_visibility'),

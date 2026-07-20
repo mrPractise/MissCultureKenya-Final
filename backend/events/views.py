@@ -1026,6 +1026,130 @@ def ticket_pdf_download(request):
     return response
 
 
+def _get_checkin_event(request):
+    """Return (event, error_response). Validates the per-event check-in PIN.
+
+    Expects request.data to contain `event` (id) and `pin`.
+    """
+    event_id = request.data.get('event')
+    if not event_id:
+        return None, Response({'error': 'event is required.'}, status=status.HTTP_400_BAD_REQUEST)
+    try:
+        event = Event.objects.get(id=event_id)
+    except Event.DoesNotExist:
+        return None, Response({'error': 'Event not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+    configured = (event.checkin_pin or '').strip()
+    if not configured:
+        return None, Response(
+            {'error': 'Check-in is not enabled for this event. Set a Check-in PIN in the admin.'},
+            status=status.HTTP_503_SERVICE_UNAVAILABLE,
+        )
+    supplied = str(request.data.get('pin', '')).strip()
+    if supplied != configured:
+        return None, Response({'error': 'Invalid PIN.'}, status=status.HTTP_401_UNAUTHORIZED)
+    return event, None
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def checkin_events(request):
+    """Public list of events that have check-in enabled (a PIN set).
+
+    Only exposes non-sensitive fields so staff can pick an event to check in.
+    """
+    events = Event.objects.exclude(checkin_pin='').order_by('-start_date')
+    data = [
+        {
+            'id': e.id,
+            'title': e.title,
+            'start_date': e.start_date,
+            'venue_name': e.venue_name,
+            'city': e.city,
+        }
+        for e in events
+    ]
+    return Response({'count': len(data), 'events': data})
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def checkin_list(request):
+    """PIN-protected list of tickets for one event's gate check-in page.
+
+    Body: { event (id), pin, search? }
+    """
+    event, err = _get_checkin_event(request)
+    if err:
+        return err
+
+    tickets = Ticket.objects.select_related('event', 'ticket_category').filter(event=event)
+
+    search = str(request.data.get('search', '')).strip()
+    if search:
+        tickets = tickets.filter(
+            Q(ticket_code__icontains=search)
+            | Q(full_name__icontains=search)
+            | Q(phone__icontains=search)
+            | Q(email__icontains=search)
+        )
+
+    tickets = tickets.order_by('full_name')
+    data = [
+        {
+            'id': t.id,
+            'ticket_code': t.ticket_code,
+            'full_name': t.full_name,
+            'phone': t.phone,
+            'email': t.email,
+            'event_title': t.event.title if t.event else '',
+            'ticket_category_name': t.ticket_category.name if t.ticket_category else 'General',
+            'is_used': t.is_used,
+            'issued_at': t.issued_at,
+        }
+        for t in tickets
+    ]
+    return Response({'count': len(data), 'event_title': event.title, 'tickets': data})
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def checkin_toggle(request):
+    """PIN-protected check-in toggle. Marks a ticket used/unused (never deletes).
+
+    Body: { event (id), pin, ticket_id (or ticket_code), is_used (bool) }
+    """
+    event, err = _get_checkin_event(request)
+    if err:
+        return err
+
+    ticket_id = request.data.get('ticket_id')
+    ticket_code = request.data.get('ticket_code')
+    try:
+        if ticket_id:
+            ticket = Ticket.objects.get(id=ticket_id, event=event)
+        elif ticket_code:
+            ticket = Ticket.objects.get(ticket_code=str(ticket_code).strip(), event=event)
+        else:
+            return Response(
+                {'error': 'ticket_id or ticket_code is required.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+    except Ticket.DoesNotExist:
+        return Response({'error': 'Ticket not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+    is_used = request.data.get('is_used', True)
+    ticket.is_used = bool(is_used)
+    ticket.save(update_fields=['is_used'])
+
+    return Response({
+        'id': ticket.id,
+        'ticket_code': ticket.ticket_code,
+        'full_name': ticket.full_name,
+        'is_used': ticket.is_used,
+    })
+
+
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def initiate_contribution_payment(request):

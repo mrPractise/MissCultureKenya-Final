@@ -253,6 +253,21 @@ const apiClient = {
     return handle(client.post(`/api/events/events/${eventId}/initiate_ticket_payment/`, data))
   },
 
+  // Gate check-in: list events that have check-in enabled
+  checkinEvents() {
+    return handle(client.get('/api/events/checkin/events/'))
+  },
+
+  // Gate check-in: PIN-protected list of tickets for one event
+  checkinList(data: { event: number | string; pin: string; search?: string }) {
+    return handle(client.post('/api/events/checkin/list/', data))
+  },
+
+  // Gate check-in: mark a ticket used/unused (never deletes)
+  checkinToggle(data: { event: number | string; pin: string; ticket_id?: number; ticket_code?: string; is_used: boolean }) {
+    return handle(client.post('/api/events/checkin/toggle/', data))
+  },
+
   // Initiate M-Pesa STK Push for public contributions
   // Returns { success, checkout_request_id, merchant_request_id, contribution_id, message }
   initiateContributionPayment(data: { full_name: string; email: string; phone_number?: string; amount: number }) {

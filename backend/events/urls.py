@@ -7,6 +7,7 @@ from .views import (
     verify_votes_by_phone, ticket_lookup, ticket_pdf_download, mpesa_callback,
     initiate_contribution_payment, contribution_status,
     pesapal_ipn_callback, pesapal_payment_redirect,
+    checkin_events, checkin_list, checkin_toggle,
 )
 
 router = DefaultRouter()
@@ -24,6 +25,9 @@ urlpatterns = [
     path('verify-votes/', verify_votes_by_phone, name='verify-votes'),
     path('ticket-lookup/', ticket_lookup, name='ticket-lookup'),
     path('ticket-pdf/', ticket_pdf_download, name='ticket-pdf'),
+    path('checkin/events/', checkin_events, name='checkin-events'),
+    path('checkin/list/', checkin_list, name='checkin-list'),
+    path('checkin/toggle/', checkin_toggle, name='checkin-toggle'),
     path('contributions/initiate/', initiate_contribution_payment, name='initiate-contribution-payment'),
     path('contributions/<int:pk>/', contribution_status, name='contribution-status'),
     path('pesapal-ipn/', pesapal_ipn_callback, name='pesapal-ipn'),

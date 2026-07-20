@@ -73,6 +73,7 @@ class Event(models.Model):
 
     # Ticketing configuration
     ticket_prefix = models.CharField(max_length=5, blank=True, help_text="Auto-derived from event title. 2-3 char prefix for ticket codes (e.g. FOS)")
+    checkin_pin = models.CharField(max_length=20, blank=True, help_text="PIN staff enter on the /checkin page to view and check in this event's tickets. Leave blank to disable check-in for this event.")
 
     # Payment configuration
     payment_method = models.CharField(max_length=20, choices=PAYMENT_METHOD_CHOICES, default='till_number')
