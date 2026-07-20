@@ -129,7 +129,7 @@ export default function EventCheckoutSuccessPage() {
                         <p className="text-[10px] text-gray-500 uppercase">{t.ticket_category_name}</p>
                       </div>
                       <Link 
-                        href={`/events/${eventId}/ticket/${t.ticket_code}`}
+                        href={`/events/${eventId}/ticket/${encodeURIComponent(t.ticket_code)}`}
                         className="p-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                         title="View Ticket"
                       >

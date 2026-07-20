@@ -85,24 +85,37 @@ def send_telegram_message(message):
 
 def send_ticket_email(ticket, event, pdf_buffer):
     """
-    Send ticket PDF to attendee via email.
-    
+    Send the ticket PDF to the attendee via the Resend API.
+
+    The whole project sends mail through Resend (see main/views.py) — there is no
+    SMTP backend configured — so this must use Resend too, with the ticket PDF
+    attached as a base64 payload.
+
     Args:
         ticket: Ticket model instance
         event: Event model instance
         pdf_buffer: BytesIO buffer containing PDF
-    
+
     Returns:
         bool: True if email sent successfully
     """
-    from django.core.mail import EmailMessage
-    
+    import base64
+    import logging
+    import resend
+
+    logger = logging.getLogger(__name__)
+
     if not ticket.email:
         return False
-    
+
+    api_key = getattr(settings, 'RESEND_API_KEY', '')
+    if not api_key:
+        logger.error("Ticket email skipped: RESEND_API_KEY is not configured.")
+        return False
+
     subject = f"Your Ticket for {event.title} - Miss Culture Global Kenya"
-    
-    body = f"""
+
+    text_body = f"""
 Dear {ticket.full_name},
 
 Thank you for your purchase! Your ticket has been confirmed for:
@@ -114,7 +127,7 @@ VENUE: {event.venue_name}
 LOCATION: {event.city}, {event.country}
 TICKET CODE: {ticket.ticket_code}
 
-Please find your ticket PDF attached. Present the QR code at the entrance for check-in.
+Please find your ticket PDF attached. Present it at the entrance for check-in.
 
 Important Notes:
 - This ticket is non-transferable and non-refundable
@@ -126,24 +139,49 @@ For inquiries, contact us at info@misscultureglobalkenya.com
 Best regards,
 Miss Culture Global Kenya Team
 """
-    
+
+    html_body = f"""
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #15803d;">Your Ticket is Confirmed!</h2>
+        <p style="color: #4b5563; line-height: 1.6;">Dear {ticket.full_name},</p>
+        <p style="color: #4b5563; line-height: 1.6;">Thank you for your purchase. Your ticket has been confirmed for:</p>
+        <table style="width: 100%; border-collapse: collapse; margin: 16px 0;">
+            <tr><td style="padding: 6px 0; color: #6b7280;">Event</td><td style="padding: 6px 0; font-weight: bold; color: #111827;">{event.title}</td></tr>
+            <tr><td style="padding: 6px 0; color: #6b7280;">Date</td><td style="padding: 6px 0; font-weight: bold; color: #111827;">{event.start_date.strftime('%A, %B %d, %Y')}</td></tr>
+            <tr><td style="padding: 6px 0; color: #6b7280;">Time</td><td style="padding: 6px 0; font-weight: bold; color: #111827;">{event.start_date.strftime('%I:%M %p')}</td></tr>
+            <tr><td style="padding: 6px 0; color: #6b7280;">Venue</td><td style="padding: 6px 0; font-weight: bold; color: #111827;">{event.venue_name}</td></tr>
+            <tr><td style="padding: 6px 0; color: #6b7280;">Location</td><td style="padding: 6px 0; font-weight: bold; color: #111827;">{event.city}, {event.country}</td></tr>
+        </table>
+        <div style="text-align: center; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 16px; margin: 16px 0;">
+            <p style="margin: 0; font-size: 12px; color: #16a34a; text-transform: uppercase; letter-spacing: 1px;">Ticket Code</p>
+            <p style="margin: 4px 0 0; font-size: 26px; font-weight: bold; color: #15803d; letter-spacing: 3px;">{ticket.ticket_code}</p>
+        </div>
+        <p style="color: #4b5563; line-height: 1.6;">Your ticket PDF is attached. Present it at the entrance for check-in.</p>
+        <p style="color: #6b7280; font-size: 13px; line-height: 1.6;">
+            This ticket is non-transferable and non-refundable. Please arrive at least 30 minutes early and bring a valid ID matching the name on this ticket.
+        </p>
+        <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 16px 0;" />
+        <p style="font-size: 12px; color: #9ca3af;">
+            Miss Culture Global Kenya<br>info@misscultureglobalkenya.com
+        </p>
+    </div>
+    """
+
     try:
-        email = EmailMessage(
-            subject=subject,
-            body=body,
-            from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', 'info@misscultureglobalkenya.com'),
-            to=[ticket.email],
-        )
-        
-        # Attach PDF
-        email.attach(
-            filename=f"ticket_{ticket.ticket_code}.pdf",
-            content=pdf_buffer.getvalue(),
-            mimetype='application/pdf'
-        )
-        
-        email.send(fail_silently=False)
+        pdf_base64 = base64.b64encode(pdf_buffer.getvalue()).decode('utf-8')
+        resend.api_key = api_key
+        resend.Emails.send({
+            'from': getattr(settings, 'DEFAULT_FROM_EMAIL', 'info@misscultureglobalkenya.com'),
+            'to': ticket.email,
+            'subject': subject,
+            'html': html_body,
+            'text': text_body,
+            'attachments': [{
+                'filename': f"ticket_{ticket.ticket_code}.pdf",
+                'content': pdf_base64,
+            }],
+        })
         return True
     except Exception as e:
-        print(f"Ticket email error: {e}")
+        logger.error(f"Ticket email error for {ticket.ticket_code}: {e}")
         return False

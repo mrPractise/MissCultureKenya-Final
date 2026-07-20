@@ -960,7 +960,7 @@ const EventDetailPage = () => {
                 </p>
                 {regSuccess.ticket_code && (
                   <Link
-                    href={`/events/${eventId}/ticket/${regSuccess.ticket_code}`}
+                    href={`/events/${eventId}/ticket/${encodeURIComponent(regSuccess.ticket_code)}`}
                     className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-colors"
                   >
                     <Ticket className="w-4 h-4" /> View Ticket
@@ -971,7 +971,7 @@ const EventDetailPage = () => {
                     {regSuccess.ticket_codes.map((code: string) => (
                       <Link
                         key={code}
-                        href={`/events/${eventId}/ticket/${code}`}
+                        href={`/events/${eventId}/ticket/${encodeURIComponent(code)}`}
                         className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-xl font-semibold text-sm transition-colors"
                       >
                         <Ticket className="w-4 h-4" /> View {code}
