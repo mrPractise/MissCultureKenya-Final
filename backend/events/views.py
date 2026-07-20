@@ -417,6 +417,10 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
 
         serializer = PesaPalTicketPaymentRequestSerializer(data=request.data)
         if not serializer.is_valid():
+            logger.warning(
+                "initiate_ticket_payment validation failed for event %s: %s",
+                pk, serializer.errors,
+            )
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         phone_number = serializer.validated_data['phone_number']
@@ -428,6 +432,10 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
         categories_by_id = {c.id: c for c in categories}
 
         if not categories_by_id:
+            logger.warning(
+                "initiate_ticket_payment: no valid categories for event %s, breakdown=%s",
+                pk, ticket_breakdown,
+            )
             return Response({'error': 'No valid ticket categories found for this event.'}, status=status.HTTP_400_BAD_REQUEST)
 
         total_qty = 0
