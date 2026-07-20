@@ -133,6 +133,11 @@ dist
 .cache/
 public
 
+# Next.js keeps source assets (favicon, icons, images) in frontend/public,
+# which MUST be committed and deployed — re-include it despite the rule above.
+!frontend/public/
+!frontend/public/**
+
 # Storybook build outputs
 .out
 .storybook-out
