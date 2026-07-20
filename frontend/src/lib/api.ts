@@ -274,6 +274,11 @@ const apiClient = {
     return handle(client.get('/api/events/ticket-lookup/', { params: { code } }))
   },
 
+  // Full URL to download a ticket PDF by code (browser downloads it directly).
+  ticketPdfUrl(code: string) {
+    return `${BASE}/api/events/ticket-pdf/?code=${encodeURIComponent(code)}`
+  },
+
   // Single ticket by ID
   getTicket(ticketId: number | string) {
     return handle(client.get(`/api/events/tickets/${ticketId}/`))

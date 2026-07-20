@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { CheckCircle, Ticket, Loader2, AlertCircle, Check } from 'lucide-react'
+import { CheckCircle, Ticket, Loader2, AlertCircle, Check, Download } from 'lucide-react'
 import apiClient from '@/lib/api'
 
 type CheckoutDraft = {
@@ -128,13 +128,22 @@ export default function EventCheckoutSuccessPage() {
                         <p className="font-mono font-bold text-green-700 text-lg tracking-wider">{t.ticket_code}</p>
                         <p className="text-[10px] text-gray-500 uppercase">{t.ticket_category_name}</p>
                       </div>
-                      <Link 
-                        href={`/events/${eventId}/ticket/${encodeURIComponent(t.ticket_code)}`}
-                        className="p-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                        title="View Ticket"
-                      >
-                        <Ticket className="w-4 h-4" />
-                      </Link>
+                      <div className="flex items-center gap-2">
+                        <a
+                          href={apiClient.ticketPdfUrl(t.ticket_code)}
+                          className="p-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                          title="Download PDF"
+                        >
+                          <Download className="w-4 h-4" />
+                        </a>
+                        <Link 
+                          href={`/events/${eventId}/ticket/${encodeURIComponent(t.ticket_code)}`}
+                          className="p-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                          title="View Ticket"
+                        >
+                          <Ticket className="w-4 h-4" />
+                        </Link>
+                      </div>
                     </div>
                   ))}
                 </div>

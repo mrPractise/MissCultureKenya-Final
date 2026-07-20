@@ -980,6 +980,47 @@ def ticket_lookup(request):
     )
 
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def ticket_pdf_download(request):
+    """Public endpoint: download a ticket as a PDF, looked up by ticket_code.
+
+    A reliable fallback so an attendee can always get their ticket even if the
+    web ticket page fails to load — the browser downloads the PDF directly.
+    """
+    from django.http import HttpResponse
+
+    code = request.query_params.get('code', '').strip()
+    if not code:
+        return Response(
+            {'error': 'code query parameter is required.'},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    try:
+        ticket = Ticket.objects.select_related('event', 'ticket_category').get(ticket_code=code)
+    except Ticket.DoesNotExist:
+        return Response(
+            {'error': f'Ticket with code "{code}" not found.'},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    try:
+        pdf_buffer = generate_ticket_pdf(ticket, ticket.event)
+    except Exception as e:
+        logger.error("Failed to generate ticket PDF for %s: %s", code, e)
+        return Response(
+            {'error': 'Failed to generate the ticket PDF.'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
+    response = HttpResponse(pdf_buffer.getvalue(), content_type='application/pdf')
+    # Ticket codes contain "#"/possibly "/", which are illegal in a filename.
+    safe_code = code.replace('#', '-').replace('/', '-')
+    response['Content-Disposition'] = f'attachment; filename="ticket_{safe_code}.pdf"'
+    return response
+
+
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def initiate_contribution_payment(request):

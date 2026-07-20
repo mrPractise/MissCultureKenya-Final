@@ -2,7 +2,7 @@
 
 import { useState, useEffect, use } from 'react'
 import { motion } from 'framer-motion'
-import { Ticket, CheckCircle, Calendar, MapPin, User, Mail, Phone, Loader2, AlertCircle, ArrowLeft, Printer } from 'lucide-react'
+import { Ticket, CheckCircle, Calendar, MapPin, User, Mail, Phone, Loader2, AlertCircle, ArrowLeft, Printer, Download } from 'lucide-react'
 import Link from 'next/link'
 import apiClient from '@/lib/api'
 import type { ApiError } from '@/lib/api'
@@ -23,6 +23,15 @@ interface TicketData {
 
 export default function TicketPage({ params }: { params: Promise<{ id: string; ticketCode: string }> }) {
   const { id, ticketCode } = use(params)
+  // Ticket codes contain a "#" (e.g. FFS-HEUG#26). It travels in the URL as %23.
+  // Decode it here so we hand the real code to the API (otherwise axios re-encodes
+  // the "%" and the backend searches for the literal "%23" and returns 404).
+  let decodedCode = ticketCode
+  try {
+    decodedCode = decodeURIComponent(ticketCode)
+  } catch {
+    decodedCode = ticketCode
+  }
   const [ticket, setTicket] = useState<TicketData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -30,7 +39,7 @@ export default function TicketPage({ params }: { params: Promise<{ id: string; t
   useEffect(() => {
     const fetchTicket = async () => {
       try {
-        const data = await apiClient.getTicketByCode(ticketCode)
+        const data = await apiClient.getTicketByCode(decodedCode)
         setTicket(data)
       } catch (err) {
         const apiErr = err as ApiError
@@ -40,7 +49,7 @@ export default function TicketPage({ params }: { params: Promise<{ id: string; t
       }
     }
     fetchTicket()
-  }, [ticketCode])
+  }, [decodedCode])
 
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString('en-KE', {
@@ -76,10 +85,19 @@ export default function TicketPage({ params }: { params: Promise<{ id: string; t
           <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
           <h2 className="text-xl font-bold text-gray-900 mb-2">Ticket Not Found</h2>
           <p className="text-gray-600 mb-6">{error || 'The ticket code you entered does not match any records.'}</p>
-          <Link href="/events" className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-full font-semibold text-sm transition-colors">
-            <ArrowLeft className="w-4 h-4" />
-            Back to Events
-          </Link>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <a
+              href={apiClient.ticketPdfUrl(decodedCode)}
+              className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-full font-semibold text-sm transition-colors"
+            >
+              <Download className="w-4 h-4" />
+              Download Ticket (PDF)
+            </a>
+            <Link href="/events" className="inline-flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-3 rounded-full font-semibold text-sm transition-colors">
+              <ArrowLeft className="w-4 h-4" />
+              Back to Events
+            </Link>
+          </div>
         </div>
       </div>
     )
@@ -94,13 +112,22 @@ export default function TicketPage({ params }: { params: Promise<{ id: string; t
             <ArrowLeft className="w-4 h-4" />
             Back to Events
           </Link>
-          <button
-            onClick={handlePrint}
-            className="flex items-center gap-1.5 text-gray-600 hover:text-green-600 transition-colors text-sm font-medium"
-          >
-            <Printer className="w-4 h-4" />
-            Print
-          </button>
+          <div className="flex items-center gap-4">
+            <a
+              href={apiClient.ticketPdfUrl(ticket.ticket_code)}
+              className="flex items-center gap-1.5 text-gray-600 hover:text-green-600 transition-colors text-sm font-medium"
+            >
+              <Download className="w-4 h-4" />
+              Download
+            </a>
+            <button
+              onClick={handlePrint}
+              className="flex items-center gap-1.5 text-gray-600 hover:text-green-600 transition-colors text-sm font-medium"
+            >
+              <Printer className="w-4 h-4" />
+              Print
+            </button>
+          </div>
         </div>
       </div>
 
