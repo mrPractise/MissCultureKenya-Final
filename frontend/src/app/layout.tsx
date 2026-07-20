@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     default: 'Miss Culture Global Kenya | Official Website',
     template: '%s | Miss Culture Global Kenya'
   },
-  description: 'Miss Culture Global Kenya is a cultural preservation and youth empowerment movement — showcasing Kenya\'s heritage through pageants, community programs, and global partnerships. Brand Ambassador: Susan Abong\'o.',
+  description: 'Miss Culture Global Kenya (MCGK) is the official Kenyan cultural preservation and youth empowerment movement — showcasing Kenya\'s heritage through pageants, community programs, and global partnerships. Based in Nairobi. Brand Ambassador: Susan Abong\'o.',
   keywords: [
     'Miss Culture Global Kenya',
     'Kenya Heritage',
@@ -35,6 +35,14 @@ export const metadata: Metadata = {
   creator: 'Miss Culture Global Kenya',
   publisher: 'Miss Culture Global Kenya',
   category: 'Culture & Heritage',
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/icon-192.png', type: 'image/png', sizes: '192x192' },
+      { url: '/icon-512.png', type: 'image/png', sizes: '512x512' },
+    ],
+    apple: '/apple-touch-icon.png',
+  },
   robots: {
     index: true,
     follow: true,
