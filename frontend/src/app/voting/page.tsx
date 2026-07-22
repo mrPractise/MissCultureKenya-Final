@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
-import { Calendar, Trophy, Search, Vote, Phone, ChevronRight, ChevronDown, AlertCircle, Loader2, Check, X } from 'lucide-react'
+import { Calendar, Trophy, Search, Vote, Phone, ChevronRight, ChevronDown, AlertCircle, Loader2, Check, X, Crown, Medal, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 import apiClient from '@/lib/api'
 import type { ApiError } from '@/lib/api'
@@ -52,6 +52,16 @@ interface VoteRecord {
   created_at: string
 }
 
+interface LiveResult {
+  contestant_id: number
+  contestant_name: string
+  contestant_number: number
+  slug: string
+  photo_url: string | null
+  vote_count: number | null
+  rank: number | null
+}
+
 const VotingPage = () => {
   const [events, setEvents] = useState<VotingEvent[]>([])
   const [selectedEvent, setSelectedEvent] = useState<VotingEvent | null>(null)
@@ -59,6 +69,10 @@ const VotingPage = () => {
   const [loading, setLoading] = useState(true)
   const [contestantsLoading, setContestantsLoading] = useState(false)
   const [error, setError] = useState('')
+
+  // Leaderboard (respects the event's result_visibility)
+  const [leaderboard, setLeaderboard] = useState<LiveResult[]>([])
+  const [leaderboardLoading, setLeaderboardLoading] = useState(false)
 
   // Vote modal state
   const [voteModalOpen, setVoteModalOpen] = useState(false)
@@ -112,6 +126,34 @@ const VotingPage = () => {
     }
     fetchContestants()
   }, [selectedEvent])
+
+  // Fetch the leaderboard for the selected event (only when totals or rankings are public)
+  const fetchLeaderboard = useCallback(async (evt: VotingEvent) => {
+    const vis = evt?.result_visibility
+    if (!evt?.voting_enabled || (vis !== 'full_live' && vis !== 'rankings_only')) {
+      setLeaderboard([])
+      return
+    }
+    setLeaderboardLoading(true)
+    try {
+      const data = await apiClient.getLiveResults(evt.id)
+      setLeaderboard(Array.isArray(data?.results) ? data.results : [])
+    } catch {
+      setLeaderboard([])
+    } finally {
+      setLeaderboardLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!selectedEvent) return
+    fetchLeaderboard(selectedEvent)
+    // Auto-refresh live totals while voting is open
+    if (selectedEvent.result_visibility === 'full_live' && selectedEvent.is_voting_active) {
+      const interval = setInterval(() => fetchLeaderboard(selectedEvent), 20000)
+      return () => clearInterval(interval)
+    }
+  }, [selectedEvent, fetchLeaderboard])
 
   const handleVoteClick = useCallback((contestant: Contestant) => {
     if (!selectedEvent) return
@@ -282,6 +324,78 @@ const VotingPage = () => {
                         </div>
                       )}
                     </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          )}
+
+          {/* Live Leaderboard — respects result_visibility (full_live shows totals, rankings_only hides them) */}
+          {selectedEvent && leaderboard.length > 0 && (
+            <section className="pt-10">
+              <div className="max-w-4xl mx-auto px-4">
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                  <div className="flex items-center justify-between gap-3 px-5 sm:px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-green-50 to-white">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-9 h-9 bg-green-100 rounded-full flex items-center justify-center">
+                        <Trophy className="w-5 h-5 text-green-600" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-gray-900 leading-tight">
+                          {selectedEvent.result_visibility === 'full_live' ? 'Live Leaderboard' : 'Current Standings'}
+                        </h3>
+                        <p className="text-xs text-gray-500">
+                          {selectedEvent.result_visibility === 'full_live'
+                            ? 'Vote totals update automatically'
+                            : 'Rankings shown — vote totals are hidden'}
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => fetchLeaderboard(selectedEvent)}
+                      disabled={leaderboardLoading}
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-green-700 hover:text-green-800 disabled:opacity-50"
+                    >
+                      <RefreshCw className={`w-3.5 h-3.5 ${leaderboardLoading ? 'animate-spin' : ''}`} />
+                      Refresh
+                    </button>
+                  </div>
+
+                  <div className="divide-y divide-gray-50">
+                    {leaderboard.map((r) => {
+                      const rank = r.rank ?? 0
+                      const medal =
+                        rank === 1 ? 'bg-yellow-100 text-yellow-700' :
+                        rank === 2 ? 'bg-gray-200 text-gray-600' :
+                        rank === 3 ? 'bg-orange-100 text-orange-700' :
+                        'bg-gray-100 text-gray-500'
+                      return (
+                        <div key={r.contestant_id} className="flex items-center gap-3 px-5 sm:px-6 py-3">
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-sm ${medal}`}>
+                            {rank === 1 ? <Crown className="w-4 h-4" /> : rank <= 3 && rank > 0 ? <Medal className="w-4 h-4" /> : rank || '—'}
+                          </div>
+                          <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
+                            {r.photo_url ? (
+                              <img src={r.photo_url} alt={r.contestant_name} className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-xs font-bold text-green-400">
+                                #{r.contestant_number}
+                              </div>
+                            )}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="font-semibold text-gray-900 truncate">{r.contestant_name}</p>
+                            <p className="text-xs text-gray-400">Contestant #{r.contestant_number}</p>
+                          </div>
+                          {selectedEvent.result_visibility === 'full_live' && r.vote_count !== null && (
+                            <div className="text-right flex-shrink-0">
+                              <p className="font-bold text-green-700">{r.vote_count.toLocaleString()}</p>
+                              <p className="text-xs text-gray-400">votes</p>
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })}
                   </div>
                 </div>
               </div>
