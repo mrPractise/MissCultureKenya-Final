@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo, useCallback } from 'react'
-import { Lock, Search, RefreshCw, LogOut, Loader2, AlertCircle, CheckCircle, ArrowUp, ArrowDown, Ticket as TicketIcon, Calendar, MapPin, ChevronRight, ArrowLeft } from 'lucide-react'
+import { Lock, Search, RefreshCw, LogOut, Loader2, AlertCircle, CheckCircle, ArrowUp, ArrowDown, Ticket as TicketIcon, Calendar, MapPin, ChevronRight, ArrowLeft, Eye, EyeOff } from 'lucide-react'
 import apiClient from '@/lib/api'
 import type { ApiError } from '@/lib/api'
 
@@ -37,6 +37,7 @@ export default function CheckinPage() {
   const [selectedEvent, setSelectedEvent] = useState<CheckinEvent | null>(null)
 
   const [pin, setPin] = useState('')
+    const [showPin, setShowPin] = useState(false)
   const [tickets, setTickets] = useState<CheckinTicket[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -258,15 +259,25 @@ export default function CheckinPage() {
           <h1 className="text-lg font-bold text-gray-900 text-center">{selectedEvent?.title}</h1>
           <p className="text-sm text-gray-500 text-center mt-1 mb-6">Enter the check-in PIN for this event</p>
 
-          <input
-            type="password"
-            inputMode="numeric"
-            value={pin}
-            onChange={(e) => { setPin(e.target.value); setError('') }}
-            placeholder="PIN"
-            autoFocus
-            className="w-full px-4 py-3 border border-gray-300 rounded-xl text-center text-lg tracking-widest focus:ring-2 focus:ring-green-500 focus:border-green-500"
-          />
+          <div className="relative">
+            <input
+              type={showPin ? 'text' : 'password'}
+              inputMode="text"
+              value={pin}
+              onChange={(e) => { setPin(e.target.value); setError('') }}
+              placeholder="PIN"
+              autoFocus
+              className="w-full pl-4 pr-11 py-3 border border-gray-300 rounded-xl text-center text-lg tracking-widest focus:ring-2 focus:ring-green-500 focus:border-green-500"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPin((s) => !s)}
+              aria-label={showPin ? 'Hide PIN' : 'Show PIN'}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            >
+              {showPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            </button>
+          </div>
 
           {error && (
             <div className="flex items-start gap-2 mt-4 p-3 bg-red-50 border border-red-200 rounded-xl">

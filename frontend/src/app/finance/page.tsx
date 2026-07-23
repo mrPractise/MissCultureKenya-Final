@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import {
   Lock, Loader2, AlertCircle, Search, Download, RefreshCw, LogOut,
-  ArrowUp, ArrowDown, Wallet, Vote, Ticket as TicketIcon, HeartHandshake, TrendingUp,
+  ArrowUp, ArrowDown, Wallet, Vote, Ticket as TicketIcon, HeartHandshake, TrendingUp, Eye, EyeOff,
 } from 'lucide-react'
 import apiClient from '@/lib/api'
 import type { ApiError } from '@/lib/api'
@@ -87,6 +87,7 @@ const fmtDate = (iso: string) => {
 const FinancePage = () => {
   const [step, setStep] = useState<'pin' | 'dash'>('pin')
   const [pin, setPin] = useState('')
+  const [showPin, setShowPin] = useState(false)
 
   const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS)
   const [totals, setTotals] = useState<Totals>({ vote: 0, ticket: 0, contribution: 0, grand: 0 })
@@ -239,14 +240,22 @@ const FinancePage = () => {
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
-                  type="password"
-                  inputMode="numeric"
+                  type={showPin ? 'text' : 'password'}
+                  inputMode="text"
                   value={pin}
                   onChange={(e) => setPin(e.target.value)}
                   placeholder="PIN"
                   autoFocus
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none text-gray-900"
+                  className="w-full pl-10 pr-11 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none text-gray-900"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPin((s) => !s)}
+                  aria-label={showPin ? 'Hide PIN' : 'Show PIN'}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  {showPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
               </div>
               {error && (
                 <div className="mt-3 flex items-start gap-2 text-sm text-red-600">
@@ -264,9 +273,6 @@ const FinancePage = () => {
               </button>
             </form>
           </div>
-          <p className="text-xs text-gray-400 text-center mt-4">
-            Set the PIN in Django admin → Events - Finance Settings.
-          </p>
         </div>
       </div>
     )
