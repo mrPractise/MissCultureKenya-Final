@@ -1,13 +1,24 @@
 {
-  "$schema": "https://railway.app/railway.schema.json",
+  "$schema": "https://railway.com/railway.schema.json",
   "build": {
-    "builder": "NIXPACKS",
+    "builder": "RAILPACK",
+    "buildEnvironment": "V3",
     "buildCommand": "SECRET_KEY=build-placeholder DATABASE_URL=sqlite:///tmp/build.sqlite3 python manage.py collectstatic --noinput"
   },
   "deploy": {
+    "runtime": "V2",
+    "numReplicas": 1,
+    "sleepApplication": false,
+    "useLegacyStacker": false,
+    "ipv6EgressEnabled": false,
+    "multiRegionConfig": {
+      "us-west2": {
+        "numReplicas": 1
+      }
+    },
     "preDeployCommand": "python manage.py migrate --noinput && python manage.py ensure_superuser",
     "startCommand": "gunicorn missculture.wsgi:application --bind 0.0.0.0:$PORT --workers 5 --threads 4 --worker-class gthread --log-file - --timeout 45 --graceful-timeout 30",
     "restartPolicyType": "ON_FAILURE",
-    "restartPolicyMaxRetries": 3
+    "restartPolicyMaxRetries": 10
   }
 }
