@@ -69,7 +69,6 @@ INSTALLED_APPS = [
     'django_filters',
     'cloudinary_storage',
     'cloudinary',
-    'django_rq',
     'missculture',
     'main',
     'gallery',
@@ -337,23 +336,6 @@ MPESA_ENVIRONMENT = config('MPESA_ENVIRONMENT', default='')
 # Telegram Notifications (optional payment/vote alerts)
 TELEGRAM_BOT_TOKEN = config('TELEGRAM_BOT_TOKEN', default='')
 TELEGRAM_CHAT_ID = config('TELEGRAM_CHAT_ID', default='')
-
-# ── Background task queue (Django-RQ) ────────────────────────────────────────
-# External I/O (ticket PDF+email, Telegram alerts) is pushed to a Redis-backed
-# queue so it never blocks the request/response cycle — especially the M-Pesa
-# callback, which Safaricom retries if it responds slowly.
-#
-# IMPORTANT: this is optional. If REDIS_URL is not set (or Redis is down), jobs
-# fall back to running synchronously via events.jobs.enqueue_or_run, so the site
-# behaves exactly as before. Set REDIS_URL and run the `worker` process to
-# actually offload the work.
-REDIS_URL = config('REDIS_URL', default='')
-RQ_QUEUES = {
-    'default': {
-        'URL': REDIS_URL or 'redis://localhost:6379/0',
-        'DEFAULT_TIMEOUT': 360,
-    }
-}
 
 FRONTEND_URL = config('FRONTEND_URL', default='https://misscultureglobalkenya.com')
 
