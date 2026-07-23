@@ -49,7 +49,7 @@ def get_daraja_auth_token():
         response = requests.get(
             auth_url,
             auth=(creds['consumer_key'], creds['consumer_secret']),
-            timeout=30
+            timeout=(5, 20)
         )
         response.raise_for_status()
         
@@ -150,7 +150,7 @@ def initiate_stk_push(phone_number, amount, account_reference, transaction_desc,
             stk_push_url,
             json=payload,
             headers=headers,
-            timeout=30
+            timeout=(5, 20)
         )
         response.raise_for_status()
         

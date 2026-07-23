@@ -11,6 +11,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.utils import timezone
 from django.conf import settings
 from django.core.mail import send_mail
+from django.db import transaction
 from django.db.models import Sum, F, Q
 
 from .models import (
@@ -29,10 +30,10 @@ from .serializers import (
     ContributionCheckoutSerializer, ContributionSerializer,
 )
 from .utils import (
-    generate_ticket_code, calculate_vote_count, 
-    send_telegram_message, send_ticket_email
+    generate_ticket_code, calculate_vote_count,
 )
 from .ticket_pdf import generate_ticket_pdf
+from .jobs import enqueue_or_run, deliver_tickets, send_telegram
 from .pesapal import submit_order, get_transaction_status
 from .daraja import initiate_stk_push, process_callback
 
@@ -505,9 +506,8 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
         event_year = event.start_date.year
         ticket_breakdown = payment.ticket_breakdown or {}
         tickets = []
-        emails_sent = []
 
-        def create_and_email_ticket(ticket_category=None):
+        def create_ticket(ticket_category=None):
             ticket_code = generate_ticket_code(event.ticket_prefix, event_year)
             ticket = Ticket.objects.create(
                 event=event,
@@ -518,20 +518,6 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
                 email=payment.email or '',
                 phone=payment.phone_number,
             )
-            
-            # Generate PDF and send email
-            if ticket.email:
-                try:
-                    pdf_buffer = generate_ticket_pdf(ticket, event)
-                    email_sent = send_ticket_email(ticket, event, pdf_buffer)
-                    if email_sent:
-                        emails_sent.append(ticket.ticket_code)
-                except Exception as e:
-                    # Log error but don't fail ticket creation
-                    import logging
-                    logger = logging.getLogger(__name__)
-                    logger.error(f"Failed to send ticket email for {ticket.ticket_code}: {e}")
-            
             return ticket
 
         if ticket_breakdown:
@@ -543,8 +529,8 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
 
                 qty = max(1, int(qty))
                 for _ in range(qty):
-                    ticket = create_and_email_ticket(ticket_category)
-                    tickets.append({'ticket_id': ticket.id, 'ticket_code': ticket.ticket_code, 'ticket_category': ticket_category.id, 'ticket_category_name': ticket_category.name, 'email_sent': ticket.ticket_code in emails_sent})
+                    ticket = create_ticket(ticket_category)
+                    tickets.append({'ticket_id': ticket.id, 'ticket_code': ticket.ticket_code, 'ticket_category': ticket_category.id, 'ticket_category_name': ticket_category.name, 'email_sent': bool(ticket.email)})
 
                 ticket_category.available = max(0, int(ticket_category.available or 0) - qty)
                 ticket_category.save(update_fields=['available'])
@@ -557,36 +543,22 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
             quantity = max(1, quantity)
 
             for _ in range(quantity):
-                ticket = create_and_email_ticket(ticket_category)
-                tickets.append({'ticket_id': ticket.id, 'ticket_code': ticket.ticket_code, 'ticket_category': ticket_category.id if ticket_category else None, 'ticket_category_name': ticket_category.name if ticket_category else 'General', 'email_sent': ticket.ticket_code in emails_sent})
+                ticket = create_ticket(ticket_category)
+                tickets.append({'ticket_id': ticket.id, 'ticket_code': ticket.ticket_code, 'ticket_category': ticket_category.id if ticket_category else None, 'ticket_category_name': ticket_category.name if ticket_category else 'General', 'email_sent': bool(ticket.email)})
 
             if ticket_category:
                 ticket_category.available = max(0, int(ticket_category.available or 0) - quantity)
                 ticket_category.save(update_fields=['available'])
 
-        # Send Telegram notification about ticket sales
+        # Generate PDFs, email tickets and send the Telegram summary in the
+        # background (external I/O). Enqueued after commit so the worker sees the
+        # committed Ticket rows; falls back to synchronous execution if Redis is
+        # unavailable. `emails_sent` reflects the number queued for delivery.
+        emails_queued = sum(1 for t in tickets if t['email_sent'])
         if tickets:
-            try:
-                ticket_lines = '\n'.join([
-                    f"• {t['ticket_code']} — {t.get('ticket_category_name') or 'General'}"
-                    for t in tickets
-                ])
-                message = f"""🎫 <b>New Ticket Purchase</b>
+            transaction.on_commit(lambda: enqueue_or_run(deliver_tickets, payment.id))
 
-Event: {event.title}
-Buyer: {payment.full_name}
-Phone: {payment.phone_number}
-Tickets: {len(tickets)}
-Amount: KES {payment.amount}
-
-Tickets (Code — Category):
-{ticket_lines}
-Emails Sent: {len(emails_sent)}/{len(tickets)}"""
-                send_telegram_message(message)
-            except:
-                pass
-
-        return {'tickets': tickets, 'ticket_count': len(tickets), 'emails_sent': len(emails_sent)}
+        return {'tickets': tickets, 'ticket_count': len(tickets), 'emails_sent': emails_queued}
 
     def _process_vote_payment(self, payment, event, request):
         """Calculate and create vote transactions after successful payment."""
@@ -618,9 +590,10 @@ Emails Sent: {len(emails_sent)}/{len(tickets)}"""
             ip_address=self._get_client_ip(request),
         )
 
-        # Notify admins about the new vote via Telegram
+        # Notify admins about the new vote via Telegram (background I/O)
         try:
-            send_telegram_message(
+            enqueue_or_run(
+                send_telegram,
                 f"\U0001f5f3 <b>New Vote Confirmed!</b>\n\n"
                 f"Event: {event.title}\n"
                 f"Contestant: #{contestant.contestant_number} {contestant.name}\n"
@@ -1433,7 +1406,8 @@ def _handle_contribution_callback(contribution, processed, ack):
 
     if not already_successful:
         try:
-            send_telegram_message(
+            enqueue_or_run(
+                send_telegram,
                 f"\U0001f4b0 <b>New Contribution!</b>\n\n"
                 f"Name: {contribution.full_name}\n"
                 f"Amount: KES {contribution.amount}\n"
@@ -1630,7 +1604,8 @@ def pesapal_ipn_callback(request):
             if contribution.status != 'successful':
                 contribution.status = 'successful'
                 contribution.save()
-                send_telegram_message(
+                enqueue_or_run(
+                    send_telegram,
                     f"<b>New Contribution Confirmed</b>\n\n"
                     f"Name: {contribution.full_name}\n"
                     f"Amount: KES {contribution.amount}\n"
@@ -1677,7 +1652,8 @@ def pesapal_ipn_callback(request):
                 if payment.payment_purpose == 'vote':
                     contestant = payment.contestant
                     vote_count = calculate_vote_count(payment.amount, event.vote_price)
-                    send_telegram_message(
+                    enqueue_or_run(
+                        send_telegram,
                         f"\U0001f5f3 <b>New Vote Confirmed!</b>\n\n"
                         f"Event: {event.title}\n"
                         f"Contestant: {contestant.name if contestant else '-'}\n"
@@ -1752,7 +1728,8 @@ def pesapal_payment_redirect(request):
                 contribution.status = 'successful'
                 contribution.pesapal_response['redirect_status'] = status_result.get('raw', {})
                 contribution.save()
-                send_telegram_message(
+                enqueue_or_run(
+                    send_telegram,
                     f"<b>New Contribution Confirmed</b>\n\n"
                     f"Name: {contribution.full_name}\n"
                     f"Amount: KES {contribution.amount}\n"

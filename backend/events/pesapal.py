@@ -61,7 +61,7 @@ def generate_access_token(force_refresh: bool = False) -> str:
     }
 
     try:
-        resp = requests.post(url, json=payload, headers=headers, timeout=15)
+        resp = requests.post(url, json=payload, headers=headers, timeout=(5, 15))
         resp.raise_for_status()
         data = resp.json()
         token = data.get("token", "")
@@ -101,7 +101,7 @@ def register_ipn_url(ipn_url: str) -> dict:
     }
 
     try:
-        resp = requests.post(url, json=payload, headers=headers, timeout=15)
+        resp = requests.post(url, json=payload, headers=headers, timeout=(5, 15))
         return resp.json()
     except requests.RequestException as exc:
         logger.error("PesaPal register IPN failed: %s", exc)
@@ -121,7 +121,7 @@ def get_registered_ipns() -> list:
     }
 
     try:
-        resp = requests.get(url, headers=headers, timeout=15)
+        resp = requests.get(url, headers=headers, timeout=(5, 15))
         return resp.json() if resp.status_code == 200 else []
     except requests.RequestException:
         return []
@@ -193,7 +193,7 @@ def submit_order(
     }
 
     try:
-        resp = requests.post(url, json=payload, headers=headers, timeout=20)
+        resp = requests.post(url, json=payload, headers=headers, timeout=(5, 20))
         data = resp.json()
 
         redirect_url = data.get("redirect_url", "")
@@ -254,7 +254,7 @@ def get_transaction_status(order_tracking_id: str, merchant_reference: str = "")
         params["order_merchant_reference"] = merchant_reference
 
     try:
-        resp = requests.get(url, headers=headers, params=params, timeout=15)
+        resp = requests.get(url, headers=headers, params=params, timeout=(5, 15))
         data = resp.json()
         return {
             "payment_status": data.get("payment_status", "UNKNOWN"),
