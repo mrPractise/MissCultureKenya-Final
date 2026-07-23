@@ -22,6 +22,17 @@ interface ApiError {
   code?: string
 }
 
+interface FinanceFilters {
+  pin: string
+  date_from?: string
+  date_to?: string
+  source?: 'all' | 'vote' | 'ticket' | 'contribution'
+  event?: number | string | null
+  phone?: string
+  mpesa_code?: string
+  status?: 'all' | 'successful' | 'pending' | 'failed' | 'cancelled' | 'reversed'
+}
+
 function extractError(err: any): ApiError {
   if (axios.isAxiosError(err)) {
     if (err.response) {
@@ -267,6 +278,38 @@ const apiClient = {
   checkinToggle(data: { event: number | string; pin: string; ticket_id?: number; ticket_code?: string; is_used: boolean }) {
     return handle(client.post('/api/events/checkin/toggle/', data))
   },
+
+  // Finance dashboard: PIN-protected revenue report (voting, ticketing, contributions)
+  financeReport(data: FinanceFilters) {
+    return handle(client.post('/api/events/finance/report/', data))
+  },
+
+  // Finance dashboard: download the filtered statement as a PDF (POST → blob, keeps PIN out of the URL)
+  async downloadFinanceStatement(data: FinanceFilters) {
+    const res = await fetch(`${BASE}/api/events/finance/statement-pdf/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    })
+    if (!res.ok) {
+      let message = `Failed to generate statement (HTTP ${res.status})`
+      try {
+        const body = await res.json()
+        message = body.error || body.detail || message
+      } catch { /* non-JSON error */ }
+      throw { message, status: res.status } as ApiError
+    }
+    const blob = await res.blob()
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `statement-${new Date().toISOString().slice(0, 10)}.pdf`
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+    window.URL.revokeObjectURL(url)
+  },
+
 
   // Initiate M-Pesa STK Push for public contributions
   // Returns { success, checkout_request_id, merchant_request_id, contribution_id, message }

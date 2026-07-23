@@ -15,7 +15,7 @@ from django.db.models import Sum, F, Q
 
 from .models import (
     Event, EventCategory,
-    TicketCategory, Contestant, GuestSpeaker, Payment, Contribution, Ticket, VoteTransaction, AuditLog
+    TicketCategory, Contestant, GuestSpeaker, Payment, Contribution, Ticket, VoteTransaction, AuditLog, FinanceSettings
 )
 from .serializers import (
     EventSerializer, EventListSerializer,
@@ -1148,6 +1148,184 @@ def checkin_toggle(request):
         'full_name': ticket.full_name,
         'is_used': ticket.is_used,
     })
+
+
+# ── Finance dashboard (PIN-protected revenue reporting) ──────────────────────
+
+def _finance_pin_ok(request):
+    """Validate the global finance PIN. Returns (ok: bool, error_response)."""
+    configured = (FinanceSettings.load().pin or '').strip()
+    if not configured:
+        return False, Response(
+            {'error': 'The finance page is not enabled. Set a Finance PIN in the admin (Events - Finance Settings).'},
+            status=status.HTTP_503_SERVICE_UNAVAILABLE,
+        )
+    supplied = str(request.data.get('pin', '')).strip()
+    if supplied != configured:
+        return False, Response({'error': 'Invalid PIN.'}, status=status.HTTP_401_UNAUTHORIZED)
+    return True, None
+
+
+def _parse_finance_filters(data):
+    """Extract the common revenue filter params from request data."""
+    return {
+        'date_from': str(data.get('date_from') or '').strip(),
+        'date_to': str(data.get('date_to') or '').strip(),
+        'source': str(data.get('source') or 'all').strip().lower(),
+        'event': data.get('event') or None,
+        'phone': str(data.get('phone') or '').strip(),
+        'mpesa_code': str(data.get('mpesa_code') or '').strip(),
+        'status': str(data.get('status') or 'successful').strip().lower(),
+    }
+
+
+def _build_finance_rows(f):
+    """Apply filters across Payment (vote/ticket) and Contribution.
+
+    Returns (rows, totals). Money totals count SUCCESSFUL payments only, so they
+    reflect what was actually received regardless of the row status filter.
+    """
+    from datetime import datetime
+
+    def parse_date(s):
+        try:
+            return datetime.strptime(s, '%Y-%m-%d').date() if s else None
+        except ValueError:
+            return None
+
+    date_from = parse_date(f['date_from'])
+    date_to = parse_date(f['date_to'])
+    source = f['source'] or 'all'
+    want_vote = source in ('all', 'vote')
+    want_ticket = source in ('all', 'ticket')
+    want_contribution = source in ('all', 'contribution')
+
+    rows = []
+
+    purposes = []
+    if want_vote:
+        purposes.append('vote')
+    if want_ticket:
+        purposes.append('ticket')
+    if purposes:
+        pq = Payment.objects.select_related('event', 'contestant', 'ticket_category').filter(payment_purpose__in=purposes)
+        if f['status'] != 'all':
+            pq = pq.filter(status=f['status'])
+        if f['event']:
+            pq = pq.filter(event_id=f['event'])
+        if f['phone']:
+            pq = pq.filter(phone_number__icontains=f['phone'])
+        if f['mpesa_code']:
+            pq = pq.filter(mpesa_code__icontains=f['mpesa_code'])
+        if date_from:
+            pq = pq.filter(created_at__date__gte=date_from)
+        if date_to:
+            pq = pq.filter(created_at__date__lte=date_to)
+        for p in pq:
+            if p.payment_purpose == 'vote':
+                ref = p.contestant.name if p.contestant else 'Vote'
+            else:
+                cat = p.ticket_category.name if p.ticket_category else 'General'
+                ref = f"{cat} x{p.ticket_quantity}"
+            rows.append({
+                'id': f"{p.payment_purpose}-{p.id}",
+                'source': p.payment_purpose,
+                'date': p.created_at,
+                'name': p.full_name or '',
+                'phone': p.phone_number or '',
+                'mpesa_code': p.mpesa_code or '',
+                'amount': float(p.amount or 0),
+                'status': p.status,
+                'event_title': p.event.title if p.event else '',
+                'reference': ref,
+            })
+
+    # Contributions have no event, so skip them when an event filter is applied
+    if want_contribution and not f['event']:
+        cq = Contribution.objects.all()
+        if f['status'] != 'all':
+            cq = cq.filter(status=f['status'])
+        if f['phone']:
+            cq = cq.filter(phone_number__icontains=f['phone'])
+        if f['mpesa_code']:
+            cq = cq.filter(mpesa_code__icontains=f['mpesa_code'])
+        if date_from:
+            cq = cq.filter(created_at__date__gte=date_from)
+        if date_to:
+            cq = cq.filter(created_at__date__lte=date_to)
+        for c in cq:
+            rows.append({
+                'id': f"contribution-{c.id}",
+                'source': 'contribution',
+                'date': c.created_at,
+                'name': c.full_name or '',
+                'phone': c.phone_number or '',
+                'mpesa_code': c.mpesa_code or '',
+                'amount': float(c.amount or 0),
+                'status': c.status,
+                'event_title': '',
+                'reference': 'Contribution',
+            })
+
+    rows.sort(key=lambda r: r['date'], reverse=True)
+
+    def sum_source(src):
+        return round(sum(r['amount'] for r in rows if r['source'] == src and r['status'] == 'successful'), 2)
+
+    totals = {
+        'vote': sum_source('vote'),
+        'ticket': sum_source('ticket'),
+        'contribution': sum_source('contribution'),
+    }
+    totals['grand'] = round(totals['vote'] + totals['ticket'] + totals['contribution'], 2)
+    return rows, totals
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def finance_report(request):
+    """PIN-protected revenue report across voting, ticketing and contributions.
+
+    Body: { pin, date_from?, date_to?, source?, event?, phone?, mpesa_code?, status? }
+    """
+    ok, err = _finance_pin_ok(request)
+    if not ok:
+        return err
+    f = _parse_finance_filters(request.data)
+    rows, totals = _build_finance_rows(f)
+    transactions = [{**r, 'date': r['date'].isoformat()} for r in rows]
+    return Response({
+        'count': len(transactions),
+        'totals': totals,
+        'counts': {
+            'vote': sum(1 for r in rows if r['source'] == 'vote'),
+            'ticket': sum(1 for r in rows if r['source'] == 'ticket'),
+            'contribution': sum(1 for r in rows if r['source'] == 'contribution'),
+        },
+        'events': list(Event.objects.order_by('-start_date').values('id', 'title')),
+        'transactions': transactions,
+    })
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def finance_statement_pdf(request):
+    """PIN-protected PDF statement of the filtered revenue report.
+
+    Body: same filters as finance_report.
+    """
+    ok, err = _finance_pin_ok(request)
+    if not ok:
+        return err
+    f = _parse_finance_filters(request.data)
+    rows, totals = _build_finance_rows(f)
+    from django.http import HttpResponse
+    from .finance_pdf import generate_finance_statement_pdf
+    buffer = generate_finance_statement_pdf(rows, totals, f)
+    response = HttpResponse(buffer.getvalue(), content_type='application/pdf')
+    filename = f"statement-{timezone.now().strftime('%Y%m%d-%H%M')}.pdf"
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    return response
 
 
 @api_view(['POST'])

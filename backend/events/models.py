@@ -412,3 +412,29 @@ class AuditLog(models.Model):
 
     def __str__(self):
         return f"[{self.action}] by {self.actor} at {self.created_at}"
+
+
+class FinanceSettings(models.Model):
+    """Singleton settings holding the PIN for the /finance revenue dashboard."""
+    pin = models.CharField(
+        max_length=30, blank=True,
+        help_text="PIN staff enter on the /finance page to view revenue (voting, ticketing, contributions) and download statements. Leave blank to disable the finance page.",
+    )
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Events - Finance Settings"
+        verbose_name_plural = "Events - Finance Settings"
+
+    def __str__(self):
+        return "Finance Settings"
+
+    def save(self, *args, **kwargs):
+        self.pk = 1  # enforce singleton
+        super().save(*args, **kwargs)
+
+    @classmethod
+    def load(cls):
+        obj, _ = cls.objects.get_or_create(pk=1)
+        return obj
+

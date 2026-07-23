@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.utils import timezone
 from .models import (
     Event, EventCategory,
-    TicketCategory, Contestant, ContestantCategory, GuestSpeaker, Payment, Contribution, Ticket, VoteTransaction, AuditLog
+    TicketCategory, Contestant, ContestantCategory, GuestSpeaker, Payment, Contribution, Ticket, VoteTransaction, AuditLog, FinanceSettings
 )
 from .utils import generate_ticket_code, calculate_vote_count
 
@@ -347,6 +347,20 @@ class AuditLogAdmin(admin.ModelAdmin):
 
     def has_change_permission(self, request, obj=None):
         return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(FinanceSettings)
+class FinanceSettingsAdmin(admin.ModelAdmin):
+    list_display = ['__str__', 'updated_at']
+    fields = ['pin', 'updated_at']
+    readonly_fields = ['updated_at']
+
+    def has_add_permission(self, request):
+        # Singleton: only allow adding if none exists
+        return not FinanceSettings.objects.exists()
 
     def has_delete_permission(self, request, obj=None):
         return False
